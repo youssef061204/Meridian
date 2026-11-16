@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import tempfile
+import uuid
 from contextlib import contextmanager
 from pathlib import Path
 from datetime import date, datetime, timedelta, timezone
@@ -17,6 +20,39 @@ from .pipeline import metrics_query
 app = FastAPI(title="MERIDIAN", description="Local historical retail portfolio case study")
 
 
+CACHE = Path(os.environ.get("MERIDIAN_SERVING_CACHE", Path(tempfile.gettempdir()) / "meridian-serving-cache"))
+_verified: set[str] = set()
+
+
+def local_snapshot(folder: Path) -> Path:
+    """Serve immutable snapshots from container-local disk.
+
+    Reading Parquet over the Windows/WSL2 bind mount made a lineage query ~24x slower
+    (6.8 s vs 0.28 s). Snapshots never change after publication, so a checksum-verified
+    local copy keyed by snapshot id is safe; the published folder stays the source of truth.
+    """
+    dest = CACHE / folder.name
+    if folder.name in _verified and dest.exists():
+        return dest
+    if not dest.exists():
+        CACHE.mkdir(parents=True, exist_ok=True)
+        temp = CACHE / f"{folder.name}.partial-{uuid.uuid4().hex[:8]}"
+        shutil.copytree(folder, temp)
+        for relative, expected in read_json(temp / "manifest.json").get("checksums", {}).items():
+            if sha256(temp / relative) != expected:
+                shutil.rmtree(temp, ignore_errors=True)
+                raise HTTPException(409, "Cached snapshot checksum mismatch")
+        try:
+            os.replace(temp, dest)
+        except OSError:            # another request won the race
+            shutil.rmtree(temp, ignore_errors=True)
+        for stale in sorted((p for p in CACHE.iterdir() if p.is_dir() and ".partial-" not in p.name), key=lambda p: p.stat().st_mtime)[:-4]:
+            shutil.rmtree(stale, ignore_errors=True)
+            _verified.discard(stale.name)
+    _verified.add(folder.name)
+    return dest
+
+
 def snapshot():
     pointer = DATA / "serving" / "current.json"
     if not pointer.exists():
@@ -28,9 +64,12 @@ def snapshot():
 @contextmanager
 def serving():
     folder, manifest = snapshot()
+    folder = local_snapshot(folder)
     con = duckdb.connect()
     try:
         con.execute("SET threads=2")
+        # Explicit cap: inside a 400 MiB container DuckDB would otherwise size itself to the Docker VM.
+        con.execute(f"SET memory_limit='{os.environ.get('MERIDIAN_API_DUCKDB_MEMORY', '256MB')}'")
         for name in ["fact_invoice_line", "daily_sales", "product_performance", "country_performance"]:
             con.execute(f"CREATE VIEW {name} AS SELECT * FROM read_parquet('{(folder/name).as_posix()}/*.parquet')")
         yield con, manifest
@@ -62,14 +101,17 @@ def health():
 def overview(country: str | None = None, start: date | None = None, end: date | None = None):
     where, args = filters(country, start, end)
     with serving() as (con, manifest):
-        con.execute("CREATE TEMP TABLE selected AS SELECT * FROM fact_invoice_line WHERE " + where, args)
+        if args:   # filtered: parameters cannot be bound inside a view, so materialise the (smaller) selection
+            con.execute("CREATE TEMP TABLE selected AS SELECT * FROM fact_invoice_line WHERE " + where, args)
+        else:      # unfiltered: a view avoids copying ~1M rows per request
+            con.execute("CREATE TEMP VIEW selected AS SELECT * FROM fact_invoice_line")
         metrics = rows(con, metrics_query("selected"))[0]
         metrics["accepted_rows"] = con.execute("SELECT count(*) FROM selected").fetchone()[0]
         daily = rows(con, "SELECT date, sum(CASE WHEN line_amount>0 THEN line_amount ELSE 0 END) AS gross_positive_gbp, sum(CASE WHEN line_amount<0 THEN line_amount ELSE 0 END) AS negative_adjustments_gbp, sum(line_amount) AS net_recorded_gbp, sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM selected GROUP BY date ORDER BY date")
         products = rows(con, "SELECT stock_code,max(description) AS description,sum(line_amount) AS net_recorded_gbp,sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM selected GROUP BY stock_code ORDER BY net_recorded_gbp DESC LIMIT 15")
         countries = rows(con, "SELECT country,sum(line_amount) AS net_recorded_gbp,count(*) AS rows FROM selected GROUP BY country ORDER BY net_recorded_gbp DESC")
         cohorts = []
-        snapshot_folder = DATA / "serving" / "snapshots" / manifest["id"]
+        snapshot_folder = local_snapshot(DATA / "serving" / "snapshots" / manifest["id"])
         if (snapshot_folder/"cohort_retention").exists() and not (country or start or end):
             con.execute(f"CREATE VIEW cohort_retention AS SELECT * FROM read_parquet('{(snapshot_folder/'cohort_retention').as_posix()}/*.parquet')")
             cohorts = rows(con, "SELECT *,cohort_size AS cohort_customers,is_period_within_source_bounds AS is_complete_month FROM cohort_retention ORDER BY cohort_month,month_index")
@@ -189,7 +231,7 @@ def correction():
     pointer = DATA / "serving" / "replay.json"
     if not pointer.exists():
         raise HTTPException(404, "No replay snapshot")
-    folder = DATA / "serving" / "snapshots" / read_json(pointer)["snapshot_id"]
+    folder = local_snapshot(DATA / "serving" / "snapshots" / read_json(pointer)["snapshot_id"])
     manifest = read_json(folder / "manifest.json")
     con = duckdb.connect()
     try:

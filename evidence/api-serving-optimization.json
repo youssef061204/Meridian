@@ -1,0 +1,66 @@
+{
+  "recorded_at": "2026-11-16T22:38:17.691765+00:00",
+  "git_sha_before_change": "4b2174bd69a7bf9a3e92dabc19d45d8fd2b9abc0",
+  "problem": "API inside Docker read immutable snapshot Parquet over the Windows/WSL2 bind mount on every request; the overview also copied ~1M rows into a temp table per request.",
+  "diagnosis_in_api_container": {
+    "lineage_query_bind_mount_s": 6.77,
+    "lineage_query_container_local_s": 0.28,
+    "aggregate_bind_mount_s": 0.65,
+    "aggregate_container_local_s": 0.02,
+    "one_time_copy_s": 1.2
+  },
+  "changes": [
+    "checksum-verified container-local cache of the immutable snapshot, keyed by snapshot id (api.local_snapshot)",
+    "explicit 256MB DuckDB memory cap per request",
+    "unfiltered overview uses a view instead of materialising ~1M rows; filtered requests keep the parameterised temp table"
+  ],
+  "rejected_change": "Narrow-key lineage rewrite: identical results but slower on the host (0.47 s vs 0.29 s), so it was reverted.",
+  "single_request_samples_before_s": {
+    "lineage": [
+      5.92,
+      5.82,
+      4.62
+    ],
+    "overview": [
+      9.16,
+      10.96
+    ]
+  },
+  "single_request_samples_after_s": {
+    "lineage": [
+      2.77,
+      0.5,
+      0.58
+    ],
+    "overview_first_then_warm": [
+      0.93,
+      0.46
+    ],
+    "overview_country_France": [
+      0.5,
+      0.53
+    ],
+    "overview_date_range": [
+      0.71,
+      0.71
+    ]
+  },
+  "result_equivalence": {
+    "_.json": {
+      "before_sha256": "efa314c63a7f11cce4130ca3aaf0f3db9a6baa34ff124db12f1ca0ba18a5f226",
+      "after_sha256": "efa314c63a7f11cce4130ca3aaf0f3db9a6baa34ff124db12f1ca0ba18a5f226",
+      "identical_json": true
+    },
+    "_country_France_.json": {
+      "before_sha256": "8370b2a6d52a07ac25624912ededbf6cfd6bd4afc138d7c0b52d89199d3559c7",
+      "after_sha256": "8370b2a6d52a07ac25624912ededbf6cfd6bd4afc138d7c0b52d89199d3559c7",
+      "identical_json": true
+    },
+    "_start_2011_01_01_end_2011_06_30_.json": {
+      "before_sha256": "04e7413d32d89a95b98f8c1d1927ddbee5e0133786b604087b8975c890f4932a",
+      "after_sha256": "04e7413d32d89a95b98f8c1d1927ddbee5e0133786b604087b8975c890f4932a",
+      "identical_json": true
+    }
+  },
+  "note": "Single-machine curl samples; the repeated-measurement benchmark is evidence/benchmark-queries.json (taken after this change). A regression (prepared parameters in a view) was caught by this equivalence check before acceptance."
+}

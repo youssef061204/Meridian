@@ -1,0 +1,146 @@
+{
+  "started_at": "2026-11-16T22:38:17Z",
+  "command": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe scripts/benchmark_queries.py",
+  "git_sha": "4b2174bd69a7bf9a3e92dabc19d45d8fd2b9abc0",
+  "python": "3.11.9",
+  "duckdb": "1.2.2",
+  "scope": "single-machine measurements; not a distributed benchmark",
+  "snapshot_id": "20261116T192553-472ac294",
+  "api": {
+    "cache_condition": "API process restarted before each endpoint's first request series; OS page cache not dropped",
+    "endpoints": {
+      "/api/overview": {
+        "cold_first_request_ms": 2670.7,
+        "warm": {
+          "n": 20,
+          "p50_ms": 2325.26,
+          "p95_ms": 2357.55,
+          "max_ms": 2384.02
+        }
+      },
+      "/api/overview?country=France": {
+        "cold_first_request_ms": 2312.12,
+        "warm": {
+          "n": 20,
+          "p50_ms": 2322.24,
+          "p95_ms": 2353.41,
+          "max_ms": 2368.88
+        }
+      },
+      "/api/overview?start=2011-01-01&end=2011-06-30": {
+        "cold_first_request_ms": 2556.45,
+        "warm": {
+          "n": 20,
+          "p50_ms": 2533.38,
+          "p95_ms": 2568.32,
+          "max_ms": 2577.2
+        }
+      },
+      "/api/lineage?metric=net_recorded_gbp&limit=50": {
+        "cold_first_request_ms": 2339.74,
+        "warm": {
+          "n": 20,
+          "p50_ms": 2371.74,
+          "p95_ms": 2418.74,
+          "max_ms": 2500.14
+        }
+      },
+      "/api/trust": {
+        "cold_first_request_ms": 2136.48,
+        "warm": {
+          "n": 20,
+          "p50_ms": 2139.29,
+          "p95_ms": 2256.58,
+          "max_ms": 2290.48
+        }
+      },
+      "/api/forecasts": {
+        "cold_first_request_ms": 2062.67,
+        "warm": {
+          "n": 20,
+          "p50_ms": 2074.01,
+          "p95_ms": 2094.57,
+          "max_ms": 2142.48
+        }
+      },
+      "/api/replay": {
+        "cold_first_request_ms": 2158.28,
+        "warm": {
+          "n": 20,
+          "p50_ms": 2104.88,
+          "p95_ms": 2260.07,
+          "max_ms": 2277.24
+        }
+      }
+    }
+  },
+  "duckdb_direct": {
+    "threads": 2,
+    "memory_limit": "512MB",
+    "queries": {
+      "headline_kpis": {
+        "new_connection_first_ms": 144.06,
+        "warm": {
+          "n": 20,
+          "p50_ms": 202.24,
+          "p95_ms": 211.29,
+          "max_ms": 212.26
+        }
+      },
+      "top_products_join_dimension": {
+        "new_connection_first_ms": 697.22,
+        "warm": {
+          "n": 20,
+          "p50_ms": 613.01,
+          "p95_ms": 646.79,
+          "max_ms": 653.0
+        }
+      },
+      "monthly_trend_window_growth": {
+        "new_connection_first_ms": 248.86,
+        "warm": {
+          "n": 20,
+          "p50_ms": 225.22,
+          "p95_ms": 230.77,
+          "max_ms": 231.68
+        }
+      },
+      "cohort_first_purchase_cte": {
+        "new_connection_first_ms": 344.81,
+        "warm": {
+          "n": 20,
+          "p50_ms": 323.61,
+          "p95_ms": 340.73,
+          "max_ms": 352.09
+        }
+      },
+      "country_rank_window": {
+        "new_connection_first_ms": 185.78,
+        "warm": {
+          "n": 20,
+          "p50_ms": 176.73,
+          "p95_ms": 186.74,
+          "max_ms": 197.34
+        }
+      }
+    }
+  },
+  "optimization_pre_aggregated_daily_mart": {
+    "result_equivalent": true,
+    "rows": 604,
+    "fact_scan": {
+      "n": 20,
+      "p50_ms": 226.56,
+      "p95_ms": 243.61,
+      "max_ms": 245.36
+    },
+    "daily_sales_mart": {
+      "n": 20,
+      "p50_ms": 10.69,
+      "p95_ms": 12.82,
+      "max_ms": 12.83
+    },
+    "speedup_p50": 21.2
+  },
+  "finished_at": "2026-11-16T22:44:32Z"
+}

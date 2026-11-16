@@ -21,7 +21,7 @@ from urllib.request import urlopen
 import duckdb
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = "http://localhost:8010"
+BASE = "http://127.0.0.1:8010"  # "localhost" on Windows urllib adds a ~2 s IPv6 fallback per request
 REPS = 20
 
 
