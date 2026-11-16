@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
+import os
 from contextlib import contextmanager
 from pathlib import Path
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 import duckdb
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -113,13 +115,125 @@ def trust():
     _, manifest = snapshot()
     runs = sorted((RUNTIME / "runs").glob("*.json"), reverse=True)[:30]
     run_data = [read_json(p) for p in runs]
+    for run in run_data:
+        # A process killed on purpose (fault drills) never writes its completion record.
+        if run.get("state") == "running" and run.get("started_at", "") < (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat():
+            run["state"] = "interrupted: no completion recorded"
     latest_publish = next((r for r in run_data if r["stage"] == "batch"), None)
     return {"snapshot":manifest,"runs":run_data,"source":read_json(DATA/"converted"/"manifest.json") if (DATA/"converted"/"manifest.json").exists() else {},"publication":{"state":latest_publish["state"] if latest_publish else "unknown", "last_validated_at":manifest["published_at"],"last_attempt":latest_publish}}
 
 
 @app.get("/api/forecasts")
 def forecasts():
-    return {"state":"not_executed","message":"Forecasting is scheduled for Gate 4 after historical and recovery validation."}
+    path = ROOT / "analysis" / "forecast" / "serving.json"
+    if not path.exists():
+        return {"state": "not_executed", "message": "Run python -m meridian.cli forecast to produce evaluated forecasts."}
+    result = read_json(path)
+    inventory = ROOT / "analysis" / "forecast" / "inventory.json"
+    if inventory.exists():
+        data = read_json(inventory)
+        result["inventory"] = {k: data.get(k) for k in ["label", "selected_model", "assumptions", "base_scenario", "lowest_cost_policy_counts", "sensitivity", "limitations", "episodes"]}
+    return result
+
+
+def _jsonl(path, limit=None):
+    if not path.exists():
+        return []
+    records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return records[-limit:] if limit else records
+
+
+@app.get("/api/replay")
+def replay_state():
+    config_path = RUNTIME / "replay" / "config.json"
+    if not config_path.exists():
+        return {"state": "not_initialised", "message": "Run python -m meridian.cli replay-init --profile demo"}
+    cfg = read_json(config_path)
+    folder = RUNTIME / "replay" / cfg["generation"]
+    pointer = DATA / "serving" / "replay.json"
+    manifest = None
+    if pointer.exists():
+        manifest = read_json(DATA / "serving" / "snapshots" / read_json(pointer)["snapshot_id"] / "manifest.json")
+        manifest.pop("checksums", None)
+    batches = {}
+    for record in _jsonl(folder / "batches.jsonl"):
+        batches[record["batch_id"]] = record          # a retried batch keeps its last persisted record
+    publications = _jsonl(folder / "publications.jsonl", 12)
+    last_attempt = publications[-1] if publications else None
+    age = None
+    if manifest:
+        from datetime import datetime
+        age = (datetime.now(datetime.fromisoformat(manifest["published_at"]).tzinfo) - datetime.fromisoformat(manifest["published_at"])).total_seconds()
+    resets = _jsonl(folder / "resets.jsonl", 3)
+    serving_state = "current"
+    if last_attempt and last_attempt["state"] != "passed" and not (resets and resets[-1]["reset_at"] > last_attempt["attempted_at"]):
+        serving_state = f"last validated snapshot retained: latest attempt {last_attempt['state']}"
+    elif resets and (not last_attempt or resets[-1]["reset_at"] > last_attempt["attempted_at"]):
+        serving_state = "current: restored to recorded baseline"
+    job_records = [read_json(p) for p in (RUNTIME / "jobs").glob("*.json") if p.name != "worker.json"] if (RUNTIME / "jobs").exists() else []
+    job_records = sorted(job_records, key=lambda j: j.get("requested_at", ""), reverse=True)[:8]
+    worker = RUNTIME / "jobs" / "worker.json"
+    timeline = folder / "incident_timeline.json"
+    return {"state": "ready", "config": cfg, "snapshot": manifest, "snapshot_age_seconds": age,
+            "serving_state": serving_state,
+            "publications": publications, "batches": [batches[k] for k in sorted(batches)][-30:],
+            "status": read_json(folder / "status.json") if (folder / "status.json").exists() else None,
+            "backfills": _jsonl(folder / "backfills.jsonl", 6), "resets": _jsonl(folder / "resets.jsonl", 3),
+            "timeline": read_json(timeline) if timeline.exists() else None,
+            "worker": read_json(worker) if worker.exists() else {"state": "not_running"},
+            "jobs": job_records, "controls_enabled": _controls_enabled()}
+
+
+@app.get("/api/replay/correction")
+def correction():
+    pointer = DATA / "serving" / "replay.json"
+    if not pointer.exists():
+        raise HTTPException(404, "No replay snapshot")
+    folder = DATA / "serving" / "snapshots" / read_json(pointer)["snapshot_id"]
+    manifest = read_json(folder / "manifest.json")
+    con = duckdb.connect()
+    try:
+        con.execute(f"CREATE VIEW revisions AS SELECT * FROM read_parquet('{(folder/'revisions').as_posix()}/*.parquet')")
+        con.execute(f"CREATE VIEW fact AS SELECT * FROM read_parquet('{(folder/'fact_invoice_line').as_posix()}/*.parquet')")
+        lines = rows(con, """SELECT r.line_id, r.revision, r.mode, r.incident, r.source_sheet, r.source_row, r.invoice, r.stock_code, r.description,
+              r.quantity, r.unit_price, round(try_cast(r.quantity AS DECIMAL(18,4)) * try_cast(r.unit_price AS DECIMAL(18,4)), 2) AS line_amount,
+              r.event_time, r.first_batch_id, f.revision = r.revision AS is_current
+            FROM revisions r LEFT JOIN fact f ON f.line_id = r.line_id
+            WHERE r.line_id IN (SELECT line_id FROM revisions WHERE revision > 1) ORDER BY r.line_id, r.revision""")
+    finally:
+        con.close()
+    return {"snapshot_id": manifest["id"], "reconciliation": manifest.get("reconciliation"), "metrics": manifest.get("metrics"),
+            "batch_reference_snapshot": manifest.get("batch_reference_snapshot"), "batch_net_recorded_gbp": manifest.get("batch_net_recorded_gbp"),
+            "lines": lines}
+
+
+def _controls_enabled():
+    return os.environ.get("MERIDIAN_DEMO_CONTROLS", "1") == "1"
+
+
+@app.post("/api/demo/jobs")
+def create_job(body: dict, x_meridian_demo: str | None = Header(default=None)):
+    # Custom header => browsers must preflight; no CORS is granted, so other origins cannot trigger jobs.
+    if not _controls_enabled() or x_meridian_demo != "local":
+        raise HTTPException(403, "Demo controls are local-only and require the X-Meridian-Demo header")
+    from .worker import ALLOWED_JOBS, enqueue
+    kind = body.get("kind")
+    if kind not in ALLOWED_JOBS:
+        raise HTTPException(400, f"Allowed jobs: {sorted(ALLOWED_JOBS)}")
+    active = [p for p in (RUNTIME / "jobs").glob("*.json") if p.name != "worker.json" and read_json(p).get("state") in ("queued", "running")] if (RUNTIME / "jobs").exists() else []
+    if active:
+        raise HTTPException(409, "Another demo job is queued or running")
+    return enqueue(kind, requested_by="local-ui")
+
+
+@app.get("/api/demo/jobs/{job_id}")
+def job(job_id: str):
+    if not job_id.replace("-", "").isalnum():
+        raise HTTPException(400, "Invalid job id")
+    path = RUNTIME / "jobs" / f"{job_id}.json"
+    if not path.exists():
+        raise HTTPException(404, "Unknown job")
+    return read_json(path)
 
 
 dist = ROOT / "frontend" / "dist"

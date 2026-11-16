@@ -1,0 +1,1436 @@
+{
+  "state": "passed",
+  "label": "SIMULATED - assumptions, not client outcomes",
+  "generated_at": "2026-11-16T20:46:26.422415+00:00",
+  "snapshot_id": "20261116T192553-472ac294",
+  "forecast_config_sha256": "b2db0997dcc7ef9490352dd1cbe6828250352d95c31bfdb54513cbcf9a71d88e",
+  "selected_model": "gradient_boosting",
+  "selected_model_reason": "promoted forecast model from rolling-origin validation (meridian.forecast)",
+  "policies": [
+    "fixed",
+    "gradient_boosting",
+    "seasonal_naive",
+    "trailing_mean"
+  ],
+  "assumptions": {
+    "label": "SIMULATED - assumptions, not client outcomes",
+    "cost_unit": "abstract cost units (not GBP)",
+    "review_period_days": {
+      "value": 7,
+      "status": "ASSUMED"
+    },
+    "lead_time_days": {
+      "value": 3,
+      "status": "ASSUMED"
+    },
+    "holding_cost_per_unit_day": {
+      "value": 1.0,
+      "status": "ASSUMED"
+    },
+    "shortage_cost_per_unit": {
+      "value": 100.0,
+      "status": "ASSUMED",
+      "note": "lost-sale penalty; ratio to holding = 100 (one lost unit costs as much as holding one unit for 100 days)"
+    },
+    "starting_stock_days_of_cover": {
+      "value": 14,
+      "status": "ASSUMED",
+      "note": "starting on-hand = 14 x mu0, identical for every policy"
+    },
+    "safety_z": {
+      "value": 0.84,
+      "status": "ASSUMED",
+      "note": "about an 80% one-sided normal quantile"
+    },
+    "mu0": {
+      "status": "ASSUMED",
+      "note": "calendar-day mean of observed sales in the 28 days ending at the episode start (unavailable days count as 0)"
+    },
+    "sigma0": {
+      "status": "ASSUMED",
+      "note": "std of daily observed sales on observation-available days in those 28 days"
+    },
+    "unavailable_day_demand": {
+      "value": 0,
+      "status": "ASSUMED",
+      "note": "no source records -> no recorded sales"
+    },
+    "demand_proxy": "observed positive merchandise units (censored by any historical stock-outs; not unconstrained demand)",
+    "end_of_episode": "orders still in transit at the end of the episode are ignored for every policy",
+    "grid": {
+      "lead_time_days": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "shortage_to_holding_ratio": [
+        5,
+        10,
+        25,
+        100,
+        500
+      ],
+      "safety_z": [
+        0.0,
+        0.84,
+        1.28
+      ]
+    }
+  },
+  "episodes": [
+    {
+      "series_id": "22197",
+      "start": "2011-11-10",
+      "days": 28,
+      "observed_demand_units": 13899.0,
+      "mu0": 319.821,
+      "sigma0": 559.207,
+      "review_days": [
+        "2011-11-10",
+        "2011-11-17",
+        "2011-11-24",
+        "2011-12-01"
+      ]
+    },
+    {
+      "series_id": "84077",
+      "start": "2011-11-10",
+      "days": 28,
+      "observed_demand_units": 4192.0,
+      "mu0": 294.357,
+      "sigma0": 967.119,
+      "review_days": [
+        "2011-11-10",
+        "2011-11-17",
+        "2011-11-24",
+        "2011-12-01"
+      ]
+    },
+    {
+      "series_id": "84879",
+      "start": "2011-11-10",
+      "days": 28,
+      "observed_demand_units": 4112.0,
+      "mu0": 153.536,
+      "sigma0": 258.976,
+      "review_days": [
+        "2011-11-10",
+        "2011-11-17",
+        "2011-11-24",
+        "2011-12-01"
+      ]
+    },
+    {
+      "series_id": "85099B",
+      "start": "2011-11-10",
+      "days": 28,
+      "observed_demand_units": 3937.0,
+      "mu0": 177.75,
+      "sigma0": 250.581,
+      "review_days": [
+        "2011-11-10",
+        "2011-11-17",
+        "2011-11-24",
+        "2011-12-01"
+      ]
+    },
+    {
+      "series_id": "85123A",
+      "start": "2011-11-10",
+      "days": 28,
+      "observed_demand_units": 3831.0,
+      "mu0": 107.964,
+      "sigma0": 246.648,
+      "review_days": [
+        "2011-11-10",
+        "2011-11-17",
+        "2011-11-24",
+        "2011-12-01"
+      ]
+    }
+  ],
+  "base_scenario": {
+    "lead_time_days": 3,
+    "shortage_to_holding_ratio": 100.0,
+    "safety_z": 0.84,
+    "lowest_total_cost_policy": "trailing_mean",
+    "policies": {
+      "fixed": {
+        "total_cost": 421462.1984,
+        "holding_cost": 319026.4382,
+        "shortage_cost": 102435.7602,
+        "lost_units": 1024.3576,
+        "fill_rate": 0.9658,
+        "mean_cost_per_demand_unit": 14.6662
+      },
+      "gradient_boosting": {
+        "total_cost": 516176.8132,
+        "holding_cost": 245420.2057,
+        "shortage_cost": 270756.6075,
+        "lost_units": 2707.5661,
+        "fill_rate": 0.9097,
+        "mean_cost_per_demand_unit": 14.3385
+      },
+      "seasonal_naive": {
+        "total_cost": 449401.2362,
+        "holding_cost": 284244.0474,
+        "shortage_cost": 165157.1888,
+        "lost_units": 1651.5719,
+        "fill_rate": 0.9449,
+        "mean_cost_per_demand_unit": 13.5304
+      },
+      "trailing_mean": {
+        "total_cost": 334570.4764,
+        "holding_cost": 321013.2877,
+        "shortage_cost": 13557.1888,
+        "lost_units": 135.5719,
+        "fill_rate": 0.9955,
+        "mean_cost_per_demand_unit": 13.1118
+      }
+    },
+    "selected_vs_fixed_cost_change": 0.2247,
+    "selected_vs_seasonal_naive_cost_change": 0.1486
+  },
+  "base_scenario_per_episode": [
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "22197",
+      "policy": "fixed",
+      "holding_cost": 70394.06,
+      "shortage_cost": 102435.7602,
+      "total_cost": 172829.8201,
+      "lost_units": 1024.3576,
+      "sold_units": 12874.6424,
+      "demand_units": 13899.0,
+      "ordered_units": 8397.1424,
+      "fill_rate": 0.9263,
+      "mean_on_hand": 2514.0736
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "22197",
+      "policy": "gradient_boosting",
+      "holding_cost": 46956.9516,
+      "shortage_cost": 270756.6075,
+      "total_cost": 317713.5591,
+      "lost_units": 2707.5661,
+      "sold_units": 11191.4339,
+      "demand_units": 13899.0,
+      "ordered_units": 6713.9339,
+      "fill_rate": 0.8052,
+      "mean_on_hand": 1677.034
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "22197",
+      "policy": "seasonal_naive",
+      "holding_cost": 81306.7028,
+      "shortage_cost": 165157.1888,
+      "total_cost": 246463.8916,
+      "lost_units": 1651.5719,
+      "sold_units": 12247.4281,
+      "demand_units": 13899.0,
+      "ordered_units": 7769.9281,
+      "fill_rate": 0.8812,
+      "mean_on_hand": 2903.8108
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "22197",
+      "policy": "trailing_mean",
+      "holding_cost": 82219.206,
+      "shortage_cost": 13557.1888,
+      "total_cost": 95776.3948,
+      "lost_units": 135.5719,
+      "sold_units": 13763.4281,
+      "demand_units": 13899.0,
+      "ordered_units": 9285.9281,
+      "fill_rate": 0.9902,
+      "mean_on_hand": 2936.4002
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84077",
+      "policy": "fixed",
+      "holding_cost": 131378.1049,
+      "shortage_cost": 0.0,
+      "total_cost": 131378.1049,
+      "lost_units": 0.0,
+      "sold_units": 4192.0,
+      "demand_units": 4192.0,
+      "ordered_units": 4463.5425,
+      "fill_rate": 1.0,
+      "mean_on_hand": 4692.0752
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84077",
+      "policy": "gradient_boosting",
+      "holding_cost": 90613.2392,
+      "shortage_cost": 0.0,
+      "total_cost": 90613.2392,
+      "lost_units": 0.0,
+      "sold_units": 4192.0,
+      "demand_units": 4192.0,
+      "ordered_units": 3062.8606,
+      "fill_rate": 1.0,
+      "mean_on_hand": 3236.1871
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84077",
+      "policy": "seasonal_naive",
+      "holding_cost": 91075.4503,
+      "shortage_cost": 0.0,
+      "total_cost": 91075.4503,
+      "lost_units": 0.0,
+      "sold_units": 4192.0,
+      "demand_units": 4192.0,
+      "ordered_units": 2500.9711,
+      "fill_rate": 1.0,
+      "mean_on_hand": 3252.6947
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84077",
+      "policy": "trailing_mean",
+      "holding_cost": 115786.5854,
+      "shortage_cost": 0.0,
+      "total_cost": 115786.5854,
+      "lost_units": 0.0,
+      "sold_units": 4192.0,
+      "demand_units": 4192.0,
+      "ordered_units": 2929.6375,
+      "fill_rate": 1.0,
+      "mean_on_hand": 4135.2352
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84879",
+      "policy": "fixed",
+      "holding_cost": 39573.2157,
+      "shortage_cost": 0.0,
+      "total_cost": 39573.2157,
+      "lost_units": 0.0,
+      "sold_units": 4112.0,
+      "demand_units": 4112.0,
+      "ordered_units": 2975.7775,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1413.3291
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84879",
+      "policy": "gradient_boosting",
+      "holding_cost": 35753.1686,
+      "shortage_cost": 0.0,
+      "total_cost": 35753.1686,
+      "lost_units": 0.0,
+      "sold_units": 4112.0,
+      "demand_units": 4112.0,
+      "ordered_units": 3047.5456,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1276.8989
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84879",
+      "policy": "seasonal_naive",
+      "holding_cost": 39981.93,
+      "shortage_cost": 0.0,
+      "total_cost": 39981.93,
+      "lost_units": 0.0,
+      "sold_units": 4112.0,
+      "demand_units": 4112.0,
+      "ordered_units": 2584.4204,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1427.9261
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "84879",
+      "policy": "trailing_mean",
+      "holding_cost": 39859.6521,
+      "shortage_cost": 0.0,
+      "total_cost": 39859.6521,
+      "lost_units": 0.0,
+      "sold_units": 4112.0,
+      "demand_units": 4112.0,
+      "ordered_units": 3010.4204,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1423.559
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85099B",
+      "policy": "fixed",
+      "holding_cost": 49049.795,
+      "shortage_cost": 0.0,
+      "total_cost": 49049.795,
+      "lost_units": 0.0,
+      "sold_units": 3937.0,
+      "demand_units": 3937.0,
+      "ordered_units": 2950.6208,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1751.7784
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85099B",
+      "policy": "gradient_boosting",
+      "holding_cost": 42121.1809,
+      "shortage_cost": 0.0,
+      "total_cost": 42121.1809,
+      "lost_units": 0.0,
+      "sold_units": 3937.0,
+      "demand_units": 3937.0,
+      "ordered_units": 2744.6686,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1504.3279
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85099B",
+      "policy": "seasonal_naive",
+      "holding_cost": 41583.1405,
+      "shortage_cost": 0.0,
+      "total_cost": 41583.1405,
+      "lost_units": 0.0,
+      "sold_units": 3937.0,
+      "demand_units": 3937.0,
+      "ordered_units": 1884.1208,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1485.1122
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85099B",
+      "policy": "trailing_mean",
+      "holding_cost": 49840.963,
+      "shortage_cost": 0.0,
+      "total_cost": 49840.963,
+      "lost_units": 0.0,
+      "sold_units": 3937.0,
+      "demand_units": 3937.0,
+      "ordered_units": 2932.4544,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1780.0344
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85123A",
+      "policy": "fixed",
+      "holding_cost": 28631.2627,
+      "shortage_cost": 0.0,
+      "total_cost": 28631.2627,
+      "lost_units": 0.0,
+      "sold_units": 3831.0,
+      "demand_units": 3831.0,
+      "ordered_units": 3260.3178,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1022.5451
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85123A",
+      "policy": "gradient_boosting",
+      "holding_cost": 29975.6655,
+      "shortage_cost": 0.0,
+      "total_cost": 29975.6655,
+      "lost_units": 0.0,
+      "sold_units": 3831.0,
+      "demand_units": 3831.0,
+      "ordered_units": 3723.4549,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1070.5595
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85123A",
+      "policy": "seasonal_naive",
+      "holding_cost": 30296.8239,
+      "shortage_cost": 0.0,
+      "total_cost": 30296.8239,
+      "lost_units": 0.0,
+      "sold_units": 3831.0,
+      "demand_units": 3831.0,
+      "ordered_units": 3252.6749,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1082.0294
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "series_id": "85123A",
+      "policy": "trailing_mean",
+      "holding_cost": 33306.8812,
+      "shortage_cost": 0.0,
+      "total_cost": 33306.8812,
+      "lost_units": 0.0,
+      "sold_units": 3831.0,
+      "demand_units": 3831.0,
+      "ordered_units": 3381.0085,
+      "fill_rate": 1.0,
+      "mean_on_hand": 1189.5315
+    }
+  ],
+  "sensitivity": [
+    {
+      "lead_time_days": 1,
+      "shortage_to_holding_ratio": 5.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 305793.5494,
+          "holding_cost": 296689.4431,
+          "shortage_cost": 9104.1064,
+          "lost_units": 1820.8213,
+          "fill_rate": 0.9392,
+          "mean_cost_per_demand_unit": 12.2604
+        },
+        "gradient_boosting": {
+          "total_cost": 272627.1618,
+          "holding_cost": 258541.5603,
+          "shortage_cost": 14085.6016,
+          "lost_units": 2817.1203,
+          "fill_rate": 0.906,
+          "mean_cost_per_demand_unit": 11.091
+        },
+        "seasonal_naive": {
+          "total_cost": 300343.9342,
+          "holding_cost": 291066.9707,
+          "shortage_cost": 9276.9635,
+          "lost_units": 1855.3927,
+          "fill_rate": 0.9381,
+          "mean_cost_per_demand_unit": 11.4078
+        },
+        "trailing_mean": {
+          "total_cost": 320763.3579,
+          "holding_cost": 316747.0194,
+          "shortage_cost": 4016.3385,
+          "lost_units": 803.2677,
+          "fill_rate": 0.9732,
+          "mean_cost_per_demand_unit": 12.5882
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.1085,
+      "selected_vs_seasonal_naive_cost_change": -0.0923
+    },
+    {
+      "lead_time_days": 1,
+      "shortage_to_holding_ratio": 10.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 314897.6558,
+          "holding_cost": 296689.4431,
+          "shortage_cost": 18208.2128,
+          "lost_units": 1820.8213,
+          "fill_rate": 0.9392,
+          "mean_cost_per_demand_unit": 12.3914
+        },
+        "gradient_boosting": {
+          "total_cost": 286712.7634,
+          "holding_cost": 258541.5603,
+          "shortage_cost": 28171.2031,
+          "lost_units": 2817.1203,
+          "fill_rate": 0.906,
+          "mean_cost_per_demand_unit": 11.2937
+        },
+        "seasonal_naive": {
+          "total_cost": 309620.8978,
+          "holding_cost": 291066.9707,
+          "shortage_cost": 18553.9271,
+          "lost_units": 1855.3927,
+          "fill_rate": 0.9381,
+          "mean_cost_per_demand_unit": 11.5413
+        },
+        "trailing_mean": {
+          "total_cost": 324779.6964,
+          "holding_cost": 316747.0194,
+          "shortage_cost": 8032.6771,
+          "lost_units": 803.2677,
+          "fill_rate": 0.9732,
+          "mean_cost_per_demand_unit": 12.646
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.0895,
+      "selected_vs_seasonal_naive_cost_change": -0.074
+    },
+    {
+      "lead_time_days": 1,
+      "shortage_to_holding_ratio": 25.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 342209.975,
+          "holding_cost": 296689.4431,
+          "shortage_cost": 45520.5319,
+          "lost_units": 1820.8213,
+          "fill_rate": 0.9392,
+          "mean_cost_per_demand_unit": 12.7844
+        },
+        "gradient_boosting": {
+          "total_cost": 328969.5681,
+          "holding_cost": 258541.5603,
+          "shortage_cost": 70428.0078,
+          "lost_units": 2817.1203,
+          "fill_rate": 0.906,
+          "mean_cost_per_demand_unit": 11.9018
+        },
+        "seasonal_naive": {
+          "total_cost": 337451.7884,
+          "holding_cost": 291066.9707,
+          "shortage_cost": 46384.8176,
+          "lost_units": 1855.3927,
+          "fill_rate": 0.9381,
+          "mean_cost_per_demand_unit": 11.9418
+        },
+        "trailing_mean": {
+          "total_cost": 336828.712,
+          "holding_cost": 316747.0194,
+          "shortage_cost": 20081.6926,
+          "lost_units": 803.2677,
+          "fill_rate": 0.9732,
+          "mean_cost_per_demand_unit": 12.8194
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.0387,
+      "selected_vs_seasonal_naive_cost_change": -0.0251
+    },
+    {
+      "lead_time_days": 1,
+      "shortage_to_holding_ratio": 100.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "trailing_mean",
+      "policies": {
+        "fixed": {
+          "total_cost": 478771.5708,
+          "holding_cost": 296689.4431,
+          "shortage_cost": 182082.1277,
+          "lost_units": 1820.8213,
+          "fill_rate": 0.9392,
+          "mean_cost_per_demand_unit": 14.7495
+        },
+        "gradient_boosting": {
+          "total_cost": 540253.5915,
+          "holding_cost": 258541.5603,
+          "shortage_cost": 281712.0312,
+          "lost_units": 2817.1203,
+          "fill_rate": 0.906,
+          "mean_cost_per_demand_unit": 14.942
+        },
+        "seasonal_naive": {
+          "total_cost": 476606.2413,
+          "holding_cost": 291066.9707,
+          "shortage_cost": 185539.2706,
+          "lost_units": 1855.3927,
+          "fill_rate": 0.9381,
+          "mean_cost_per_demand_unit": 13.9442
+        },
+        "trailing_mean": {
+          "total_cost": 397073.79,
+          "holding_cost": 316747.0194,
+          "shortage_cost": 80326.7706,
+          "lost_units": 803.2677,
+          "fill_rate": 0.9732,
+          "mean_cost_per_demand_unit": 13.6863
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.1284,
+      "selected_vs_seasonal_naive_cost_change": 0.1335
+    },
+    {
+      "lead_time_days": 1,
+      "shortage_to_holding_ratio": 500.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "trailing_mean",
+      "policies": {
+        "fixed": {
+          "total_cost": 1207100.0817,
+          "holding_cost": 296689.4431,
+          "shortage_cost": 910410.6387,
+          "lost_units": 1820.8213,
+          "fill_rate": 0.9392,
+          "mean_cost_per_demand_unit": 25.2298
+        },
+        "gradient_boosting": {
+          "total_cost": 1667101.7162,
+          "holding_cost": 258541.5603,
+          "shortage_cost": 1408560.1559,
+          "lost_units": 2817.1203,
+          "fill_rate": 0.906,
+          "mean_cost_per_demand_unit": 31.1569
+        },
+        "seasonal_naive": {
+          "total_cost": 1218763.3237,
+          "holding_cost": 291066.9707,
+          "shortage_cost": 927696.353,
+          "lost_units": 1855.3927,
+          "fill_rate": 0.9381,
+          "mean_cost_per_demand_unit": 24.6234
+        },
+        "trailing_mean": {
+          "total_cost": 718380.8724,
+          "holding_cost": 316747.0194,
+          "shortage_cost": 401633.853,
+          "lost_units": 803.2677,
+          "fill_rate": 0.9732,
+          "mean_cost_per_demand_unit": 18.3097
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.3811,
+      "selected_vs_seasonal_naive_cost_change": 0.3679
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 5.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 324148.2262,
+          "holding_cost": 319026.4382,
+          "shortage_cost": 5121.788,
+          "lost_units": 1024.3576,
+          "fill_rate": 0.9658,
+          "mean_cost_per_demand_unit": 13.2659
+        },
+        "gradient_boosting": {
+          "total_cost": 258958.0361,
+          "holding_cost": 245420.2057,
+          "shortage_cost": 13537.8304,
+          "lost_units": 2707.5661,
+          "fill_rate": 0.9097,
+          "mean_cost_per_demand_unit": 10.6373
+        },
+        "seasonal_naive": {
+          "total_cost": 292501.9068,
+          "holding_cost": 284244.0474,
+          "shortage_cost": 8257.8594,
+          "lost_units": 1651.5719,
+          "fill_rate": 0.9449,
+          "mean_cost_per_demand_unit": 11.2727
+        },
+        "trailing_mean": {
+          "total_cost": 321691.1471,
+          "holding_cost": 321013.2877,
+          "shortage_cost": 677.8594,
+          "lost_units": 135.5719,
+          "fill_rate": 0.9955,
+          "mean_cost_per_demand_unit": 12.9265
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.2011,
+      "selected_vs_seasonal_naive_cost_change": -0.1147
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 10.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 329270.0142,
+          "holding_cost": 319026.4382,
+          "shortage_cost": 10243.576,
+          "lost_units": 1024.3576,
+          "fill_rate": 0.9658,
+          "mean_cost_per_demand_unit": 13.3396
+        },
+        "gradient_boosting": {
+          "total_cost": 272495.8664,
+          "holding_cost": 245420.2057,
+          "shortage_cost": 27075.6608,
+          "lost_units": 2707.5661,
+          "fill_rate": 0.9097,
+          "mean_cost_per_demand_unit": 10.8321
+        },
+        "seasonal_naive": {
+          "total_cost": 300759.7663,
+          "holding_cost": 284244.0474,
+          "shortage_cost": 16515.7189,
+          "lost_units": 1651.5719,
+          "fill_rate": 0.9449,
+          "mean_cost_per_demand_unit": 11.3916
+        },
+        "trailing_mean": {
+          "total_cost": 322369.0065,
+          "holding_cost": 321013.2877,
+          "shortage_cost": 1355.7189,
+          "lost_units": 135.5719,
+          "fill_rate": 0.9955,
+          "mean_cost_per_demand_unit": 12.9362
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.1724,
+      "selected_vs_seasonal_naive_cost_change": -0.094
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 25.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 344635.3783,
+          "holding_cost": 319026.4382,
+          "shortage_cost": 25608.94,
+          "lost_units": 1024.3576,
+          "fill_rate": 0.9658,
+          "mean_cost_per_demand_unit": 13.5607
+        },
+        "gradient_boosting": {
+          "total_cost": 313109.3576,
+          "holding_cost": 245420.2057,
+          "shortage_cost": 67689.1519,
+          "lost_units": 2707.5661,
+          "fill_rate": 0.9097,
+          "mean_cost_per_demand_unit": 11.4165
+        },
+        "seasonal_naive": {
+          "total_cost": 325533.3446,
+          "holding_cost": 284244.0474,
+          "shortage_cost": 41289.2972,
+          "lost_units": 1651.5719,
+          "fill_rate": 0.9449,
+          "mean_cost_per_demand_unit": 11.748
+        },
+        "trailing_mean": {
+          "total_cost": 324402.5849,
+          "holding_cost": 321013.2877,
+          "shortage_cost": 3389.2972,
+          "lost_units": 135.5719,
+          "fill_rate": 0.9955,
+          "mean_cost_per_demand_unit": 12.9655
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.0915,
+      "selected_vs_seasonal_naive_cost_change": -0.0382
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "safety_z": 0.0,
+      "lowest_total_cost_policy": "trailing_mean",
+      "policies": {
+        "fixed": {
+          "total_cost": 490711.4286,
+          "holding_cost": 195854.2857,
+          "shortage_cost": 294857.1429,
+          "lost_units": 2948.5714,
+          "fill_rate": 0.9016,
+          "mean_cost_per_demand_unit": 12.5043
+        },
+        "gradient_boosting": {
+          "total_cost": 738652.3724,
+          "holding_cost": 168168.0424,
+          "shortage_cost": 570484.33,
+          "lost_units": 5704.8433,
+          "fill_rate": 0.8097,
+          "mean_cost_per_demand_unit": 17.0884
+        },
+        "seasonal_naive": {
+          "total_cost": 603556.5,
+          "holding_cost": 173506.5,
+          "shortage_cost": 430050.0,
+          "lost_units": 4300.5,
+          "fill_rate": 0.8565,
+          "mean_cost_per_demand_unit": 15.3722
+        },
+        "trailing_mean": {
+          "total_cost": 383008.3656,
+          "holding_cost": 199775.0056,
+          "shortage_cost": 183233.36,
+          "lost_units": 1832.3336,
+          "fill_rate": 0.9389,
+          "mean_cost_per_demand_unit": 10.848
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.5053,
+      "selected_vs_seasonal_naive_cost_change": 0.2238
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "trailing_mean",
+      "policies": {
+        "fixed": {
+          "total_cost": 421462.1984,
+          "holding_cost": 319026.4382,
+          "shortage_cost": 102435.7602,
+          "lost_units": 1024.3576,
+          "fill_rate": 0.9658,
+          "mean_cost_per_demand_unit": 14.6662
+        },
+        "gradient_boosting": {
+          "total_cost": 516176.8132,
+          "holding_cost": 245420.2057,
+          "shortage_cost": 270756.6075,
+          "lost_units": 2707.5661,
+          "fill_rate": 0.9097,
+          "mean_cost_per_demand_unit": 14.3385
+        },
+        "seasonal_naive": {
+          "total_cost": 449401.2362,
+          "holding_cost": 284244.0474,
+          "shortage_cost": 165157.1888,
+          "lost_units": 1651.5719,
+          "fill_rate": 0.9449,
+          "mean_cost_per_demand_unit": 13.5304
+        },
+        "trailing_mean": {
+          "total_cost": 334570.4764,
+          "holding_cost": 321013.2877,
+          "shortage_cost": 13557.1888,
+          "lost_units": 135.5719,
+          "fill_rate": 0.9955,
+          "mean_cost_per_demand_unit": 13.1118
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.2247,
+      "selected_vs_seasonal_naive_cost_change": 0.1486
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 100.0,
+      "safety_z": 1.28,
+      "lowest_total_cost_policy": "trailing_mean",
+      "policies": {
+        "fixed": {
+          "total_cost": 425132.1792,
+          "holding_cost": 400504.5582,
+          "shortage_cost": 24627.621,
+          "lost_units": 246.2762,
+          "fill_rate": 0.9918,
+          "mean_cost_per_demand_unit": 16.8616
+        },
+        "gradient_boosting": {
+          "total_cost": 424590.99,
+          "holding_cost": 309450.6609,
+          "shortage_cost": 115140.3291,
+          "lost_units": 1151.4033,
+          "fill_rate": 0.9616,
+          "mean_cost_per_demand_unit": 14.8755
+        },
+        "seasonal_naive": {
+          "total_cost": 452462.3935,
+          "holding_cost": 365113.3439,
+          "shortage_cost": 87349.0495,
+          "lost_units": 873.4905,
+          "fill_rate": 0.9709,
+          "mean_cost_per_demand_unit": 15.6939
+        },
+        "trailing_mean": {
+          "total_cost": 402054.8566,
+          "holding_cost": 402054.8566,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 16.1884
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.0013,
+      "selected_vs_seasonal_naive_cost_change": -0.0616
+    },
+    {
+      "lead_time_days": 3,
+      "shortage_to_holding_ratio": 500.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "trailing_mean",
+      "policies": {
+        "fixed": {
+          "total_cost": 831205.2391,
+          "holding_cost": 319026.4382,
+          "shortage_cost": 512178.8009,
+          "lost_units": 1024.3576,
+          "fill_rate": 0.9658,
+          "mean_cost_per_demand_unit": 20.5622
+        },
+        "gradient_boosting": {
+          "total_cost": 1599203.2432,
+          "holding_cost": 245420.2057,
+          "shortage_cost": 1353783.0375,
+          "lost_units": 2707.5661,
+          "fill_rate": 0.9097,
+          "mean_cost_per_demand_unit": 29.9228
+        },
+        "seasonal_naive": {
+          "total_cost": 1110029.9912,
+          "holding_cost": 284244.0474,
+          "shortage_cost": 825785.9438,
+          "lost_units": 1651.5719,
+          "fill_rate": 0.9449,
+          "mean_cost_per_demand_unit": 23.0366
+        },
+        "trailing_mean": {
+          "total_cost": 388799.2314,
+          "holding_cost": 321013.2877,
+          "shortage_cost": 67785.9438,
+          "lost_units": 135.5719,
+          "fill_rate": 0.9955,
+          "mean_cost_per_demand_unit": 13.8921
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.924,
+      "selected_vs_seasonal_naive_cost_change": 0.4407
+    },
+    {
+      "lead_time_days": 7,
+      "shortage_to_holding_ratio": 5.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 346635.4447,
+          "holding_cost": 346635.4447,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 14.5446
+        },
+        "gradient_boosting": {
+          "total_cost": 276973.6564,
+          "holding_cost": 266511.016,
+          "shortage_cost": 10462.6403,
+          "lost_units": 2092.5281,
+          "fill_rate": 0.9302,
+          "mean_cost_per_demand_unit": 11.7768
+        },
+        "seasonal_naive": {
+          "total_cost": 395387.1759,
+          "holding_cost": 394568.2431,
+          "shortage_cost": 818.9328,
+          "lost_units": 163.7866,
+          "fill_rate": 0.9945,
+          "mean_cost_per_demand_unit": 15.4156
+        },
+        "trailing_mean": {
+          "total_cost": 379501.9487,
+          "holding_cost": 379501.9487,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 15.4772
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.201,
+      "selected_vs_seasonal_naive_cost_change": -0.2995
+    },
+    {
+      "lead_time_days": 7,
+      "shortage_to_holding_ratio": 10.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 346635.4447,
+          "holding_cost": 346635.4447,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 14.5446
+        },
+        "gradient_boosting": {
+          "total_cost": 287436.2967,
+          "holding_cost": 266511.016,
+          "shortage_cost": 20925.2807,
+          "lost_units": 2092.5281,
+          "fill_rate": 0.9302,
+          "mean_cost_per_demand_unit": 11.9405
+        },
+        "seasonal_naive": {
+          "total_cost": 396206.1086,
+          "holding_cost": 394568.2431,
+          "shortage_cost": 1637.8656,
+          "lost_units": 163.7866,
+          "fill_rate": 0.9945,
+          "mean_cost_per_demand_unit": 15.4584
+        },
+        "trailing_mean": {
+          "total_cost": 379501.9487,
+          "holding_cost": 379501.9487,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 15.4772
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.1708,
+      "selected_vs_seasonal_naive_cost_change": -0.2745
+    },
+    {
+      "lead_time_days": 7,
+      "shortage_to_holding_ratio": 25.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 346635.4447,
+          "holding_cost": 346635.4447,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 14.5446
+        },
+        "gradient_boosting": {
+          "total_cost": 318824.2177,
+          "holding_cost": 266511.016,
+          "shortage_cost": 52313.2017,
+          "lost_units": 2092.5281,
+          "fill_rate": 0.9302,
+          "mean_cost_per_demand_unit": 12.4314
+        },
+        "seasonal_naive": {
+          "total_cost": 398662.907,
+          "holding_cost": 394568.2431,
+          "shortage_cost": 4094.6639,
+          "lost_units": 163.7866,
+          "fill_rate": 0.9945,
+          "mean_cost_per_demand_unit": 15.5866
+        },
+        "trailing_mean": {
+          "total_cost": 379501.9487,
+          "holding_cost": 379501.9487,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 15.4772
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.0802,
+      "selected_vs_seasonal_naive_cost_change": -0.2003
+    },
+    {
+      "lead_time_days": 7,
+      "shortage_to_holding_ratio": 100.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "fixed",
+      "policies": {
+        "fixed": {
+          "total_cost": 346635.4447,
+          "holding_cost": 346635.4447,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 14.5446
+        },
+        "gradient_boosting": {
+          "total_cost": 475763.8227,
+          "holding_cost": 266511.016,
+          "shortage_cost": 209252.8067,
+          "lost_units": 2092.5281,
+          "fill_rate": 0.9302,
+          "mean_cost_per_demand_unit": 14.8859
+        },
+        "seasonal_naive": {
+          "total_cost": 410946.8988,
+          "holding_cost": 394568.2431,
+          "shortage_cost": 16378.6557,
+          "lost_units": 163.7866,
+          "fill_rate": 0.9945,
+          "mean_cost_per_demand_unit": 16.2279
+        },
+        "trailing_mean": {
+          "total_cost": 379501.9487,
+          "holding_cost": 379501.9487,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 15.4772
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.3725,
+      "selected_vs_seasonal_naive_cost_change": 0.1577
+    },
+    {
+      "lead_time_days": 7,
+      "shortage_to_holding_ratio": 500.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "fixed",
+      "policies": {
+        "fixed": {
+          "total_cost": 346635.4447,
+          "holding_cost": 346635.4447,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 14.5446
+        },
+        "gradient_boosting": {
+          "total_cost": 1312775.0495,
+          "holding_cost": 266511.016,
+          "shortage_cost": 1046264.0335,
+          "lost_units": 2092.5281,
+          "fill_rate": 0.9302,
+          "mean_cost_per_demand_unit": 27.9768
+        },
+        "seasonal_naive": {
+          "total_cost": 476461.5216,
+          "holding_cost": 394568.2431,
+          "shortage_cost": 81893.2785,
+          "lost_units": 163.7866,
+          "fill_rate": 0.9945,
+          "mean_cost_per_demand_unit": 19.6482
+        },
+        "trailing_mean": {
+          "total_cost": 379501.9487,
+          "holding_cost": 379501.9487,
+          "shortage_cost": 0.0,
+          "lost_units": 0.0,
+          "fill_rate": 1.0,
+          "mean_cost_per_demand_unit": 15.4772
+        }
+      },
+      "selected_vs_fixed_cost_change": 2.7872,
+      "selected_vs_seasonal_naive_cost_change": 1.7553
+    },
+    {
+      "lead_time_days": 14,
+      "shortage_to_holding_ratio": 5.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 351848.3319,
+          "holding_cost": 344203.3319,
+          "shortage_cost": 7645.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 14.7063
+        },
+        "gradient_boosting": {
+          "total_cost": 272247.2204,
+          "holding_cost": 255309.1266,
+          "shortage_cost": 16938.0938,
+          "lost_units": 3387.6188,
+          "fill_rate": 0.887,
+          "mean_cost_per_demand_unit": 11.5388
+        },
+        "seasonal_naive": {
+          "total_cost": 441500.8319,
+          "holding_cost": 433855.8319,
+          "shortage_cost": 7645.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 17.1345
+        },
+        "trailing_mean": {
+          "total_cost": 374938.8289,
+          "holding_cost": 367293.8289,
+          "shortage_cost": 7645.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 15.494
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.2262,
+      "selected_vs_seasonal_naive_cost_change": -0.3834
+    },
+    {
+      "lead_time_days": 14,
+      "shortage_to_holding_ratio": 10.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 359493.3319,
+          "holding_cost": 344203.3319,
+          "shortage_cost": 15290.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 14.9213
+        },
+        "gradient_boosting": {
+          "total_cost": 289185.3142,
+          "holding_cost": 255309.1266,
+          "shortage_cost": 33876.1876,
+          "lost_units": 3387.6188,
+          "fill_rate": 0.887,
+          "mean_cost_per_demand_unit": 11.8876
+        },
+        "seasonal_naive": {
+          "total_cost": 449145.8319,
+          "holding_cost": 433855.8319,
+          "shortage_cost": 15290.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 17.3495
+        },
+        "trailing_mean": {
+          "total_cost": 382583.8289,
+          "holding_cost": 367293.8289,
+          "shortage_cost": 15290.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 15.7091
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.1956,
+      "selected_vs_seasonal_naive_cost_change": -0.3561
+    },
+    {
+      "lead_time_days": 14,
+      "shortage_to_holding_ratio": 25.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "gradient_boosting",
+      "policies": {
+        "fixed": {
+          "total_cost": 382428.3319,
+          "holding_cost": 344203.3319,
+          "shortage_cost": 38225.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 15.5665
+        },
+        "gradient_boosting": {
+          "total_cost": 339999.5956,
+          "holding_cost": 255309.1266,
+          "shortage_cost": 84690.469,
+          "lost_units": 3387.6188,
+          "fill_rate": 0.887,
+          "mean_cost_per_demand_unit": 12.9339
+        },
+        "seasonal_naive": {
+          "total_cost": 472080.8319,
+          "holding_cost": 433855.8319,
+          "shortage_cost": 38225.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 17.9946
+        },
+        "trailing_mean": {
+          "total_cost": 405518.8289,
+          "holding_cost": 367293.8289,
+          "shortage_cost": 38225.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 16.3542
+        }
+      },
+      "selected_vs_fixed_cost_change": -0.1109,
+      "selected_vs_seasonal_naive_cost_change": -0.2798
+    },
+    {
+      "lead_time_days": 14,
+      "shortage_to_holding_ratio": 100.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "fixed",
+      "policies": {
+        "fixed": {
+          "total_cost": 497103.3319,
+          "holding_cost": 344203.3319,
+          "shortage_cost": 152900.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 18.7921
+        },
+        "gradient_boosting": {
+          "total_cost": 594071.0026,
+          "holding_cost": 255309.1266,
+          "shortage_cost": 338761.8759,
+          "lost_units": 3387.6188,
+          "fill_rate": 0.887,
+          "mean_cost_per_demand_unit": 18.1654
+        },
+        "seasonal_naive": {
+          "total_cost": 586755.8319,
+          "holding_cost": 433855.8319,
+          "shortage_cost": 152900.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 21.2203
+        },
+        "trailing_mean": {
+          "total_cost": 520193.8289,
+          "holding_cost": 367293.8289,
+          "shortage_cost": 152900.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 19.5799
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.1951,
+      "selected_vs_seasonal_naive_cost_change": 0.0125
+    },
+    {
+      "lead_time_days": 14,
+      "shortage_to_holding_ratio": 500.0,
+      "safety_z": 0.84,
+      "lowest_total_cost_policy": "fixed",
+      "policies": {
+        "fixed": {
+          "total_cost": 1108703.3319,
+          "holding_cost": 344203.3319,
+          "shortage_cost": 764500.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 35.9955
+        },
+        "gradient_boosting": {
+          "total_cost": 1949118.5063,
+          "holding_cost": 255309.1266,
+          "shortage_cost": 1693809.3796,
+          "lost_units": 3387.6188,
+          "fill_rate": 0.887,
+          "mean_cost_per_demand_unit": 46.0666
+        },
+        "seasonal_naive": {
+          "total_cost": 1198355.8319,
+          "holding_cost": 433855.8319,
+          "shortage_cost": 764500.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 38.4236
+        },
+        "trailing_mean": {
+          "total_cost": 1131793.8289,
+          "holding_cost": 367293.8289,
+          "shortage_cost": 764500.0,
+          "lost_units": 1529.0,
+          "fill_rate": 0.949,
+          "mean_cost_per_demand_unit": 36.7832
+        }
+      },
+      "selected_vs_fixed_cost_change": 0.758,
+      "selected_vs_seasonal_naive_cost_change": 0.6265
+    }
+  ],
+  "lowest_cost_policy_counts": {
+    "gradient_boosting": 12,
+    "trailing_mean": 6,
+    "fixed": 4
+  },
+  "chart": "analysis/forecast/inventory_sensitivity.png",
+  "limitations": [
+    "SIMULATED - assumptions, not client outcomes.",
+    "Observed sales are a censored demand proxy; no stock-out or inventory records exist, so lost sales are simulated, not measured.",
+    "Only held-out test episodes are used (one 28-day window per product); results are small-sample and illustrative.",
+    "Costs are abstract cost units chosen as assumptions; they are not GBP and not savings achieved by any business.",
+    "The fixed policy and safety stock use only information known at the episode start."
+  ]
+}

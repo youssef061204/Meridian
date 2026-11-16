@@ -1,0 +1,138 @@
+{
+  "started_at": "2026-11-16T21:02:24.467941+00:00",
+  "command": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe scripts/verify_browser_demo.py",
+  "python": "3.11.9",
+  "playwright": "1.52.0",
+  "git_sha": "98bbe6fcbde3dfd256a0c9937d079f7787808433",
+  "verification": "Real Chromium; real API, worker, Kafka, Spark and Delta; no mocked responses",
+  "steps": [
+    {
+      "name": "kpi_opens_source_evidence",
+      "status": "passed",
+      "at_seconds": 139.9,
+      "net": 19379245.82
+    },
+    {
+      "name": "unsafe_calculation_isolated_with_discrepancy",
+      "status": "passed",
+      "at_seconds": 207.3,
+      "label": "UNSAFE: naive sum of quantity x price over every received delivery (no identity dedup, no envelope or business validation, no merchandise rules, synthetic included)",
+      "unsafe_net_gbp": "72642.25",
+      "discrepancy_gbp": "3066.89",
+      "trusted": "69575.36"
+    },
+    {
+      "name": "incident_detected_contained_and_publication_blocked",
+      "status": "passed",
+      "at_seconds": 207.4,
+      "detected": {
+        "rejected_envelopes": 10,
+        "within_batch_duplicates": 4,
+        "cross_batch_duplicates": 72,
+        "identity_conflicts": 1,
+        "late_routed_to_backfill": 13,
+        "additive_schema_v2": 12
+      },
+      "quarantine": {
+        "missing_required_field": 3,
+        "identity_payload_conflict": 1,
+        "incompatible_schema": 2,
+        "malformed_json": 5
+      },
+      "late": {
+        "pending": 13,
+        "applied": 0,
+        "pending_amount_hint_gbp": 220.83
+      }
+    },
+    {
+      "name": "repair_reconciles_and_publishes_new_snapshot",
+      "status": "passed",
+      "at_seconds": 349.7,
+      "snapshot": "replay-20261116T210707630",
+      "recovery_seconds": 205.1,
+      "reconciliation": {
+        "state": "reconciled",
+        "missing_vs_batch_rows": 0,
+        "missing_vs_batch_gbp": "0.00",
+        "extra_vs_batch_rows": 0,
+        "extra_vs_batch_gbp": "0.00",
+        "uncorrected_value_differences": 0,
+        "revision1_vs_batch_mismatches": 0,
+        "synthetic_corrections": 1,
+        "correction_delta_gbp": "-41.64",
+        "bridge": "batch net + synthetic correction delta - not-yet-received + extra = replay net"
+      }
+    },
+    {
+      "name": "explorer_shows_reconciliation_before_and_after_correction",
+      "status": "passed",
+      "at_seconds": 361.4,
+      "delta": "-41.64",
+      "lines": 2
+    },
+    {
+      "name": "forecast_view_matches_api",
+      "status": "passed",
+      "at_seconds": 365.7,
+      "promoted": "gradient_boosting",
+      "next7_units": 137449
+    },
+    {
+      "name": "interrupted_publish_retains_last_validated_snapshot",
+      "status": "passed",
+      "at_seconds": 396.7,
+      "snapshot": "replay-20261116T210707630"
+    },
+    {
+      "name": "reset_restores_baseline",
+      "status": "passed",
+      "at_seconds": 523.1,
+      "snapshot": "replay-20261116T204945206"
+    },
+    {
+      "name": "keyboard_navigation",
+      "status": "passed",
+      "at_seconds": 535.5
+    },
+    {
+      "name": "no_mobile_page_overflow",
+      "status": "passed",
+      "at_seconds": 545.2,
+      "sizes": {
+        "Forecast & planning": {
+          "viewport": 390,
+          "document": 390
+        },
+        "Data trust & recovery": {
+          "viewport": 390,
+          "document": 390
+        },
+        "Metric explorer": {
+          "viewport": 390,
+          "document": 390
+        }
+      }
+    },
+    {
+      "name": "no_browser_errors",
+      "status": "passed",
+      "at_seconds": 545.2
+    }
+  ],
+  "console_errors": [],
+  "page_errors": [],
+  "screenshots": [
+    "evidence/screenshots/demo-1-kpi-evidence.png",
+    "evidence/screenshots/demo-2-incident-contained.png",
+    "evidence/screenshots/demo-3-recovered.png",
+    "evidence/screenshots/demo-4-correction.png",
+    "evidence/screenshots/demo-5-forecast.png",
+    "evidence/screenshots/demo-6-interrupted-publish.png",
+    "evidence/screenshots/demo-7-mobile-trust.png"
+  ],
+  "signature_sequence_seconds": 240.8,
+  "status": "passed",
+  "finished_at": "2026-11-16T21:11:30.354888+00:00",
+  "duration_seconds": 545.9
+}

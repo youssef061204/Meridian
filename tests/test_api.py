@@ -269,11 +269,27 @@ def test_trust_preserves_valid_snapshot_and_reports_later_failed_attempt(publish
     assert test_client.get("/api/overview").json()["snapshot"]["id"] == manifest["id"]
 
 
-def test_unexecuted_forecasting_is_explicit(published):
+def test_forecasts_are_explicitly_unexecuted_until_evidence_exists(published):
     test_client, _, _, _ = published
     body = test_client.get("/api/forecasts").json()
     assert body["state"] == "not_executed"
-    assert "Gate 4" in body["message"]
+    _json(api.ROOT / "analysis" / "forecast" / "serving.json", {"state": "passed", "promoted_model": "seasonal_naive"})
+    body = test_client.get("/api/forecasts").json()
+    assert body["state"] == "passed" and body["promoted_model"] == "seasonal_naive"
+
+
+def test_demo_controls_require_local_header_and_allow_listed_jobs(published):
+    test_client, _, runtime, _ = published
+    assert test_client.get("/api/replay").json()["state"] == "not_initialised"
+    assert test_client.post("/api/demo/jobs", json={"kind": "incident"}).status_code == 403
+    headers = {"X-Meridian-Demo": "local"}
+    assert test_client.post("/api/demo/jobs", json={"kind": "rm -rf"}, headers=headers).status_code == 400
+    from meridian import worker
+    worker.JOBS = runtime / "jobs"
+    created = test_client.post("/api/demo/jobs", json={"kind": "reset"}, headers=headers)
+    assert created.status_code == 200 and created.json()["state"] == "queued"
+    assert test_client.post("/api/demo/jobs", json={"kind": "reset"}, headers=headers).status_code == 409
+    assert test_client.get("/api/demo/jobs/..%2Fsecret").status_code in (400, 404)
 
 
 def test_unknown_api_route_is_not_mistaken_for_frontend(published):

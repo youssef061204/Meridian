@@ -1,0 +1,80 @@
+{
+  "dataset": "databricks/contract/lines.csv",
+  "mode": "synthetic",
+  "description": "Hand-calculated expectations for the MERIDIAN contract-validation dataset. Synthetic test data only; never additional observed transactions. Every value below was calculated by hand from the CSV rows (row-by-row working in databricks/README.md), not produced by running the pipeline.",
+  "line_identity": "sha256(source_sha256|source_sheet|source_row); repeated deliveries of one coordinate collapse to one logical row",
+  "deliveries": {
+    "received_deliveries": 41,
+    "distinct_source_rows": 37,
+    "repeated_deliveries": 4,
+    "repeated_coordinates": [2, 5, 19, 29],
+    "conflicting_repeat_payloads": 0
+  },
+  "dispositions": {
+    "accepted": 22,
+    "excluded": 5,
+    "quarantined": 10
+  },
+  "classifications": {
+    "positive_merchandise": 17,
+    "negative_adjustment": 5,
+    "non_merchandise_code": 5,
+    "invalid_quantity": 3,
+    "missing_invoice": 1,
+    "missing_stock_code": 1,
+    "invalid_price": 1,
+    "cancellation_sign_conflict": 1,
+    "invalid_timestamp": 2,
+    "price_precision_exceeded": 1
+  },
+  "kpis": {
+    "gross_positive_gbp": "222.35",
+    "negative_adjustments_gbp": "-31.21",
+    "net_recorded_gbp": "191.14",
+    "positive_units": 146,
+    "accepted_rows": 22,
+    "known_customer_rows": 18,
+    "known_customer_coverage": "18/22"
+  },
+  "amount_bridge": {
+    "accepted_parsed_amount_gbp": "191.14",
+    "excluded_parsed_amount_gbp": "62.60",
+    "quarantined_parsed_amount_gbp": "20.22",
+    "source_parsed_amount_gbp": "273.96",
+    "unparseable_amount_rows": 1
+  },
+  "unsafe_comparison": {
+    "description": "Deliberately unsafe sum of line amounts over accepted DELIVERIES (no dedup by line identity). Must never become a trusted KPI.",
+    "accepted_delivery_net_gbp": "214.09",
+    "overstatement_gbp": "22.95"
+  },
+  "legitimate_identical_rows": {
+    "source_rows": [2, 3],
+    "each_line_amount_gbp": "15.30",
+    "note": "Identical business fields at different coordinates both remain accepted."
+  },
+  "row_level": {
+    "rounding_positive_row_11_gbp": "4.66",
+    "rounding_negative_row_22_gbp": "-4.66",
+    "trimmed_stock_code_row_18": "P111",
+    "blank_country_row_16": "Unknown",
+    "summer_civil_time_row_17": "2010-07-15 14:30:00"
+  },
+  "daily_sales": [
+    {"date": "2010-03-01", "gross_positive_gbp": "81.18", "negative_adjustments_gbp": "0.00", "net_recorded_gbp": "81.18", "positive_units": 54, "rows": 7, "known_customer_rows": 5},
+    {"date": "2010-03-02", "gross_positive_gbp": "27.41", "negative_adjustments_gbp": "0.00", "net_recorded_gbp": "27.41", "positive_units": 26, "rows": 4, "known_customer_rows": 4},
+    {"date": "2010-03-03", "gross_positive_gbp": "77.06", "negative_adjustments_gbp": "0.00", "net_recorded_gbp": "77.06", "positive_units": 52, "rows": 3, "known_customer_rows": 2},
+    {"date": "2010-03-04", "gross_positive_gbp": "9.75", "negative_adjustments_gbp": "0.00", "net_recorded_gbp": "9.75", "positive_units": 3, "rows": 1, "known_customer_rows": 1},
+    {"date": "2010-03-05", "gross_positive_gbp": "0.00", "negative_adjustments_gbp": "-18.46", "net_recorded_gbp": "-18.46", "positive_units": 0, "rows": 4, "known_customer_rows": 4},
+    {"date": "2010-03-06", "gross_positive_gbp": "0.00", "negative_adjustments_gbp": "-12.75", "net_recorded_gbp": "-12.75", "positive_units": 0, "rows": 1, "known_customer_rows": 0},
+    {"date": "2010-07-15", "gross_positive_gbp": "26.95", "negative_adjustments_gbp": "0.00", "net_recorded_gbp": "26.95", "positive_units": 11, "rows": 2, "known_customer_rows": 2}
+  ],
+  "country_net_gbp": {
+    "United Kingdom": "89.23",
+    "France": "12.60",
+    "Germany": "2.50",
+    "Netherlands": "51.56",
+    "EIRE": "25.50",
+    "Unknown": "9.75"
+  }
+}

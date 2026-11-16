@@ -1,0 +1,64 @@
+# MERIDIAN contract-validation bundle (Declarative Automation Bundles, formerly Databricks Asset Bundles).
+# Status: PREPARED, UNEXECUTED. No `databricks bundle validate/deploy/run` has been run from this repository,
+# because no authenticated workspace exists on the development machine. Do not read this file as deployment evidence.
+#
+# Runs only the synthetic BATCH contract path (CSV -> Bronze -> Silver -> Gold daily -> reconciliation).
+# The Kafka replay path is deliberately absent. Databricks Free Edition restricts outbound internet access to trusted
+# domains and runs serverless compute only (no ProcessingTime/Continuous triggers), so it cannot reach the local broker.
+#
+# Tasks declare no cluster, so they run on serverless jobs compute (the only compute Free Edition offers).
+# The workspace host is not hard-coded. Supply it via `databricks auth login` / a CLI profile / DATABRICKS_HOST.
+bundle:
+  name: meridian-contract
+
+variables:
+  catalog:
+    description: Unity Catalog catalog. Free Edition creates tables under the `workspace` catalog.
+    default: workspace
+  schema:
+    description: Schema created by 00_setup for the synthetic contract tables.
+    default: meridian_contract
+
+resources:
+  jobs:
+    meridian_contract_batch:
+      name: meridian-contract-batch
+      description: >-
+        MERIDIAN synthetic contract validation. Batch path only, using byte-identical copies of sql/silver.sql and
+        sql/daily_sales.sql. Fails if any hand-calculated expectation in contract/expected.json is not matched.
+      max_concurrent_runs: 1
+      tags:
+        project: meridian
+        mode: synthetic
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+        - name: bundle_root
+          default: ${workspace.file_path}
+      tasks:
+        - task_key: setup
+          notebook_task:
+            notebook_path: ./notebooks/00_setup.py
+        - task_key: bronze_ingest
+          depends_on: [{task_key: setup}]
+          notebook_task:
+            notebook_path: ./notebooks/01_bronze_ingest.py
+        - task_key: silver
+          depends_on: [{task_key: bronze_ingest}]
+          notebook_task:
+            notebook_path: ./notebooks/02_silver.py
+        - task_key: gold_daily
+          depends_on: [{task_key: silver}]
+          notebook_task:
+            notebook_path: ./notebooks/03_gold_daily.py
+        - task_key: reconcile
+          depends_on: [{task_key: gold_daily}]
+          notebook_task:
+            notebook_path: ./notebooks/04_reconcile.py
+
+targets:
+  free:
+    mode: development
+    default: true

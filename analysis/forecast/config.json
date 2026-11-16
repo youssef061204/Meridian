@@ -1,0 +1,117 @@
+{
+  "snapshot_id": "20261116T192553-472ac294",
+  "seed": 20261116,
+  "target": "positive merchandise units (observed sales), calendar day",
+  "last_complete_day": "2011-12-08",
+  "excluded_partial_day": "2011-12-09",
+  "horizons": [
+    7,
+    28
+  ],
+  "max_horizon": 28,
+  "origins": [
+    {
+      "origin": "2011-02-03",
+      "role": "warmup"
+    },
+    {
+      "origin": "2011-03-03",
+      "role": "warmup"
+    },
+    {
+      "origin": "2011-03-31",
+      "role": "warmup"
+    },
+    {
+      "origin": "2011-04-28",
+      "role": "warmup"
+    },
+    {
+      "origin": "2011-05-26",
+      "role": "validation"
+    },
+    {
+      "origin": "2011-06-23",
+      "role": "validation"
+    },
+    {
+      "origin": "2011-07-21",
+      "role": "validation"
+    },
+    {
+      "origin": "2011-08-18",
+      "role": "validation"
+    },
+    {
+      "origin": "2011-09-15",
+      "role": "validation"
+    },
+    {
+      "origin": "2011-10-13",
+      "role": "validation"
+    },
+    {
+      "origin": "2011-11-10",
+      "role": "test"
+    },
+    {
+      "origin": "2011-11-17",
+      "role": "test"
+    },
+    {
+      "origin": "2011-11-24",
+      "role": "test"
+    },
+    {
+      "origin": "2011-12-01",
+      "role": "test"
+    }
+  ],
+  "latest_origin": "2011-12-08",
+  "models": {
+    "seasonal_naive": "most recent observation-available value on the target weekday at or before the origin; fallback trailing mean",
+    "trailing_mean": "mean of observation-available days in the 28 calendar days ending at the origin",
+    "gradient_boosting": "sklearn HistGradientBoostingRegressor(loss=absolute_error), direct multi-horizon (horizon is a feature), pooled over aggregate + selected products, target and level features divided by an origin-time scale"
+  },
+  "gbm_grid": {
+    "g1": {
+      "learning_rate": 0.05,
+      "max_iter": 300,
+      "max_leaf_nodes": 15,
+      "min_samples_leaf": 40,
+      "l2_regularization": 0.0
+    },
+    "g2": {
+      "learning_rate": 0.05,
+      "max_iter": 300,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "l2_regularization": 1.0
+    },
+    "g3": {
+      "learning_rate": 0.1,
+      "max_iter": 150,
+      "max_leaf_nodes": 7,
+      "min_samples_leaf": 80,
+      "l2_regularization": 0.0
+    }
+  },
+  "params": {
+    "n_products": 5,
+    "selection_window_days": 182,
+    "selection_min_sold_share": 0.5,
+    "scale_window_days": 56,
+    "trailing_mean_days": 28,
+    "cold_start_days": 28,
+    "non_trading_weekday_rate": 0.1,
+    "min_interval_residuals": 25
+  },
+  "test_product_panel": "products are selected once at the first test origin and kept for the later weekly test origins (selection uses data <= the first test origin only)",
+  "product_selection": "at each origin: stock codes sold on >= 50% of observation-available days in the 182 days ending at the origin, ranked by units in that window, top 5",
+  "availability_rule": "target days with is_observation_available=false (no source records, quarantined rows, partial final day) are forecast but never scored; observed zero = available day without sales of that product",
+  "non_trading_rule": "if a weekday had observation availability < 10% in history at the origin, all models forecast 0 for it (flag expected_non_trading)",
+  "interval_method": "80%: prediction + scale * empirical 10%/90% quantiles of (actual - prediction)/scale of the same model, pooled over earlier non-test origins with target date <= current origin, bucketed by scope (aggregate|product) and horizon (1-7|8-28); falls back to all horizons, then all scopes, if fewer than 25 residuals; lower bound clipped at 0. The latest (operational) forecast may also use test residuals.",
+  "tuning": "gradient_boosting config chosen by the promotion metric on validation origins only",
+  "promotion_metric": "mean of validation WAPE over {aggregate, products} x {7, 28}; lowest wins, ties go to the simpler model (seasonal_naive, trailing_mean, gradient_boosting)",
+  "metric_rules": "horizon H window = forecasts with h <= H from origins whose full H-day window ends <= last complete day; WAPE = sum|error|/sum actual, null with reason when sum actual is 0"
+}

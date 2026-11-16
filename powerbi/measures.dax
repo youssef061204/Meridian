@@ -1,0 +1,104 @@
+// MERIDIAN Power BI measures (DAX)
+// Status: written for a native report that is UNFINISHED. Power BI Desktop is not installed on the build
+// machine, so none of these measures has run in Power BI. The values they must reproduce are in
+// powerbi/reconciliation.json, which DuckDB SQL computed from validated snapshot 20261116T192553-472ac294.
+//
+// Definitions follow docs/metrics.md. Money is GBP recorded merchandise invoice value from historical
+// source rows. It is not audited revenue, profit, or settled cash.
+// Table names match the export file names in powerbi/exports/.
+// Create every measure in a dedicated empty table named "Measures" (Home > Enter data > Load).
+// Set the format strings shown on each measure.
+
+// ---------------------------------------------------------------- core money
+Net Recorded Merchandise =
+    SUM ( fact_invoice_line[line_amount] )
+// Format: "£"#,0.00;-"£"#,0.00   Expected unfiltered: 19,379,245.82
+
+Gross Positive Merchandise =
+    CALCULATE ( SUM ( fact_invoice_line[line_amount] ), KEEPFILTERS ( fact_invoice_line[line_amount] > 0 ) )
+// Format: "£"#,0.00              Expected unfiltered: 20,112,074.02
+
+Negative Adjustments =
+    CALCULATE ( SUM ( fact_invoice_line[line_amount] ), KEEPFILTERS ( fact_invoice_line[line_amount] < 0 ) )
+// Signed negative GBP; includes negative quantities without a C prefix. No link to an original invoice.
+// Format: "£"#,0.00;-"£"#,0.00   Expected unfiltered: -732,828.20
+
+Revenue Bridge Difference =
+    [Gross Positive Merchandise] + [Negative Adjustments] - [Net Recorded Merchandise]
+// Must be 0.00 in every filter context. Any other value means a type or relationship error.
+
+// ---------------------------------------------------------------- units and lines
+Positive Units =
+    CALCULATE ( SUM ( fact_invoice_line[quantity] ), KEEPFILTERS ( fact_invoice_line[quantity] > 0 ) )
+// Includes zero-price items. These are observed sales, not demand or inventory.
+// Format: #,0   Expected unfiltered: 11,648,090
+
+Accepted Lines =
+    COUNTROWS ( fact_invoice_line )
+// Expected unfiltered: 1,061,664
+
+Known-Customer Lines =
+    CALCULATE ( [Accepted Lines], KEEPFILTERS ( fact_invoice_line[customer_key] <> "__UNKNOWN__" ) )
+// Expected unfiltered: 820,647
+
+Known-Customer Coverage % =
+    DIVIDE ( [Known-Customer Lines], [Accepted Lines] )
+// Line-weighted. Format: 0.00%   Expected unfiltered: 77.30% (77.2982% to 4 dp)
+
+Unknown-Customer Net =
+    CALCULATE ( [Net Recorded Merchandise], KEEPFILTERS ( fact_invoice_line[customer_key] = "__UNKNOWN__" ) )
+// The reserved member is a reporting bucket, not one real customer. Expected unfiltered: 2,664,470.67
+
+Adjustment Ratio % =
+    DIVIDE ( - [Negative Adjustments], [Gross Positive Merchandise] )
+// Absolute negative adjustments / gross positive merchandise. Format: 0.00%   Expected: 3.64% (3.6437%)
+
+// ---------------------------------------------------------------- observation availability
+Observed Source Days =
+    CALCULATE ( COUNTROWS ( dim_date ), KEEPFILTERS ( dim_date[observed_source_day] = TRUE () ) )
+// Dates with at least one source row. Calendar dates without source rows are UNAVAILABLE, not zero sales.
+
+Net per Observed Source Day =
+    DIVIDE ( [Net Recorded Merchandise], [Observed Source Days] )
+
+// ---------------------------------------------------------------- comparable periods
+// dim_date must be marked as the date table (on dim_date[date]). It is contiguous from 2009-12-01 to
+// 2011-12-09 and does not span full calendar years. A comparison that reaches outside that range
+// returns BLANK, never zero. 2011-12-09 is a partial final source day.
+
+Net SPLY =
+    CALCULATE ( [Net Recorded Merchandise], SAMEPERIODLASTYEAR ( dim_date[date] ) )
+// Month 2011-11 -> 1,400,610.30 (Nov 2010). Net for month 2011-11 itself is 1,432,651.11.
+
+Gross SPLY =
+    CALCULATE ( [Gross Positive Merchandise], SAMEPERIODLASTYEAR ( dim_date[date] ) )
+
+Observed Source Days SPLY =
+    CALCULATE ( [Observed Source Days], SAMEPERIODLASTYEAR ( dim_date[date] ) )
+
+Net YoY Change =
+    VAR prior = [Net SPLY]
+    RETURN IF ( ISBLANK ( prior ), BLANK (), [Net Recorded Merchandise] - prior )
+
+Net YoY % =
+    VAR prior = [Net SPLY]
+    RETURN IF ( ISBLANK ( prior ), BLANK (), DIVIDE ( [Net Recorded Merchandise] - prior, prior ) )
+// Show next to [Observed Source Days] and [Observed Source Days SPLY]. Unequal observed days make the
+// comparison unsafe to interpret as like-for-like.
+
+Comparable Period Observed Days Match =
+    IF ( [Observed Source Days] = [Observed Source Days SPLY], "Same observed-day count", "Observed-day counts differ" )
+
+Net Last 28 Days =
+    VAR anchor = MAX ( fact_invoice_line[date] )
+    RETURN CALCULATE ( [Net Recorded Merchandise], DATESINPERIOD ( dim_date[date], anchor, -28, DAY ) )
+// Anchor = last fact date in the current filter context. Unfiltered: 2011-11-12..2011-12-09 -> 1,317,989.21
+
+Net Prior 28 Days =
+    VAR anchor = MAX ( fact_invoice_line[date] )
+    RETURN CALCULATE ( [Net Recorded Merchandise], DATESINPERIOD ( dim_date[date], anchor - 28, -28, DAY ) )
+// Unfiltered: 2011-10-15..2011-11-11 -> 1,124,863.37
+
+Net 28-Day Change % =
+    DIVIDE ( [Net Last 28 Days] - [Net Prior 28 Days], [Net Prior 28 Days] )
+// The final window includes the partial final source day 2011-12-09.

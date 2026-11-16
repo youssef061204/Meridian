@@ -42,6 +42,8 @@ def main():
     control.add_argument("action", choices=["pause", "resume"])
     sub.add_parser("replay-drill")
     sub.add_parser("worker")
+    sub.add_parser("forecast", help="Rolling-origin forecasting evaluation (Gate 4)")
+    sub.add_parser("inventory", help="SIMULATED inventory scenarios from held-out forecasts")
     job = sub.add_parser("job", help="Enqueue an allow-listed demo job for the worker")
     job.add_argument("kind", choices=["incident", "repair", "reset", "interrupted-publish"])
     args = parser.parse_args()
@@ -94,6 +96,9 @@ def main():
     elif args.command == "worker":
         from .worker import worker
         worker()
+    elif args.command in ("forecast", "inventory"):
+        import importlib
+        importlib.import_module(f"meridian.{args.command}").main([])
     elif args.command == "job":
         from .worker import enqueue
         show(enqueue(args.kind))

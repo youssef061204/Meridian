@@ -1,0 +1,4 @@
+# Large generated exports from scripts/export_powerbi.py stay out of git.
+*.csv
+*.parquet
+!README.md

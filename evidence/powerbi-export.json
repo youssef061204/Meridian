@@ -1,0 +1,254 @@
+{
+  "label": "powerbi-export",
+  "scope": "Local export of validated Gold snapshot tables for Power BI. Not evidence that a Power BI report was built.",
+  "state": "passed",
+  "exported_at_utc": "2026-11-16T20:38:58.453184+00:00",
+  "git_commit": "3e7afbfa268e715f128e9f32032eb1edd3019ac0",
+  "command": ".venv/Scripts/python.exe scripts/export_powerbi.py --format both",
+  "engine": {
+    "duckdb": "1.2.2",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "memory_limit": "512MB",
+    "threads": 2
+  },
+  "pointer": "data/serving/full.json",
+  "snapshot_id": "20261116T192553-472ac294",
+  "manifest_sha256": "172e2d0bd4bc642246bdbda3330b8b5958e8623d87ae4bcdf4fcd3b6685dc112",
+  "mode": "historical",
+  "profile": "full",
+  "read_method": "DuckDB read_parquet over the explicit file list in the manifest checksums, each SHA-256 re-verified; no glob, no Delta internals",
+  "verified_snapshot_files": {
+    "fact_invoice_line/part-00000-06ad8430-8881-40c0-b90a-46c130ecd376-c000.snappy.parquet": "905b8f0c6333bbabef3a1d8a08728c3dce552964ec330d376745fdcf19702b5a",
+    "daily_sales/part-00000-b370c809-f185-43d4-aa32-0646c1125767-c000.snappy.parquet": "41e04cbbdf313ec7972b5d225ff1903e73668640ebc1101f44ceaf4067a77faa",
+    "dim_date/part-00000-fcd9c34a-3c2e-45ad-8061-001d47fbb5f6-c000.snappy.parquet": "20da999aa8a8ebc1449c13ffdffaebf7ad532f51b0cb26c96e51e4250252251f",
+    "dim_product/part-00000-170448c2-62c0-4ea1-b875-85a2a626b4a6-c000.snappy.parquet": "1a1c902d5499c10ecce4face6283482da8e30528d3b2cccfe61aac4e25cc53dc",
+    "dim_customer/part-00000-ab72b5bb-c9f0-437b-9ab0-33eaa41005c2-c000.snappy.parquet": "3df58a3165db973f7b30d0d5f247621cfa4262243ec60de96ac76d8275f32918",
+    "dim_geography/part-00000-d3a3d6a3-b066-417b-89c0-fda59dc354a2-c000.snappy.parquet": "1aa02bf7f6c30333233b37d1160ed08680812a13b0723bf69b64605a3c4a9b1c",
+    "cohort_retention/part-00000-9d28aa8d-5b9c-4dc4-825c-d9c334bdb315-c000.snappy.parquet": "de4dac96065f76065350c82662759e94da81112f89d33971fff450fd4b199e78",
+    "customer_summary/part-00000-74694aaf-a889-46d2-a86b-b3ee00cdbb69-c000.snappy.parquet": "42bcce9466eac405eaad36cb7aa2d5b3f3d7075b05acb4d3d60ec372f2107591",
+    "quality_daily/part-00000-2ebffeaa-d33c-4676-8ea7-7a3c76b02021-c000.snappy.parquet": "47d32fa5ac8c8dd48860293ea3b524c03fc90c568fa307ddbb49447d20f148fb"
+  },
+  "tables": {
+    "fact_invoice_line": {
+      "rows": 1061664,
+      "source_files": [
+        "fact_invoice_line/part-00000-06ad8430-8881-40c0-b90a-46c130ecd376-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/fact_invoice_line.csv",
+          "bytes": 205402258,
+          "sha256": "c887d92bf98f9c118aac67f19306891149503c26d5b4efe4d35d8f7c02227698"
+        },
+        "parquet": {
+          "path": "powerbi/exports/fact_invoice_line.parquet",
+          "bytes": 59676892,
+          "sha256": "7129fb1dc784f727568507aab732b493a72868414baf9703a1ecc62094a1098b"
+        }
+      }
+    },
+    "dim_date": {
+      "rows": 739,
+      "source_files": [
+        "dim_date/part-00000-fcd9c34a-3c2e-45ad-8061-001d47fbb5f6-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/dim_date.csv",
+          "bytes": 96565,
+          "sha256": "03a223365727d61cf4f105324f76e5a7016b9bf761fbfcf6ad4ef552093b7901"
+        },
+        "parquet": {
+          "path": "powerbi/exports/dim_date.parquet",
+          "bytes": 24098,
+          "sha256": "0b4b4a6fd1a37ddd8dc1ae0fc29bb6b25d47b3dd79aec0147a1a6633ada1dd35"
+        }
+      }
+    },
+    "dim_product": {
+      "rows": 5118,
+      "source_files": [
+        "dim_product/part-00000-170448c2-62c0-4ea1-b875-85a2a626b4a6-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/dim_product.csv",
+          "bytes": 350878,
+          "sha256": "503c94a3ca60bf6ab3db15d5f91cc90cc61bc9759463895379976c2db6a85f16"
+        },
+        "parquet": {
+          "path": "powerbi/exports/dim_product.parquet",
+          "bytes": 90594,
+          "sha256": "5d7a626279a166aea5bebe01d6794c41346ddde04d3b8d8854f2f6cec3597ea1"
+        }
+      }
+    },
+    "dim_customer": {
+      "rows": 5877,
+      "source_files": [
+        "dim_customer/part-00000-ab72b5bb-c9f0-437b-9ab0-33eaa41005c2-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/dim_customer.csv",
+          "bytes": 193997,
+          "sha256": "3c05f657d240bcff8c95fa2fb9db2aca1f9ba98940baf1038563b141dd18ef72"
+        },
+        "parquet": {
+          "path": "powerbi/exports/dim_customer.parquet",
+          "bytes": 37793,
+          "sha256": "6fce21b868bfadba22f4922c1f557e41ec8d11430b5ae97be9f0ac4bbc6152a0"
+        }
+      }
+    },
+    "dim_geography": {
+      "rows": 43,
+      "source_files": [
+        "dim_geography/part-00000-d3a3d6a3-b066-417b-89c0-fda59dc354a2-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/dim_geography.csv",
+          "bytes": 1384,
+          "sha256": "1d4863a90186faf7a2c0e9c615ea3e60ce7fe7ee96cb7b57290e752009523609"
+        },
+        "parquet": {
+          "path": "powerbi/exports/dim_geography.parquet",
+          "bytes": 1515,
+          "sha256": "4155280daf97409b9909b5104cfafe7e9f65163454071ccd7cc4c46ff462401c"
+        }
+      }
+    },
+    "daily_sales": {
+      "rows": 604,
+      "source_files": [
+        "daily_sales/part-00000-b370c809-f185-43d4-aa32-0646c1125767-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/daily_sales.csv",
+          "bytes": 31724,
+          "sha256": "80516b3dd1aaaace317e13889f8e6a7b224903f68cbf2e965491e52b93e0d372"
+        },
+        "parquet": {
+          "path": "powerbi/exports/daily_sales.parquet",
+          "bytes": 21115,
+          "sha256": "4addedfb43e0822d6eb672538c54c9c5930e756d0d17228023cfb3a6e0074f0a"
+        }
+      }
+    },
+    "quality_daily": {
+      "rows": 604,
+      "source_files": [
+        "quality_daily/part-00000-2ebffeaa-d33c-4676-8ea7-7a3c76b02021-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/quality_daily.csv",
+          "bytes": 42949,
+          "sha256": "caae3445dcfca68315fb83779186c370754c2455d8d62ae2d04a660525ec1b13"
+        },
+        "parquet": {
+          "path": "powerbi/exports/quality_daily.parquet",
+          "bytes": 24781,
+          "sha256": "32166be9aab032d1b11bb608e13361b5265aef1b2a3f5e947e097e3cba7f8cb5"
+        }
+      }
+    },
+    "cohort_retention": {
+      "rows": 325,
+      "source_files": [
+        "cohort_retention/part-00000-9d28aa8d-5b9c-4dc4-825c-d9c334bdb315-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/cohort_retention.csv",
+          "bytes": 25180,
+          "sha256": "e3bb7ae9f8b407df626d03fa6791347508007f590996981564892be22ec136ee"
+        },
+        "parquet": {
+          "path": "powerbi/exports/cohort_retention.parquet",
+          "bytes": 6683,
+          "sha256": "71316612c877c04eae7b1db7ce5fe0522c246452da82aede71015033f20d353b"
+        }
+      }
+    },
+    "customer_summary": {
+      "rows": 5876,
+      "source_files": [
+        "customer_summary/part-00000-74694aaf-a889-46d2-a86b-b3ee00cdbb69-c000.snappy.parquet"
+      ],
+      "outputs": {
+        "csv": {
+          "path": "powerbi/exports/customer_summary.csv",
+          "bytes": 882571,
+          "sha256": "3f1c1ab0f35bbd72dd354ddd50d4c68486afe2557f2991d47fcaf59097004711"
+        },
+        "parquet": {
+          "path": "powerbi/exports/customer_summary.parquet",
+          "bytes": 153811,
+          "sha256": "75300eb03d2611e7a5c5d0333210996fbe6b41265328df3b7c2dc7a2c4cb30c8"
+        }
+      }
+    }
+  },
+  "cardinality": {
+    "dim_date.date": {
+      "duplicate_keys": 0,
+      "null_keys": 0,
+      "fact_rows_without_match": 0,
+      "fact_column": "fact_invoice_line.date",
+      "relationship": "many-to-one"
+    },
+    "dim_product.stock_code": {
+      "duplicate_keys": 0,
+      "null_keys": 0,
+      "fact_rows_without_match": 0,
+      "fact_column": "fact_invoice_line.stock_code",
+      "relationship": "many-to-one"
+    },
+    "dim_customer.customer_id": {
+      "duplicate_keys": 0,
+      "null_keys": 0,
+      "fact_rows_without_match": 0,
+      "fact_column": "fact_invoice_line.customer_key",
+      "relationship": "many-to-one"
+    },
+    "dim_geography.country": {
+      "duplicate_keys": 0,
+      "null_keys": 0,
+      "fact_rows_without_match": 0,
+      "fact_column": "fact_invoice_line.country",
+      "relationship": "many-to-one"
+    }
+  },
+  "star_join": {
+    "rows": 1061664,
+    "net_gbp": "19379245.82"
+  },
+  "checks": {
+    "net_matches_manifest": true,
+    "gross_matches_manifest": true,
+    "adjustments_match_manifest": true,
+    "units_match_manifest": true,
+    "known_lines_match_manifest": true,
+    "fact_rows_match_manifest_accepted": true,
+    "dimension_keys_unique_nonnull": true,
+    "no_orphan_fact_rows": true,
+    "star_join_preserves_rows_and_gbp": true,
+    "unknown_customer_member_present_once": true,
+    "dim_date_contiguous": true,
+    "daily_sales_net_equals_fact_net": true,
+    "csv_roundtrip_measures_identical": true,
+    "parquet_roundtrip_measures_identical": true
+  },
+  "reconciliation_file": "powerbi/reconciliation.json",
+  "headline": {
+    "gross_positive_merchandise_gbp": "20112074.02",
+    "negative_adjustments_gbp": "-732828.20",
+    "net_recorded_merchandise_gbp": "19379245.82",
+    "positive_units": 11648090
+  },
+  "duration_seconds": 64.56
+}

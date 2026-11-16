@@ -1,0 +1,469 @@
+{
+  "label": "databricks-contract-local",
+  "scope": "LOCAL contract evidence only (DuckDB on the host). This is NOT a Databricks execution; the Databricks job in databricks/ is prepared but unexecuted.",
+  "mode": "synthetic",
+  "state": "passed",
+  "checked_at_utc": "2026-11-16T20:33:41.096525+00:00",
+  "git_commit": "3e7afbfa268e715f128e9f32032eb1edd3019ac0",
+  "uncommitted_changes_in_checked_files": true,
+  "command": ".venv/Scripts/python.exe scripts/check_databricks_contract.py",
+  "engine": {
+    "duckdb": "1.2.2",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "memory_limit": "512MB",
+    "threads": 2
+  },
+  "sql_adaptation": "sql/silver.sql with TIMESTAMP_NTZ replaced by DuckDB TIMESTAMP (civil, no offset), as in src/meridian/baseline.py; sql/daily_sales.sql unchanged",
+  "inputs": {
+    "dataset": {
+      "path": "databricks/contract/lines.csv",
+      "sha256": "34a2f2d6fcde242f28244143751e615c195ab3fe258db97db57acb3e494b65c8"
+    },
+    "expected": {
+      "path": "databricks/contract/expected.json",
+      "sha256": "557cc1e17bfeb6705d0ede2df7ad12bfc15775c4cd9f294f399ef2419cd40506"
+    },
+    "sql_sha256": {
+      "sql/silver.sql": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+      "sql/daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b"
+    }
+  },
+  "results": {
+    "kpis": {
+      "gross_positive_gbp": "222.35",
+      "negative_adjustments_gbp": "-31.21",
+      "net_recorded_gbp": "191.14",
+      "positive_units": 146,
+      "accepted_rows": 22,
+      "known_customer_rows": 18,
+      "known_customer_coverage": "18/22"
+    },
+    "amount_bridge": {
+      "accepted_parsed_amount_gbp": "191.14",
+      "excluded_parsed_amount_gbp": "62.60",
+      "quarantined_parsed_amount_gbp": "20.22",
+      "source_parsed_amount_gbp": "273.96",
+      "unparseable_amount_rows": 1
+    },
+    "dispositions": {
+      "excluded": 5,
+      "accepted": 22,
+      "quarantined": 10
+    },
+    "unsafe_accepted_delivery_net_gbp": "214.09"
+  },
+  "checks_passed": 36,
+  "checks_total": 36,
+  "checks": [
+    {
+      "check": "databricks/sql/silver.sql identical to sql/silver.sql",
+      "expected": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+      "actual": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+      "passed": true
+    },
+    {
+      "check": "databricks/sql/daily_sales.sql identical to sql/daily_sales.sql",
+      "expected": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+      "actual": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+      "passed": true
+    },
+    {
+      "check": "received deliveries",
+      "expected": 41,
+      "actual": 41,
+      "passed": true
+    },
+    {
+      "check": "distinct source rows",
+      "expected": 37,
+      "actual": 37,
+      "passed": true
+    },
+    {
+      "check": "repeated deliveries",
+      "expected": 4,
+      "actual": 4,
+      "passed": true
+    },
+    {
+      "check": "repeated coordinates",
+      "expected": [
+        2,
+        5,
+        19,
+        29
+      ],
+      "actual": [
+        2,
+        5,
+        19,
+        29
+      ],
+      "passed": true
+    },
+    {
+      "check": "conflicting repeat payloads",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "check": "dispositions",
+      "expected": {
+        "accepted": 22,
+        "excluded": 5,
+        "quarantined": 10
+      },
+      "actual": {
+        "accepted": 22,
+        "excluded": 5,
+        "quarantined": 10
+      },
+      "passed": true
+    },
+    {
+      "check": "disposition rows sum to distinct source rows",
+      "expected": 37,
+      "actual": 37,
+      "passed": true
+    },
+    {
+      "check": "classifications",
+      "expected": {
+        "positive_merchandise": 17,
+        "negative_adjustment": 5,
+        "non_merchandise_code": 5,
+        "invalid_quantity": 3,
+        "missing_invoice": 1,
+        "missing_stock_code": 1,
+        "invalid_price": 1,
+        "cancellation_sign_conflict": 1,
+        "invalid_timestamp": 2,
+        "price_precision_exceeded": 1
+      },
+      "actual": {
+        "invalid_quantity": 3,
+        "price_precision_exceeded": 1,
+        "positive_merchandise": 17,
+        "invalid_timestamp": 2,
+        "cancellation_sign_conflict": 1,
+        "non_merchandise_code": 5,
+        "negative_adjustment": 5,
+        "missing_stock_code": 1,
+        "missing_invoice": 1,
+        "invalid_price": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "kpi gross_positive_gbp",
+      "expected": "222.35",
+      "actual": "222.35",
+      "passed": true
+    },
+    {
+      "check": "kpi negative_adjustments_gbp",
+      "expected": "-31.21",
+      "actual": "-31.21",
+      "passed": true
+    },
+    {
+      "check": "kpi net_recorded_gbp",
+      "expected": "191.14",
+      "actual": "191.14",
+      "passed": true
+    },
+    {
+      "check": "kpi positive_units",
+      "expected": 146,
+      "actual": 146,
+      "passed": true
+    },
+    {
+      "check": "kpi accepted_rows",
+      "expected": 22,
+      "actual": 22,
+      "passed": true
+    },
+    {
+      "check": "kpi known_customer_rows",
+      "expected": 18,
+      "actual": 18,
+      "passed": true
+    },
+    {
+      "check": "kpi known_customer_coverage",
+      "expected": "18/22",
+      "actual": "18/22",
+      "passed": true
+    },
+    {
+      "check": "gross + adjustments = net",
+      "expected": "191.14",
+      "actual": "191.14",
+      "passed": true
+    },
+    {
+      "check": "bridge accepted_parsed_amount_gbp",
+      "expected": "191.14",
+      "actual": "191.14",
+      "passed": true
+    },
+    {
+      "check": "bridge excluded_parsed_amount_gbp",
+      "expected": "62.60",
+      "actual": "62.60",
+      "passed": true
+    },
+    {
+      "check": "bridge quarantined_parsed_amount_gbp",
+      "expected": "20.22",
+      "actual": "20.22",
+      "passed": true
+    },
+    {
+      "check": "bridge source_parsed_amount_gbp",
+      "expected": "273.96",
+      "actual": "273.96",
+      "passed": true
+    },
+    {
+      "check": "bridge unparseable_amount_rows",
+      "expected": 1,
+      "actual": 1,
+      "passed": true
+    },
+    {
+      "check": "accepted + excluded + quarantined parsed = source parsed",
+      "expected": "273.96",
+      "actual": "273.96",
+      "passed": true
+    },
+    {
+      "check": "unsafe accepted-delivery net (comparison only)",
+      "expected": "214.09",
+      "actual": "214.09",
+      "passed": true
+    },
+    {
+      "check": "unsafe overstatement",
+      "expected": "22.95",
+      "actual": "22.95",
+      "passed": true
+    },
+    {
+      "check": "legitimate identical rows both accepted",
+      "expected": [
+        2,
+        3
+      ],
+      "actual": [
+        2,
+        3
+      ],
+      "passed": true
+    },
+    {
+      "check": "legitimate identical row amount",
+      "expected": [
+        "15.30"
+      ],
+      "actual": [
+        "15.30"
+      ],
+      "passed": true
+    },
+    {
+      "check": "half-up positive row 11",
+      "expected": "4.66",
+      "actual": "4.66",
+      "passed": true
+    },
+    {
+      "check": "half-up negative row 22",
+      "expected": "-4.66",
+      "actual": "-4.66",
+      "passed": true
+    },
+    {
+      "check": "trimmed upper stock code row 18",
+      "expected": "P111",
+      "actual": "P111",
+      "passed": true
+    },
+    {
+      "check": "blank country row 16",
+      "expected": "Unknown",
+      "actual": "Unknown",
+      "passed": true
+    },
+    {
+      "check": "summer civil time row 17 (no offset applied)",
+      "expected": "2010-07-15 14:30:00",
+      "actual": "2010-07-15 14:30:00",
+      "passed": true
+    },
+    {
+      "check": "daily_sales rows",
+      "expected": [
+        {
+          "date": "2010-03-01",
+          "gross_positive_gbp": "81.18",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "81.18",
+          "positive_units": 54,
+          "rows": 7,
+          "known_customer_rows": 5
+        },
+        {
+          "date": "2010-03-02",
+          "gross_positive_gbp": "27.41",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "27.41",
+          "positive_units": 26,
+          "rows": 4,
+          "known_customer_rows": 4
+        },
+        {
+          "date": "2010-03-03",
+          "gross_positive_gbp": "77.06",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "77.06",
+          "positive_units": 52,
+          "rows": 3,
+          "known_customer_rows": 2
+        },
+        {
+          "date": "2010-03-04",
+          "gross_positive_gbp": "9.75",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "9.75",
+          "positive_units": 3,
+          "rows": 1,
+          "known_customer_rows": 1
+        },
+        {
+          "date": "2010-03-05",
+          "gross_positive_gbp": "0.00",
+          "negative_adjustments_gbp": "-18.46",
+          "net_recorded_gbp": "-18.46",
+          "positive_units": 0,
+          "rows": 4,
+          "known_customer_rows": 4
+        },
+        {
+          "date": "2010-03-06",
+          "gross_positive_gbp": "0.00",
+          "negative_adjustments_gbp": "-12.75",
+          "net_recorded_gbp": "-12.75",
+          "positive_units": 0,
+          "rows": 1,
+          "known_customer_rows": 0
+        },
+        {
+          "date": "2010-07-15",
+          "gross_positive_gbp": "26.95",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "26.95",
+          "positive_units": 11,
+          "rows": 2,
+          "known_customer_rows": 2
+        }
+      ],
+      "actual": [
+        {
+          "date": "2010-03-01",
+          "gross_positive_gbp": "81.18",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "81.18",
+          "positive_units": 54,
+          "rows": 7,
+          "known_customer_rows": 5
+        },
+        {
+          "date": "2010-03-02",
+          "gross_positive_gbp": "27.41",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "27.41",
+          "positive_units": 26,
+          "rows": 4,
+          "known_customer_rows": 4
+        },
+        {
+          "date": "2010-03-03",
+          "gross_positive_gbp": "77.06",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "77.06",
+          "positive_units": 52,
+          "rows": 3,
+          "known_customer_rows": 2
+        },
+        {
+          "date": "2010-03-04",
+          "gross_positive_gbp": "9.75",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "9.75",
+          "positive_units": 3,
+          "rows": 1,
+          "known_customer_rows": 1
+        },
+        {
+          "date": "2010-03-05",
+          "gross_positive_gbp": "0.00",
+          "negative_adjustments_gbp": "-18.46",
+          "net_recorded_gbp": "-18.46",
+          "positive_units": 0,
+          "rows": 4,
+          "known_customer_rows": 4
+        },
+        {
+          "date": "2010-03-06",
+          "gross_positive_gbp": "0.00",
+          "negative_adjustments_gbp": "-12.75",
+          "net_recorded_gbp": "-12.75",
+          "positive_units": 0,
+          "rows": 1,
+          "known_customer_rows": 0
+        },
+        {
+          "date": "2010-07-15",
+          "gross_positive_gbp": "26.95",
+          "negative_adjustments_gbp": "0.00",
+          "net_recorded_gbp": "26.95",
+          "positive_units": 11,
+          "rows": 2,
+          "known_customer_rows": 2
+        }
+      ],
+      "passed": true
+    },
+    {
+      "check": "daily net sums to fact net",
+      "expected": "191.14",
+      "actual": "191.14",
+      "passed": true
+    },
+    {
+      "check": "country net",
+      "expected": {
+        "United Kingdom": "89.23",
+        "France": "12.60",
+        "Germany": "2.50",
+        "Netherlands": "51.56",
+        "EIRE": "25.50",
+        "Unknown": "9.75"
+      },
+      "actual": {
+        "United Kingdom": "89.23",
+        "France": "12.60",
+        "Unknown": "9.75",
+        "Netherlands": "51.56",
+        "Germany": "2.50",
+        "EIRE": "25.50"
+      },
+      "passed": true
+    }
+  ],
+  "duration_seconds": 0.156
+}

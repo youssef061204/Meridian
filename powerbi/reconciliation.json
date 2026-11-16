@@ -1,0 +1,118 @@
+{
+  "purpose": "Headline values a Power BI report built from powerbi/exports must reproduce exactly (compare to the cent). Computed by DuckDB SQL from the validated snapshot, not by Power BI.",
+  "native_report_status": "unfinished: Power BI Desktop is not installed on the build machine; no .pbix exists",
+  "mode": "historical",
+  "profile": "full",
+  "snapshot_id": "20261116T192553-472ac294",
+  "manifest_sha256": "172e2d0bd4bc642246bdbda3330b8b5958e8623d87ae4bcdf4fcd3b6685dc112",
+  "currency": "GBP recorded merchandise invoice value; not audited revenue or settled cash",
+  "measure_definitions": "docs/metrics.md; DAX in powerbi/measures.dax",
+  "measures": {
+    "gross_positive_merchandise_gbp": "20112074.02",
+    "negative_adjustments_gbp": "-732828.20",
+    "net_recorded_merchandise_gbp": "19379245.82",
+    "positive_units": 11648090,
+    "accepted_lines": 1061664,
+    "known_customer_lines": 820647,
+    "known_customer_coverage_pct": "77.2982",
+    "adjustment_ratio_pct": "3.6437",
+    "fact_date_min": "2009-12-01",
+    "fact_date_max": "2011-12-09",
+    "periods": {
+      "calendar_2010": {
+        "from": "2010-01-01",
+        "to": "2010-12-31",
+        "net_recorded_gbp": "9567477.01",
+        "gross_positive_gbp": "9816580.12",
+        "fact_dates_with_rows": 298
+      },
+      "calendar_2011_partial_to_2011_12_09": {
+        "from": "2011-01-01",
+        "to": "2011-12-31",
+        "net_recorded_gbp": "9030009.75",
+        "gross_positive_gbp": "9494173.56",
+        "fact_dates_with_rows": 285
+      },
+      "month_2011_11": {
+        "from": "2011-11-01",
+        "to": "2011-11-30",
+        "net_recorded_gbp": "1432651.11",
+        "gross_positive_gbp": "1457745.53",
+        "fact_dates_with_rows": 26
+      },
+      "month_2010_11_same_period_last_year": {
+        "from": "2010-11-01",
+        "to": "2010-11-30",
+        "net_recorded_gbp": "1400610.30",
+        "gross_positive_gbp": "1435731.18",
+        "fact_dates_with_rows": 26
+      },
+      "last_28_days_ending_2011_12_09": {
+        "from": "2011-11-12",
+        "to": "2011-12-09",
+        "net_recorded_gbp": "1317989.21",
+        "gross_positive_gbp": "1505914.43",
+        "fact_dates_with_rows": 24
+      },
+      "prior_28_days_ending_2011_11_11": {
+        "from": "2011-10-15",
+        "to": "2011-11-11",
+        "net_recorded_gbp": "1124863.37",
+        "gross_positive_gbp": "1150570.31",
+        "fact_dates_with_rows": 24
+      }
+    },
+    "unknown_customer_member_net_gbp": "2664470.67",
+    "top_countries_net_gbp": {
+      "United Kingdom": "16587674.39",
+      "EIRE": "608532.38",
+      "Netherlands": "546274.68",
+      "Germany": "379900.91",
+      "France": "299259.61"
+    }
+  },
+  "visual_checks": [
+    {
+      "visual": "Card: Net Recorded Merchandise (no filters)",
+      "must_equal": "19379245.82"
+    },
+    {
+      "visual": "Card: Gross Positive Merchandise (no filters)",
+      "must_equal": "20112074.02"
+    },
+    {
+      "visual": "Card: Negative Adjustments (no filters)",
+      "must_equal": "-732828.20"
+    },
+    {
+      "visual": "Card: Positive Units (no filters)",
+      "must_equal": 11648090
+    },
+    {
+      "visual": "Card: Known-Customer Coverage % (no filters)",
+      "must_equal_pct_4dp": "77.2982"
+    },
+    {
+      "visual": "Card: Adjustment Ratio % (no filters)",
+      "must_equal_pct_4dp": "3.6437"
+    },
+    {
+      "visual": "Net Recorded Merchandise, dim_customer[customer_id] = __UNKNOWN__",
+      "must_equal": "2664470.67"
+    },
+    {
+      "visual": "Net Recorded Merchandise, dim_date month 2011-11; Net SPLY",
+      "must_equal": [
+        "1432651.11",
+        "1400610.30"
+      ]
+    },
+    {
+      "visual": "Net Last 28 Days / Net Prior 28 Days with no date filter (anchor = last fact date 2011-12-09)",
+      "must_equal": [
+        "1317989.21",
+        "1124863.37"
+      ]
+    }
+  ]
+}

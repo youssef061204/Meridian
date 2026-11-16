@@ -1,0 +1,4918 @@
+{
+  "state": "passed",
+  "snapshot_id": "20261116T192553-472ac294",
+  "generated_at": "2026-11-16T20:45:19.972240+00:00",
+  "config": {
+    "sha256": "b2db0997dcc7ef9490352dd1cbe6828250352d95c31bfdb54513cbcf9a71d88e",
+    "test_forecast_origin": "2011-11-10",
+    "latest_forecast_origin": "2011-12-08",
+    "horizons": [
+      7,
+      28
+    ],
+    "origins": [
+      {
+        "origin": "2011-02-03",
+        "role": "warmup"
+      },
+      {
+        "origin": "2011-03-03",
+        "role": "warmup"
+      },
+      {
+        "origin": "2011-03-31",
+        "role": "warmup"
+      },
+      {
+        "origin": "2011-04-28",
+        "role": "warmup"
+      },
+      {
+        "origin": "2011-05-26",
+        "role": "validation"
+      },
+      {
+        "origin": "2011-06-23",
+        "role": "validation"
+      },
+      {
+        "origin": "2011-07-21",
+        "role": "validation"
+      },
+      {
+        "origin": "2011-08-18",
+        "role": "validation"
+      },
+      {
+        "origin": "2011-09-15",
+        "role": "validation"
+      },
+      {
+        "origin": "2011-10-13",
+        "role": "validation"
+      },
+      {
+        "origin": "2011-11-10",
+        "role": "test"
+      },
+      {
+        "origin": "2011-11-17",
+        "role": "test"
+      },
+      {
+        "origin": "2011-11-24",
+        "role": "test"
+      },
+      {
+        "origin": "2011-12-01",
+        "role": "test"
+      }
+    ],
+    "last_complete_day": "2011-12-08",
+    "excluded_partial_day": "2011-12-09",
+    "interval_method": "80%: prediction + scale * empirical 10%/90% quantiles of (actual - prediction)/scale of the same model, pooled over earlier non-test origins with target date <= current origin, bucketed by scope (aggregate|product) and horizon (1-7|8-28); falls back to all horizons, then all scopes, if fewer than 25 residuals; lower bound clipped at 0. The latest (operational) forecast may also use test residuals.",
+    "product_selection": "at each origin: stock codes sold on >= 50% of observation-available days in the 182 days ending at the origin, ranked by units in that window, top 5",
+    "promotion_metric": "mean of validation WAPE over {aggregate, products} x {7, 28}; lowest wins, ties go to the simpler model (seasonal_naive, trailing_mean, gradient_boosting)"
+  },
+  "promoted_model": "gradient_boosting",
+  "promotion_reason": "Gradient boosting (g3) has the lowest validation promotion metric (mean WAPE over aggregate/products x 7/28 days) = 0.5248; Trailing mean = 0.6456; Seasonal naive = 0.6760. Chosen on validation origins only; the test period did not influence the choice.",
+  "models": [
+    {
+      "model": "seasonal_naive",
+      "model_key": "seasonal_naive",
+      "description": "most recent observation-available value on the target weekday at or before the origin; fallback trailing mean",
+      "validation_promotion_score": 0.6759838080811452
+    },
+    {
+      "model": "trailing_mean",
+      "model_key": "trailing_mean",
+      "description": "mean of observation-available days in the 28 calendar days ending at the origin",
+      "validation_promotion_score": 0.6456047652170596
+    },
+    {
+      "model": "gradient_boosting",
+      "model_key": "gbm:g3",
+      "description": "sklearn HistGradientBoostingRegressor(loss=absolute_error), direct multi-horizon (horizon is a feature), pooled over aggregate + selected products, target and level features divided by an origin-time scale",
+      "validation_promotion_score": 0.524753084649972
+    }
+  ],
+  "metrics": {
+    "validation": [
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 7,
+        "series_scope": "aggregate",
+        "mae": 5397.832435940066,
+        "wape": 0.2979246267475049,
+        "wape_null_reason": null,
+        "coverage80": 0.7142857142857143,
+        "width80": 11910.038249185192,
+        "n": 35
+      },
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 7,
+        "series_scope": "products",
+        "mae": 109.31502688959152,
+        "wape": 0.7573589495102148,
+        "wape_null_reason": null,
+        "coverage80": 0.7771428571428571,
+        "width80": 288.6765627691883,
+        "n": 175
+      },
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 28,
+        "series_scope": "aggregate",
+        "mae": 5482.348691418471,
+        "wape": 0.2844025188538135,
+        "wape_null_reason": null,
+        "coverage80": 0.6950354609929078,
+        "width80": 13726.883206313403,
+        "n": 141
+      },
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 28,
+        "series_scope": "products",
+        "mae": 116.92439385369119,
+        "wape": 0.7593262434883545,
+        "wape_null_reason": null,
+        "coverage80": 0.7319148936170212,
+        "width80": 281.949390661379,
+        "n": 705
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 7,
+        "series_scope": "aggregate",
+        "mae": 6434.742857142857,
+        "wape": 0.355155219559273,
+        "wape_null_reason": null,
+        "coverage80": 0.6571428571428571,
+        "width80": 16194.07622303027,
+        "n": 35
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 7,
+        "series_scope": "products",
+        "mae": 139.98285714285714,
+        "wape": 0.9698325349380419,
+        "wape_null_reason": null,
+        "coverage80": 0.8571428571428571,
+        "width80": 290.8960065302685,
+        "n": 175
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 28,
+        "series_scope": "aggregate",
+        "mae": 7376.070921985815,
+        "wape": 0.38264132172781784,
+        "wape_null_reason": null,
+        "coverage80": 0.6879432624113475,
+        "width80": 18575.23335647206,
+        "n": 141
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 28,
+        "series_scope": "products",
+        "mae": 153.41560283687943,
+        "wape": 0.9963061560994483,
+        "wape_null_reason": null,
+        "coverage80": 0.8226950354609929,
+        "width80": 292.42852844690714,
+        "n": 705
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 7,
+        "series_scope": "aggregate",
+        "mae": 7159.992151326935,
+        "wape": 0.395184180782678,
+        "wape_null_reason": null,
+        "coverage80": 0.6857142857142857,
+        "width80": 16502.222043942547,
+        "n": 35
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 7,
+        "series_scope": "products",
+        "mae": 136.0652042160738,
+        "wape": 0.9426901594605056,
+        "wape_null_reason": null,
+        "coverage80": 0.8685714285714285,
+        "width80": 299.27015077955656,
+        "n": 175
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 28,
+        "series_scope": "aggregate",
+        "mae": 6505.497263336418,
+        "wape": 0.3374794111482834,
+        "wape_null_reason": null,
+        "coverage80": 0.7588652482269503,
+        "width80": 17252.3373248604,
+        "n": 141
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 28,
+        "series_scope": "products",
+        "mae": 139.67390486736,
+        "wape": 0.9070653094767711,
+        "wape_null_reason": null,
+        "coverage80": 0.8482269503546099,
+        "width80": 293.0388444088626,
+        "n": 705
+      }
+    ],
+    "test": [
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 7,
+        "series_scope": "aggregate",
+        "mae": 6378.79144272,
+        "wape": 0.21410369693283657,
+        "wape_null_reason": null,
+        "coverage80": 0.8333333333333334,
+        "width80": 22855.82451508177,
+        "n": 24
+      },
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 7,
+        "series_scope": "products",
+        "mae": 161.59788419897603,
+        "wape": 0.6470169865495687,
+        "wape_null_reason": null,
+        "coverage80": 0.7,
+        "width80": 418.9954769015123,
+        "n": 120
+      },
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 28,
+        "series_scope": "aggregate",
+        "mae": 5879.83982374236,
+        "wape": 0.1973564200900332,
+        "wape_null_reason": null,
+        "coverage80": 0.7916666666666666,
+        "width80": 23272.424866491772,
+        "n": 24
+      },
+      {
+        "model": "gradient_boosting",
+        "model_key": "gbm:g3",
+        "horizon": 28,
+        "series_scope": "products",
+        "mae": 160.53317086497725,
+        "wape": 0.6427540123385028,
+        "wape_null_reason": null,
+        "coverage80": 0.7166666666666667,
+        "width80": 389.72288212921046,
+        "n": 120
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 7,
+        "series_scope": "aggregate",
+        "mae": 6582.291666666667,
+        "wape": 0.22093416798129314,
+        "wape_null_reason": null,
+        "coverage80": 0.8333333333333334,
+        "width80": 28295.540603521873,
+        "n": 24
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 7,
+        "series_scope": "products",
+        "mae": 196.73333333333332,
+        "wape": 0.7876947716125589,
+        "wape_null_reason": null,
+        "coverage80": 0.8166666666666667,
+        "width80": 467.5259647637553,
+        "n": 120
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 28,
+        "series_scope": "aggregate",
+        "mae": 6897.75,
+        "wape": 0.2315225052864767,
+        "wape_null_reason": null,
+        "coverage80": 0.9583333333333334,
+        "width80": 32498.016276633047,
+        "n": 24
+      },
+      {
+        "model": "seasonal_naive",
+        "model_key": "seasonal_naive",
+        "horizon": 28,
+        "series_scope": "products",
+        "mae": 299.5083333333333,
+        "wape": 1.199192552801041,
+        "wape_null_reason": null,
+        "coverage80": 0.7,
+        "width80": 443.36736596117754,
+        "n": 120
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 7,
+        "series_scope": "aggregate",
+        "mae": 6567.402777777777,
+        "wape": 0.22043442344771513,
+        "wape_null_reason": null,
+        "coverage80": 0.8333333333333334,
+        "width80": 29836.96790046497,
+        "n": 24
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 7,
+        "series_scope": "products",
+        "mae": 172.80555555555557,
+        "wape": 0.6918910502374518,
+        "wape_null_reason": null,
+        "coverage80": 0.85,
+        "width80": 471.6831501885699,
+        "n": 120
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 28,
+        "series_scope": "aggregate",
+        "mae": 7284.333333333333,
+        "wape": 0.24449814833462,
+        "wape_null_reason": null,
+        "coverage80": 0.8333333333333334,
+        "width80": 28434.375554565926,
+        "n": 24
+      },
+      {
+        "model": "trailing_mean",
+        "model_key": "trailing_mean",
+        "horizon": 28,
+        "series_scope": "products",
+        "mae": 171.6222222222222,
+        "wape": 0.687153136921246,
+        "wape_null_reason": null,
+        "coverage80": 0.8,
+        "width80": 426.55166174473635,
+        "n": 120
+      }
+    ]
+  },
+  "improvement": {
+    "validation": [
+      {
+        "series_scope": "aggregate",
+        "horizon": 7,
+        "model": "gradient_boosting",
+        "wape": 0.2979246267475049,
+        "seasonal_naive_wape": 0.355155219559273,
+        "wape_reduction_vs_seasonal_naive": 0.16114247985088861
+      },
+      {
+        "series_scope": "aggregate",
+        "horizon": 28,
+        "model": "gradient_boosting",
+        "wape": 0.2844025188538135,
+        "seasonal_naive_wape": 0.38264132172781784,
+        "wape_reduction_vs_seasonal_naive": 0.25673861471732007
+      },
+      {
+        "series_scope": "products",
+        "horizon": 7,
+        "model": "gradient_boosting",
+        "wape": 0.7573589495102148,
+        "seasonal_naive_wape": 0.9698325349380419,
+        "wape_reduction_vs_seasonal_naive": 0.21908275684049008
+      },
+      {
+        "series_scope": "products",
+        "horizon": 28,
+        "model": "gradient_boosting",
+        "wape": 0.7593262434883545,
+        "seasonal_naive_wape": 0.9963061560994483,
+        "wape_reduction_vs_seasonal_naive": 0.23785852487238784
+      }
+    ],
+    "test": [
+      {
+        "series_scope": "aggregate",
+        "horizon": 7,
+        "model": "gradient_boosting",
+        "wape": 0.21410369693283657,
+        "seasonal_naive_wape": 0.22093416798129314,
+        "wape_reduction_vs_seasonal_naive": 0.030916318244785586
+      },
+      {
+        "series_scope": "aggregate",
+        "horizon": 28,
+        "model": "gradient_boosting",
+        "wape": 0.1973564200900332,
+        "seasonal_naive_wape": 0.2315225052864767,
+        "wape_reduction_vs_seasonal_naive": 0.14757133503789507
+      },
+      {
+        "series_scope": "products",
+        "horizon": 7,
+        "model": "gradient_boosting",
+        "wape": 0.6470169865495687,
+        "seasonal_naive_wape": 0.7876947716125589,
+        "wape_reduction_vs_seasonal_naive": 0.17859428567108085
+      },
+      {
+        "series_scope": "products",
+        "horizon": 28,
+        "model": "gradient_boosting",
+        "wape": 0.6427540123385028,
+        "seasonal_naive_wape": 1.199192552801041,
+        "wape_reduction_vs_seasonal_naive": 0.4640110040400304
+      }
+    ]
+  },
+  "series": [
+    {
+      "series_id": "__ALL__",
+      "label": "All merchandise (aggregate)",
+      "in_test": true,
+      "in_latest": true
+    },
+    {
+      "series_id": "22197",
+      "label": "SMALL POPCORN HOLDER",
+      "in_test": true,
+      "in_latest": true
+    },
+    {
+      "series_id": "85099B",
+      "label": "JUMBO BAG RED RETROSPOT",
+      "in_test": true,
+      "in_latest": true
+    },
+    {
+      "series_id": "84077",
+      "label": "WORLD WAR 2 GLIDERS ASSTD DESIGNS",
+      "in_test": true,
+      "in_latest": true
+    },
+    {
+      "series_id": "84879",
+      "label": "ASSORTED COLOUR BIRD ORNAMENT",
+      "in_test": true,
+      "in_latest": true
+    },
+    {
+      "series_id": "85123A",
+      "label": "WHITE HANGING HEART T-LIGHT HOLDER",
+      "in_test": true,
+      "in_latest": false
+    },
+    {
+      "series_id": "23084",
+      "label": "RABBIT NIGHT LIGHT",
+      "in_test": false,
+      "in_latest": true
+    }
+  ],
+  "test_forecast": {
+    "22197": [
+      {
+        "date": "2011-11-11",
+        "actual": 184.0,
+        "available": true,
+        "prediction": 177.0,
+        "lower": 45.5,
+        "upper": 575.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 114.0,
+        "available": true,
+        "prediction": 83.5,
+        "lower": 0.0,
+        "upper": 482.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 1767.0,
+        "available": true,
+        "prediction": 181.6,
+        "lower": 50.1,
+        "upper": 580.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 224.0,
+        "available": true,
+        "prediction": 184.7,
+        "lower": 53.3,
+        "upper": 583.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 352.0,
+        "available": true,
+        "prediction": 185.3,
+        "lower": 53.8,
+        "upper": 584.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 135.0,
+        "available": true,
+        "prediction": 188.7,
+        "lower": 57.3,
+        "upper": 587.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 449.0,
+        "available": true,
+        "prediction": 132.2,
+        "lower": 0.0,
+        "upper": 533.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 218.0,
+        "available": true,
+        "prediction": 76.3,
+        "lower": 0.0,
+        "upper": 477.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 349.0,
+        "available": true,
+        "prediction": 167.6,
+        "lower": 31.7,
+        "upper": 569.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 1162.0,
+        "available": true,
+        "prediction": 167.4,
+        "lower": 31.4,
+        "upper": 568.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 497.0,
+        "available": true,
+        "prediction": 167.9,
+        "lower": 31.9,
+        "upper": 569.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 558.0,
+        "available": true,
+        "prediction": 171.4,
+        "lower": 35.4,
+        "upper": 572.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 342.0,
+        "available": true,
+        "prediction": 123.9,
+        "lower": 0.0,
+        "upper": 525.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 47.0,
+        "available": true,
+        "prediction": 57.1,
+        "lower": 0.0,
+        "upper": 458.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 248.0,
+        "available": true,
+        "prediction": 150.7,
+        "lower": 14.8,
+        "upper": 552.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 796.0,
+        "available": true,
+        "prediction": 172.4,
+        "lower": 36.4,
+        "upper": 573.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 470.0,
+        "available": true,
+        "prediction": 171.2,
+        "lower": 35.3,
+        "upper": 572.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 279.0,
+        "available": true,
+        "prediction": 368.5,
+        "lower": 232.6,
+        "upper": 769.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 1369.0,
+        "available": true,
+        "prediction": 223.8,
+        "lower": 87.9,
+        "upper": 625.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 113.0,
+        "available": true,
+        "prediction": 136.7,
+        "lower": 0.7,
+        "upper": 538.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 410.0,
+        "available": true,
+        "prediction": 272.5,
+        "lower": 136.5,
+        "upper": 673.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 337.0,
+        "available": true,
+        "prediction": 257.5,
+        "lower": 121.6,
+        "upper": 658.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 368.0,
+        "available": true,
+        "prediction": 258.1,
+        "lower": 122.1,
+        "upper": 659.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 3111.0,
+        "available": true,
+        "prediction": 233.4,
+        "lower": 97.4,
+        "upper": 634.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-11",
+        "actual": 184.0,
+        "available": true,
+        "prediction": 174.0,
+        "lower": 0.0,
+        "upper": 546.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 114.0,
+        "available": true,
+        "prediction": 294.0,
+        "lower": 0.0,
+        "upper": 666.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 1767.0,
+        "available": true,
+        "prediction": 2012.0,
+        "lower": 1679.2,
+        "upper": 2384.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 224.0,
+        "available": true,
+        "prediction": 172.0,
+        "lower": 0.0,
+        "upper": 544.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 352.0,
+        "available": true,
+        "prediction": 1079.0,
+        "lower": 746.2,
+        "upper": 1451.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 135.0,
+        "available": true,
+        "prediction": 339.0,
+        "lower": 6.2,
+        "upper": 711.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 449.0,
+        "available": true,
+        "prediction": 174.0,
+        "lower": 0.0,
+        "upper": 545.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 218.0,
+        "available": true,
+        "prediction": 294.0,
+        "lower": 0.0,
+        "upper": 665.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 349.0,
+        "available": true,
+        "prediction": 2012.0,
+        "lower": 1657.0,
+        "upper": 2383.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 1162.0,
+        "available": true,
+        "prediction": 172.0,
+        "lower": 0.0,
+        "upper": 543.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 497.0,
+        "available": true,
+        "prediction": 1079.0,
+        "lower": 724.0,
+        "upper": 1450.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 558.0,
+        "available": true,
+        "prediction": 339.0,
+        "lower": 0.0,
+        "upper": 710.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 342.0,
+        "available": true,
+        "prediction": 174.0,
+        "lower": 0.0,
+        "upper": 545.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 47.0,
+        "available": true,
+        "prediction": 294.0,
+        "lower": 0.0,
+        "upper": 665.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 248.0,
+        "available": true,
+        "prediction": 2012.0,
+        "lower": 1657.0,
+        "upper": 2383.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 796.0,
+        "available": true,
+        "prediction": 172.0,
+        "lower": 0.0,
+        "upper": 543.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 470.0,
+        "available": true,
+        "prediction": 1079.0,
+        "lower": 724.0,
+        "upper": 1450.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 279.0,
+        "available": true,
+        "prediction": 339.0,
+        "lower": 0.0,
+        "upper": 710.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 1369.0,
+        "available": true,
+        "prediction": 174.0,
+        "lower": 0.0,
+        "upper": 545.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 113.0,
+        "available": true,
+        "prediction": 294.0,
+        "lower": 0.0,
+        "upper": 665.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 410.0,
+        "available": true,
+        "prediction": 2012.0,
+        "lower": 1657.0,
+        "upper": 2383.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 337.0,
+        "available": true,
+        "prediction": 172.0,
+        "lower": 0.0,
+        "upper": 543.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 368.0,
+        "available": true,
+        "prediction": 1079.0,
+        "lower": 724.0,
+        "upper": 1450.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 3111.0,
+        "available": true,
+        "prediction": 339.0,
+        "lower": 0.0,
+        "upper": 710.6,
+        "model": "seasonal_naive"
+      }
+    ],
+    "84077": [
+      {
+        "date": "2011-11-11",
+        "actual": 250.0,
+        "available": true,
+        "prediction": 178.5,
+        "lower": 60.7,
+        "upper": 536.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 144.0,
+        "available": true,
+        "prediction": 75.9,
+        "lower": 0.0,
+        "upper": 433.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 340.0,
+        "available": true,
+        "prediction": 151.1,
+        "lower": 33.2,
+        "upper": 508.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 101.0,
+        "available": true,
+        "prediction": 123.7,
+        "lower": 5.8,
+        "upper": 481.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 293.0,
+        "available": true,
+        "prediction": 166.4,
+        "lower": 48.6,
+        "upper": 524.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 192.0,
+        "available": true,
+        "prediction": 156.2,
+        "lower": 38.4,
+        "upper": 513.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 148.0,
+        "available": true,
+        "prediction": 138.4,
+        "lower": 16.5,
+        "upper": 498.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 69.4,
+        "lower": 0.0,
+        "upper": 429.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 348.0,
+        "available": true,
+        "prediction": 138.6,
+        "lower": 16.7,
+        "upper": 498.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 97.0,
+        "available": true,
+        "prediction": 108.1,
+        "lower": 0.0,
+        "upper": 467.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 257.0,
+        "available": true,
+        "prediction": 150.9,
+        "lower": 29.0,
+        "upper": 510.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 19.0,
+        "available": true,
+        "prediction": 127.0,
+        "lower": 5.2,
+        "upper": 486.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 98.0,
+        "available": true,
+        "prediction": 131.0,
+        "lower": 9.1,
+        "upper": 490.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 47.7,
+        "lower": 0.0,
+        "upper": 407.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 58.0,
+        "available": true,
+        "prediction": 121.5,
+        "lower": 0.0,
+        "upper": 481.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 95.9,
+        "lower": 0.0,
+        "upper": 455.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 241.0,
+        "available": true,
+        "prediction": 148.4,
+        "lower": 26.6,
+        "upper": 508.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 198.0,
+        "available": true,
+        "prediction": 337.6,
+        "lower": 215.8,
+        "upper": 697.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 255.4,
+        "lower": 133.6,
+        "upper": 615.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 0.0,
+        "available": true,
+        "prediction": 141.7,
+        "lower": 19.9,
+        "upper": 501.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 205.0,
+        "available": true,
+        "prediction": 207.3,
+        "lower": 85.5,
+        "upper": 567.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 243.0,
+        "available": true,
+        "prediction": 173.6,
+        "lower": 51.8,
+        "upper": 533.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 240.0,
+        "available": true,
+        "prediction": 203.3,
+        "lower": 81.4,
+        "upper": 563.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 336.0,
+        "available": true,
+        "prediction": 196.2,
+        "lower": 74.4,
+        "upper": 555.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-11",
+        "actual": 250.0,
+        "available": true,
+        "prediction": 288.0,
+        "lower": 0.0,
+        "upper": 621.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 144.0,
+        "available": true,
+        "prediction": 96.0,
+        "lower": 0.0,
+        "upper": 429.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 340.0,
+        "available": true,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 333.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 101.0,
+        "available": true,
+        "prediction": 384.0,
+        "lower": 85.7,
+        "upper": 717.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 293.0,
+        "available": true,
+        "prediction": 144.0,
+        "lower": 0.0,
+        "upper": 477.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 192.0,
+        "available": true,
+        "prediction": 245.0,
+        "lower": 0.0,
+        "upper": 578.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 148.0,
+        "available": true,
+        "prediction": 288.0,
+        "lower": 0.0,
+        "upper": 621.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 96.0,
+        "lower": 0.0,
+        "upper": 429.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 348.0,
+        "available": true,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 333.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 97.0,
+        "available": true,
+        "prediction": 384.0,
+        "lower": 65.9,
+        "upper": 717.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 257.0,
+        "available": true,
+        "prediction": 144.0,
+        "lower": 0.0,
+        "upper": 477.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 19.0,
+        "available": true,
+        "prediction": 245.0,
+        "lower": 0.0,
+        "upper": 578.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 98.0,
+        "available": true,
+        "prediction": 288.0,
+        "lower": 0.0,
+        "upper": 621.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 96.0,
+        "lower": 0.0,
+        "upper": 429.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 58.0,
+        "available": true,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 333.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 384.0,
+        "lower": 65.9,
+        "upper": 717.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 241.0,
+        "available": true,
+        "prediction": 144.0,
+        "lower": 0.0,
+        "upper": 477.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 198.0,
+        "available": true,
+        "prediction": 245.0,
+        "lower": 0.0,
+        "upper": 578.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 96.0,
+        "available": true,
+        "prediction": 288.0,
+        "lower": 0.0,
+        "upper": 621.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 0.0,
+        "available": true,
+        "prediction": 96.0,
+        "lower": 0.0,
+        "upper": 429.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 205.0,
+        "available": true,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 333.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 243.0,
+        "available": true,
+        "prediction": 384.0,
+        "lower": 65.9,
+        "upper": 717.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 240.0,
+        "available": true,
+        "prediction": 144.0,
+        "lower": 0.0,
+        "upper": 477.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 336.0,
+        "available": true,
+        "prediction": 245.0,
+        "lower": 0.0,
+        "upper": 578.0,
+        "model": "seasonal_naive"
+      }
+    ],
+    "84879": [
+      {
+        "date": "2011-11-11",
+        "actual": 100.0,
+        "available": true,
+        "prediction": 124.9,
+        "lower": 55.9,
+        "upper": 334.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 56.0,
+        "available": true,
+        "prediction": 112.1,
+        "lower": 43.2,
+        "upper": 321.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 303.0,
+        "available": true,
+        "prediction": 166.2,
+        "lower": 97.2,
+        "upper": 375.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 107.0,
+        "available": true,
+        "prediction": 163.6,
+        "lower": 94.6,
+        "upper": 372.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 297.0,
+        "available": true,
+        "prediction": 169.3,
+        "lower": 100.3,
+        "upper": 378.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 94.0,
+        "available": true,
+        "prediction": 171.4,
+        "lower": 102.4,
+        "upper": 380.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 368.0,
+        "available": true,
+        "prediction": 103.9,
+        "lower": 32.6,
+        "upper": 314.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 157.0,
+        "available": true,
+        "prediction": 108.4,
+        "lower": 37.0,
+        "upper": 318.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 190.0,
+        "available": true,
+        "prediction": 158.9,
+        "lower": 87.6,
+        "upper": 369.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 132.0,
+        "available": true,
+        "prediction": 155.3,
+        "lower": 84.0,
+        "upper": 365.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 80.0,
+        "available": true,
+        "prediction": 161.0,
+        "lower": 89.7,
+        "upper": 371.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 355.0,
+        "available": true,
+        "prediction": 163.1,
+        "lower": 91.8,
+        "upper": 373.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 272.0,
+        "available": true,
+        "prediction": 99.6,
+        "lower": 28.2,
+        "upper": 310.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 8.0,
+        "available": true,
+        "prediction": 103.3,
+        "lower": 32.0,
+        "upper": 313.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 56.0,
+        "available": true,
+        "prediction": 157.9,
+        "lower": 86.6,
+        "upper": 368.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 127.0,
+        "available": true,
+        "prediction": 173.7,
+        "lower": 102.4,
+        "upper": 384.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 112.0,
+        "available": true,
+        "prediction": 163.1,
+        "lower": 91.8,
+        "upper": 373.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 88.0,
+        "available": true,
+        "prediction": 266.5,
+        "lower": 195.2,
+        "upper": 477.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 504.0,
+        "available": true,
+        "prediction": 139.1,
+        "lower": 67.8,
+        "upper": 349.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 66.0,
+        "available": true,
+        "prediction": 129.8,
+        "lower": 58.5,
+        "upper": 340.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 133.0,
+        "available": true,
+        "prediction": 211.4,
+        "lower": 140.1,
+        "upper": 421.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 240.0,
+        "available": true,
+        "prediction": 199.3,
+        "lower": 127.9,
+        "upper": 409.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 256.0,
+        "available": true,
+        "prediction": 205.0,
+        "lower": 133.6,
+        "upper": 415.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 11.0,
+        "available": true,
+        "prediction": 192.2,
+        "lower": 120.9,
+        "upper": 402.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-11",
+        "actual": 100.0,
+        "available": true,
+        "prediction": 80.0,
+        "lower": 0.0,
+        "upper": 275.2,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 56.0,
+        "available": true,
+        "prediction": 136.0,
+        "lower": 0.0,
+        "upper": 331.2,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 303.0,
+        "available": true,
+        "prediction": 24.0,
+        "lower": 0.0,
+        "upper": 219.2,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 107.0,
+        "available": true,
+        "prediction": 56.0,
+        "lower": 0.0,
+        "upper": 251.2,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 297.0,
+        "available": true,
+        "prediction": 1312.0,
+        "lower": 1137.4,
+        "upper": 1507.2,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 94.0,
+        "available": true,
+        "prediction": 200.0,
+        "lower": 25.4,
+        "upper": 395.2,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 368.0,
+        "available": true,
+        "prediction": 80.0,
+        "lower": 0.0,
+        "upper": 274.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 157.0,
+        "available": true,
+        "prediction": 136.0,
+        "lower": 0.0,
+        "upper": 330.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 190.0,
+        "available": true,
+        "prediction": 24.0,
+        "lower": 0.0,
+        "upper": 218.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 132.0,
+        "available": true,
+        "prediction": 56.0,
+        "lower": 0.0,
+        "upper": 250.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 80.0,
+        "available": true,
+        "prediction": 1312.0,
+        "lower": 1125.8,
+        "upper": 1506.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 355.0,
+        "available": true,
+        "prediction": 200.0,
+        "lower": 13.8,
+        "upper": 394.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 272.0,
+        "available": true,
+        "prediction": 80.0,
+        "lower": 0.0,
+        "upper": 274.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 8.0,
+        "available": true,
+        "prediction": 136.0,
+        "lower": 0.0,
+        "upper": 330.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 56.0,
+        "available": true,
+        "prediction": 24.0,
+        "lower": 0.0,
+        "upper": 218.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 127.0,
+        "available": true,
+        "prediction": 56.0,
+        "lower": 0.0,
+        "upper": 250.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 112.0,
+        "available": true,
+        "prediction": 1312.0,
+        "lower": 1125.8,
+        "upper": 1506.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 88.0,
+        "available": true,
+        "prediction": 200.0,
+        "lower": 13.8,
+        "upper": 394.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 504.0,
+        "available": true,
+        "prediction": 80.0,
+        "lower": 0.0,
+        "upper": 274.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 66.0,
+        "available": true,
+        "prediction": 136.0,
+        "lower": 0.0,
+        "upper": 330.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 133.0,
+        "available": true,
+        "prediction": 24.0,
+        "lower": 0.0,
+        "upper": 218.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 240.0,
+        "available": true,
+        "prediction": 56.0,
+        "lower": 0.0,
+        "upper": 250.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 256.0,
+        "available": true,
+        "prediction": 1312.0,
+        "lower": 1125.8,
+        "upper": 1506.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 11.0,
+        "available": true,
+        "prediction": 200.0,
+        "lower": 13.8,
+        "upper": 394.9,
+        "model": "seasonal_naive"
+      }
+    ],
+    "85099B": [
+      {
+        "date": "2011-11-11",
+        "actual": 48.0,
+        "available": true,
+        "prediction": 173.5,
+        "lower": 57.7,
+        "upper": 525.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 48.0,
+        "available": true,
+        "prediction": 69.3,
+        "lower": 0.0,
+        "upper": 420.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 660.0,
+        "available": true,
+        "prediction": 181.3,
+        "lower": 65.4,
+        "upper": 532.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 380.0,
+        "available": true,
+        "prediction": 178.5,
+        "lower": 62.6,
+        "upper": 530.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 316.0,
+        "available": true,
+        "prediction": 183.9,
+        "lower": 68.0,
+        "upper": 535.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 97.0,
+        "available": true,
+        "prediction": 195.4,
+        "lower": 79.5,
+        "upper": 546.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 62.0,
+        "available": true,
+        "prediction": 141.8,
+        "lower": 22.0,
+        "upper": 495.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 87.0,
+        "available": true,
+        "prediction": 68.7,
+        "lower": 0.0,
+        "upper": 422.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 147.0,
+        "available": true,
+        "prediction": 179.4,
+        "lower": 59.6,
+        "upper": 533.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 132.0,
+        "available": true,
+        "prediction": 175.2,
+        "lower": 55.4,
+        "upper": 528.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 146.0,
+        "available": true,
+        "prediction": 181.3,
+        "lower": 61.5,
+        "upper": 535.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 245.0,
+        "available": true,
+        "prediction": 192.8,
+        "lower": 73.0,
+        "upper": 546.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 55.0,
+        "available": true,
+        "prediction": 143.0,
+        "lower": 23.2,
+        "upper": 496.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 28.0,
+        "available": true,
+        "prediction": 66.6,
+        "lower": 0.0,
+        "upper": 420.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 42.0,
+        "available": true,
+        "prediction": 179.4,
+        "lower": 59.6,
+        "upper": 533.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 165.0,
+        "available": true,
+        "prediction": 182.4,
+        "lower": 62.6,
+        "upper": 536.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 189.0,
+        "available": true,
+        "prediction": 190.6,
+        "lower": 70.8,
+        "upper": 544.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 149.0,
+        "available": true,
+        "prediction": 353.7,
+        "lower": 233.9,
+        "upper": 707.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 493.0,
+        "available": true,
+        "prediction": 246.5,
+        "lower": 126.7,
+        "upper": 600.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 12.0,
+        "available": true,
+        "prediction": 108.2,
+        "lower": 0.0,
+        "upper": 462.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 66.0,
+        "available": true,
+        "prediction": 251.5,
+        "lower": 131.7,
+        "upper": 605.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 175.0,
+        "available": true,
+        "prediction": 232.7,
+        "lower": 112.9,
+        "upper": 586.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 89.0,
+        "available": true,
+        "prediction": 238.9,
+        "lower": 119.1,
+        "upper": 592.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 106.0,
+        "available": true,
+        "prediction": 245.0,
+        "lower": 125.2,
+        "upper": 598.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-11",
+        "actual": 48.0,
+        "available": true,
+        "prediction": 58.0,
+        "lower": 0.0,
+        "upper": 385.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 48.0,
+        "available": true,
+        "prediction": 120.0,
+        "lower": 0.0,
+        "upper": 447.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 660.0,
+        "available": true,
+        "prediction": 146.0,
+        "lower": 0.0,
+        "upper": 473.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 380.0,
+        "available": true,
+        "prediction": 159.0,
+        "lower": 0.0,
+        "upper": 486.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 316.0,
+        "available": true,
+        "prediction": 725.0,
+        "lower": 431.7,
+        "upper": 1052.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 97.0,
+        "available": true,
+        "prediction": 1074.0,
+        "lower": 780.7,
+        "upper": 1401.9,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 62.0,
+        "available": true,
+        "prediction": 58.0,
+        "lower": 0.0,
+        "upper": 385.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 87.0,
+        "available": true,
+        "prediction": 120.0,
+        "lower": 0.0,
+        "upper": 447.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 147.0,
+        "available": true,
+        "prediction": 146.0,
+        "lower": 0.0,
+        "upper": 473.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 132.0,
+        "available": true,
+        "prediction": 159.0,
+        "lower": 0.0,
+        "upper": 486.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 146.0,
+        "available": true,
+        "prediction": 725.0,
+        "lower": 412.2,
+        "upper": 1052.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 245.0,
+        "available": true,
+        "prediction": 1074.0,
+        "lower": 761.2,
+        "upper": 1401.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 55.0,
+        "available": true,
+        "prediction": 58.0,
+        "lower": 0.0,
+        "upper": 385.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 28.0,
+        "available": true,
+        "prediction": 120.0,
+        "lower": 0.0,
+        "upper": 447.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 42.0,
+        "available": true,
+        "prediction": 146.0,
+        "lower": 0.0,
+        "upper": 473.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 165.0,
+        "available": true,
+        "prediction": 159.0,
+        "lower": 0.0,
+        "upper": 486.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 189.0,
+        "available": true,
+        "prediction": 725.0,
+        "lower": 412.2,
+        "upper": 1052.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 149.0,
+        "available": true,
+        "prediction": 1074.0,
+        "lower": 761.2,
+        "upper": 1401.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 493.0,
+        "available": true,
+        "prediction": 58.0,
+        "lower": 0.0,
+        "upper": 385.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 12.0,
+        "available": true,
+        "prediction": 120.0,
+        "lower": 0.0,
+        "upper": 447.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 66.0,
+        "available": true,
+        "prediction": 146.0,
+        "lower": 0.0,
+        "upper": 473.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 175.0,
+        "available": true,
+        "prediction": 159.0,
+        "lower": 0.0,
+        "upper": 486.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 89.0,
+        "available": true,
+        "prediction": 725.0,
+        "lower": 412.2,
+        "upper": 1052.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 106.0,
+        "available": true,
+        "prediction": 1074.0,
+        "lower": 761.2,
+        "upper": 1401.4,
+        "model": "seasonal_naive"
+      }
+    ],
+    "85123A": [
+      {
+        "date": "2011-11-11",
+        "actual": 134.0,
+        "available": true,
+        "prediction": 112.9,
+        "lower": 62.8,
+        "upper": 264.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 67.0,
+        "available": true,
+        "prediction": 78.1,
+        "lower": 28.1,
+        "upper": 230.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 380.0,
+        "available": true,
+        "prediction": 112.0,
+        "lower": 62.0,
+        "upper": 263.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 457.0,
+        "available": true,
+        "prediction": 110.9,
+        "lower": 60.9,
+        "upper": 262.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 160.0,
+        "available": true,
+        "prediction": 104.2,
+        "lower": 54.1,
+        "upper": 256.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 102.0,
+        "available": true,
+        "prediction": 113.8,
+        "lower": 63.7,
+        "upper": 265.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 125.0,
+        "available": true,
+        "prediction": 97.7,
+        "lower": 45.9,
+        "upper": 250.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 102.0,
+        "available": true,
+        "prediction": 75.4,
+        "lower": 23.6,
+        "upper": 228.2,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 36.0,
+        "available": true,
+        "prediction": 106.7,
+        "lower": 55.0,
+        "upper": 259.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 253.0,
+        "available": true,
+        "prediction": 104.9,
+        "lower": 53.2,
+        "upper": 257.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 251.0,
+        "available": true,
+        "prediction": 98.2,
+        "lower": 46.4,
+        "upper": 251.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 131.0,
+        "available": true,
+        "prediction": 107.8,
+        "lower": 56.0,
+        "upper": 260.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 225.0,
+        "available": true,
+        "prediction": 94.5,
+        "lower": 42.8,
+        "upper": 247.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 8.0,
+        "available": true,
+        "prediction": 71.8,
+        "lower": 20.0,
+        "upper": 224.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 133.0,
+        "available": true,
+        "prediction": 106.0,
+        "lower": 54.3,
+        "upper": 258.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 117.0,
+        "available": true,
+        "prediction": 118.3,
+        "lower": 66.5,
+        "upper": 271.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 315.0,
+        "available": true,
+        "prediction": 115.2,
+        "lower": 63.4,
+        "upper": 268.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 41.0,
+        "available": true,
+        "prediction": 187.0,
+        "lower": 135.2,
+        "upper": 339.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 117.0,
+        "available": true,
+        "prediction": 137.3,
+        "lower": 85.6,
+        "upper": 290.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 8.0,
+        "available": true,
+        "prediction": 87.0,
+        "lower": 35.2,
+        "upper": 239.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 313.0,
+        "available": true,
+        "prediction": 141.9,
+        "lower": 90.1,
+        "upper": 294.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 39.0,
+        "available": true,
+        "prediction": 133.9,
+        "lower": 82.1,
+        "upper": 286.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 202.0,
+        "available": true,
+        "prediction": 130.1,
+        "lower": 78.3,
+        "upper": 282.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 115.0,
+        "available": true,
+        "prediction": 128.9,
+        "lower": 77.2,
+        "upper": 281.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-11",
+        "actual": 134.0,
+        "available": true,
+        "prediction": 85.0,
+        "lower": 0.0,
+        "upper": 226.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 67.0,
+        "available": true,
+        "prediction": 86.0,
+        "lower": 0.0,
+        "upper": 227.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 380.0,
+        "available": true,
+        "prediction": 98.0,
+        "lower": 0.0,
+        "upper": 239.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 457.0,
+        "available": true,
+        "prediction": 111.0,
+        "lower": 0.0,
+        "upper": 252.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 160.0,
+        "available": true,
+        "prediction": 113.0,
+        "lower": 0.0,
+        "upper": 254.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 102.0,
+        "available": true,
+        "prediction": 71.0,
+        "lower": 0.0,
+        "upper": 212.6,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 125.0,
+        "available": true,
+        "prediction": 85.0,
+        "lower": 0.0,
+        "upper": 226.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 102.0,
+        "available": true,
+        "prediction": 86.0,
+        "lower": 0.0,
+        "upper": 227.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 36.0,
+        "available": true,
+        "prediction": 98.0,
+        "lower": 0.0,
+        "upper": 239.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 253.0,
+        "available": true,
+        "prediction": 111.0,
+        "lower": 0.0,
+        "upper": 252.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 251.0,
+        "available": true,
+        "prediction": 113.0,
+        "lower": 0.0,
+        "upper": 254.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 131.0,
+        "available": true,
+        "prediction": 71.0,
+        "lower": 0.0,
+        "upper": 212.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 225.0,
+        "available": true,
+        "prediction": 85.0,
+        "lower": 0.0,
+        "upper": 226.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 8.0,
+        "available": true,
+        "prediction": 86.0,
+        "lower": 0.0,
+        "upper": 227.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 133.0,
+        "available": true,
+        "prediction": 98.0,
+        "lower": 0.0,
+        "upper": 239.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 117.0,
+        "available": true,
+        "prediction": 111.0,
+        "lower": 0.0,
+        "upper": 252.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 315.0,
+        "available": true,
+        "prediction": 113.0,
+        "lower": 0.0,
+        "upper": 254.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 41.0,
+        "available": true,
+        "prediction": 71.0,
+        "lower": 0.0,
+        "upper": 212.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 117.0,
+        "available": true,
+        "prediction": 85.0,
+        "lower": 0.0,
+        "upper": 226.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 8.0,
+        "available": true,
+        "prediction": 86.0,
+        "lower": 0.0,
+        "upper": 227.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 313.0,
+        "available": true,
+        "prediction": 98.0,
+        "lower": 0.0,
+        "upper": 239.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 39.0,
+        "available": true,
+        "prediction": 111.0,
+        "lower": 0.0,
+        "upper": 252.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 202.0,
+        "available": true,
+        "prediction": 113.0,
+        "lower": 0.0,
+        "upper": 254.5,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 115.0,
+        "available": true,
+        "prediction": 71.0,
+        "lower": 0.0,
+        "upper": 212.5,
+        "model": "seasonal_naive"
+      }
+    ],
+    "__ALL__": [
+      {
+        "date": "2011-11-11",
+        "actual": 29020.0,
+        "available": true,
+        "prediction": 30399.9,
+        "lower": 22684.9,
+        "upper": 44679.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 20838.0,
+        "available": true,
+        "prediction": 14695.9,
+        "lower": 6980.9,
+        "upper": 28975.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 47605.0,
+        "available": true,
+        "prediction": 31976.7,
+        "lower": 24261.7,
+        "upper": 46255.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 30888.0,
+        "available": true,
+        "prediction": 31953.2,
+        "lower": 24238.1,
+        "upper": 46232.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 33119.0,
+        "available": true,
+        "prediction": 31795.4,
+        "lower": 24080.3,
+        "upper": 46074.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 31876.0,
+        "available": true,
+        "prediction": 33724.2,
+        "lower": 26009.1,
+        "upper": 48003.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 24296.0,
+        "available": true,
+        "prediction": 26563.8,
+        "lower": 19290.1,
+        "upper": 42988.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 19405.0,
+        "available": true,
+        "prediction": 14416.9,
+        "lower": 7143.2,
+        "upper": 30841.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 25794.0,
+        "available": true,
+        "prediction": 31565.0,
+        "lower": 24291.3,
+        "upper": 47989.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 34312.0,
+        "available": true,
+        "prediction": 31394.3,
+        "lower": 24120.6,
+        "upper": 47819.1,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 39405.0,
+        "available": true,
+        "prediction": 31236.5,
+        "lower": 23962.8,
+        "upper": 47661.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 26598.0,
+        "available": true,
+        "prediction": 33374.6,
+        "lower": 26100.9,
+        "upper": 49799.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 31749.0,
+        "available": true,
+        "prediction": 26696.6,
+        "lower": 19422.9,
+        "upper": 43121.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 11152.0,
+        "available": true,
+        "prediction": 14194.8,
+        "lower": 6921.1,
+        "upper": 30619.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 29443.0,
+        "available": true,
+        "prediction": 31565.0,
+        "lower": 24291.3,
+        "upper": 47989.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 30913.0,
+        "available": true,
+        "prediction": 33020.5,
+        "lower": 25746.8,
+        "upper": 49445.3,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 28500.0,
+        "available": true,
+        "prediction": 32986.7,
+        "lower": 25713.0,
+        "upper": 49411.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 27026.0,
+        "available": true,
+        "prediction": 55487.6,
+        "lower": 48213.9,
+        "upper": 71912.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 28805.0,
+        "available": true,
+        "prediction": 39057.8,
+        "lower": 31784.1,
+        "upper": 55482.6,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 12399.0,
+        "available": true,
+        "prediction": 20353.0,
+        "lower": 13079.3,
+        "upper": 36777.8,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 43841.0,
+        "available": true,
+        "prediction": 40011.7,
+        "lower": 32738.0,
+        "upper": 56436.5,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 30438.0,
+        "available": true,
+        "prediction": 38093.9,
+        "lower": 30820.2,
+        "upper": 54518.7,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 41957.0,
+        "available": true,
+        "prediction": 37936.1,
+        "lower": 30662.4,
+        "upper": 54360.9,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 35653.0,
+        "available": true,
+        "prediction": 39506.6,
+        "lower": 32232.9,
+        "upper": 55931.4,
+        "model": "gradient_boosting"
+      },
+      {
+        "date": "2011-11-11",
+        "actual": 29020.0,
+        "available": true,
+        "prediction": 35413.0,
+        "lower": 19330.6,
+        "upper": 46795.1,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-12",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-13",
+        "actual": 20838.0,
+        "available": true,
+        "prediction": 23275.0,
+        "lower": 7192.6,
+        "upper": 34657.1,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-14",
+        "actual": 47605.0,
+        "available": true,
+        "prediction": 31378.0,
+        "lower": 15295.6,
+        "upper": 42760.1,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-15",
+        "actual": 30888.0,
+        "available": true,
+        "prediction": 26491.0,
+        "lower": 10408.6,
+        "upper": 37873.1,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-16",
+        "actual": 33119.0,
+        "available": true,
+        "prediction": 37057.0,
+        "lower": 20974.6,
+        "upper": 48439.1,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-17",
+        "actual": 31876.0,
+        "available": true,
+        "prediction": 38268.0,
+        "lower": 22185.6,
+        "upper": 49650.1,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-18",
+        "actual": 24296.0,
+        "available": true,
+        "prediction": 35413.0,
+        "lower": 20120.5,
+        "upper": 54296.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-19",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-20",
+        "actual": 19405.0,
+        "available": true,
+        "prediction": 23275.0,
+        "lower": 7982.5,
+        "upper": 42158.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-21",
+        "actual": 25794.0,
+        "available": true,
+        "prediction": 31378.0,
+        "lower": 16085.5,
+        "upper": 50261.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-22",
+        "actual": 34312.0,
+        "available": true,
+        "prediction": 26491.0,
+        "lower": 11198.5,
+        "upper": 45374.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-23",
+        "actual": 39405.0,
+        "available": true,
+        "prediction": 37057.0,
+        "lower": 21764.5,
+        "upper": 55940.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-24",
+        "actual": 26598.0,
+        "available": true,
+        "prediction": 38268.0,
+        "lower": 22975.5,
+        "upper": 57151.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-25",
+        "actual": 31749.0,
+        "available": true,
+        "prediction": 35413.0,
+        "lower": 20120.5,
+        "upper": 54296.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-26",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-27",
+        "actual": 11152.0,
+        "available": true,
+        "prediction": 23275.0,
+        "lower": 7982.5,
+        "upper": 42158.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-28",
+        "actual": 29443.0,
+        "available": true,
+        "prediction": 31378.0,
+        "lower": 16085.5,
+        "upper": 50261.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-29",
+        "actual": 30913.0,
+        "available": true,
+        "prediction": 26491.0,
+        "lower": 11198.5,
+        "upper": 45374.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-11-30",
+        "actual": 28500.0,
+        "available": true,
+        "prediction": 37057.0,
+        "lower": 21764.5,
+        "upper": 55940.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-01",
+        "actual": 27026.0,
+        "available": true,
+        "prediction": 38268.0,
+        "lower": 22975.5,
+        "upper": 57151.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-02",
+        "actual": 28805.0,
+        "available": true,
+        "prediction": 35413.0,
+        "lower": 20120.5,
+        "upper": 54296.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-03",
+        "actual": null,
+        "available": false,
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-04",
+        "actual": 12399.0,
+        "available": true,
+        "prediction": 23275.0,
+        "lower": 7982.5,
+        "upper": 42158.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-05",
+        "actual": 43841.0,
+        "available": true,
+        "prediction": 31378.0,
+        "lower": 16085.5,
+        "upper": 50261.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-06",
+        "actual": 30438.0,
+        "available": true,
+        "prediction": 26491.0,
+        "lower": 11198.5,
+        "upper": 45374.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-07",
+        "actual": 41957.0,
+        "available": true,
+        "prediction": 37057.0,
+        "lower": 21764.5,
+        "upper": 55940.4,
+        "model": "seasonal_naive"
+      },
+      {
+        "date": "2011-12-08",
+        "actual": 35653.0,
+        "available": true,
+        "prediction": 38268.0,
+        "lower": 22975.5,
+        "upper": 57151.4,
+        "model": "seasonal_naive"
+      }
+    ]
+  },
+  "latest_forecast": {
+    "22197": [
+      {
+        "date": "2011-12-09",
+        "prediction": 396.5,
+        "lower": 130.3,
+        "upper": 1077.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-10",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-11",
+        "prediction": 60.4,
+        "lower": 0.0,
+        "upper": 741.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-12",
+        "prediction": 288.4,
+        "lower": 22.2,
+        "upper": 969.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-13",
+        "prediction": 261.8,
+        "lower": 0.0,
+        "upper": 943.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-14",
+        "prediction": 261.8,
+        "lower": 0.0,
+        "upper": 943.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-15",
+        "prediction": 246.9,
+        "lower": 0.0,
+        "upper": 928.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-16",
+        "prediction": 202.8,
+        "lower": 0.0,
+        "upper": 900.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-17",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-18",
+        "prediction": 27.7,
+        "lower": 0.0,
+        "upper": 725.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-19",
+        "prediction": 277.0,
+        "lower": 1.9,
+        "upper": 974.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-20",
+        "prediction": 245.7,
+        "lower": 0.0,
+        "upper": 943.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-21",
+        "prediction": 201.4,
+        "lower": 0.0,
+        "upper": 898.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-22",
+        "prediction": 119.9,
+        "lower": 0.0,
+        "upper": 817.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-23",
+        "prediction": 44.3,
+        "lower": 0.0,
+        "upper": 741.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-24",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-25",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 697.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-26",
+        "prediction": 110.3,
+        "lower": 0.0,
+        "upper": 807.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-27",
+        "prediction": 127.8,
+        "lower": 0.0,
+        "upper": 825.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-28",
+        "prediction": 127.8,
+        "lower": 0.0,
+        "upper": 825.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-29",
+        "prediction": 134.1,
+        "lower": 0.0,
+        "upper": 831.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-30",
+        "prediction": 36.3,
+        "lower": 0.0,
+        "upper": 733.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-31",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2012-01-01",
+        "prediction": 97.7,
+        "lower": 0.0,
+        "upper": 795.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-02",
+        "prediction": 163.9,
+        "lower": 0.0,
+        "upper": 861.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-03",
+        "prediction": 189.2,
+        "lower": 0.0,
+        "upper": 886.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-04",
+        "prediction": 229.9,
+        "lower": 0.0,
+        "upper": 927.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-05",
+        "prediction": 278.2,
+        "lower": 3.1,
+        "upper": 975.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      }
+    ],
+    "23084": [
+      {
+        "date": "2011-12-09",
+        "prediction": 445.5,
+        "lower": 153.8,
+        "upper": 1192.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-10",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-11",
+        "prediction": 69.5,
+        "lower": 0.0,
+        "upper": 816.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-12",
+        "prediction": 349.3,
+        "lower": 57.5,
+        "upper": 1095.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-13",
+        "prediction": 281.4,
+        "lower": 0.0,
+        "upper": 1028.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-14",
+        "prediction": 277.8,
+        "lower": 0.0,
+        "upper": 1024.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-15",
+        "prediction": 279.0,
+        "lower": 0.0,
+        "upper": 1025.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-16",
+        "prediction": 201.4,
+        "lower": 0.0,
+        "upper": 965.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-17",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-18",
+        "prediction": 33.6,
+        "lower": 0.0,
+        "upper": 797.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-19",
+        "prediction": 305.0,
+        "lower": 3.6,
+        "upper": 1069.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-20",
+        "prediction": 304.4,
+        "lower": 3.0,
+        "upper": 1068.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-21",
+        "prediction": 250.8,
+        "lower": 0.0,
+        "upper": 1015.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-22",
+        "prediction": 136.7,
+        "lower": 0.0,
+        "upper": 900.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-23",
+        "prediction": 68.7,
+        "lower": 0.0,
+        "upper": 833.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-24",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-25",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 764.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-26",
+        "prediction": 163.3,
+        "lower": 0.0,
+        "upper": 927.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-27",
+        "prediction": 131.5,
+        "lower": 0.0,
+        "upper": 895.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-28",
+        "prediction": 127.8,
+        "lower": 0.0,
+        "upper": 892.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-29",
+        "prediction": 152.2,
+        "lower": 0.0,
+        "upper": 916.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-30",
+        "prediction": 60.0,
+        "lower": 0.0,
+        "upper": 824.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-31",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2012-01-01",
+        "prediction": 109.0,
+        "lower": 0.0,
+        "upper": 873.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-02",
+        "prediction": 184.5,
+        "lower": 0.0,
+        "upper": 948.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-03",
+        "prediction": 215.2,
+        "lower": 0.0,
+        "upper": 979.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-04",
+        "prediction": 256.2,
+        "lower": 0.0,
+        "upper": 1020.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-05",
+        "prediction": 303.3,
+        "lower": 1.8,
+        "upper": 1067.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      }
+    ],
+    "84077": [
+      {
+        "date": "2011-12-09",
+        "prediction": 300.2,
+        "lower": 155.4,
+        "upper": 670.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-10",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-11",
+        "prediction": 135.7,
+        "lower": 0.0,
+        "upper": 506.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-12",
+        "prediction": 252.7,
+        "lower": 107.8,
+        "upper": 623.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-13",
+        "prediction": 229.8,
+        "lower": 85.0,
+        "upper": 600.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-14",
+        "prediction": 261.1,
+        "lower": 116.3,
+        "upper": 631.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-15",
+        "prediction": 268.1,
+        "lower": 123.3,
+        "upper": 638.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-16",
+        "prediction": 203.5,
+        "lower": 53.8,
+        "upper": 582.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-17",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-18",
+        "prediction": 122.9,
+        "lower": 0.0,
+        "upper": 502.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-19",
+        "prediction": 245.8,
+        "lower": 96.1,
+        "upper": 625.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-20",
+        "prediction": 223.4,
+        "lower": 73.8,
+        "upper": 602.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-21",
+        "prediction": 236.1,
+        "lower": 86.5,
+        "upper": 615.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-22",
+        "prediction": 229.0,
+        "lower": 79.4,
+        "upper": 608.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-23",
+        "prediction": 161.1,
+        "lower": 11.5,
+        "upper": 540.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-24",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-25",
+        "prediction": 89.0,
+        "lower": 0.0,
+        "upper": 468.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-26",
+        "prediction": 195.5,
+        "lower": 45.9,
+        "upper": 575.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-27",
+        "prediction": 178.7,
+        "lower": 29.0,
+        "upper": 558.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-28",
+        "prediction": 210.0,
+        "lower": 60.4,
+        "upper": 589.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-29",
+        "prediction": 243.2,
+        "lower": 93.5,
+        "upper": 622.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-30",
+        "prediction": 156.8,
+        "lower": 7.1,
+        "upper": 536.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-31",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2012-01-01",
+        "prediction": 34.3,
+        "lower": 0.0,
+        "upper": 413.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-02",
+        "prediction": 62.1,
+        "lower": 0.0,
+        "upper": 441.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-03",
+        "prediction": 82.1,
+        "lower": 0.0,
+        "upper": 461.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-04",
+        "prediction": 89.9,
+        "lower": 0.0,
+        "upper": 469.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-05",
+        "prediction": 108.2,
+        "lower": 0.0,
+        "upper": 487.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      }
+    ],
+    "84879": [
+      {
+        "date": "2011-12-09",
+        "prediction": 167.9,
+        "lower": 69.9,
+        "upper": 418.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-10",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-11",
+        "prediction": 56.7,
+        "lower": 0.0,
+        "upper": 307.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-12",
+        "prediction": 139.5,
+        "lower": 41.6,
+        "upper": 390.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-13",
+        "prediction": 126.8,
+        "lower": 28.9,
+        "upper": 377.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-14",
+        "prediction": 132.5,
+        "lower": 34.5,
+        "upper": 383.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-15",
+        "prediction": 124.1,
+        "lower": 26.1,
+        "upper": 374.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-16",
+        "prediction": 90.2,
+        "lower": 0.0,
+        "upper": 346.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-17",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-18",
+        "prediction": 48.9,
+        "lower": 0.0,
+        "upper": 305.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-19",
+        "prediction": 124.7,
+        "lower": 23.4,
+        "upper": 381.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-20",
+        "prediction": 120.9,
+        "lower": 19.7,
+        "upper": 377.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-21",
+        "prediction": 123.9,
+        "lower": 22.6,
+        "upper": 380.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-22",
+        "prediction": 72.6,
+        "lower": 0.0,
+        "upper": 329.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-23",
+        "prediction": 41.6,
+        "lower": 0.0,
+        "upper": 298.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-24",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-25",
+        "prediction": 1.5,
+        "lower": 0.0,
+        "upper": 258.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-26",
+        "prediction": 72.4,
+        "lower": 0.0,
+        "upper": 329.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-27",
+        "prediction": 72.4,
+        "lower": 0.0,
+        "upper": 329.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-28",
+        "prediction": 77.2,
+        "lower": 0.0,
+        "upper": 333.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-29",
+        "prediction": 78.7,
+        "lower": 0.0,
+        "upper": 335.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-30",
+        "prediction": 41.0,
+        "lower": 0.0,
+        "upper": 297.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-31",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2012-01-01",
+        "prediction": 45.0,
+        "lower": 0.0,
+        "upper": 301.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-02",
+        "prediction": 58.9,
+        "lower": 0.0,
+        "upper": 315.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-03",
+        "prediction": 62.9,
+        "lower": 0.0,
+        "upper": 319.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-04",
+        "prediction": 75.9,
+        "lower": 0.0,
+        "upper": 332.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-05",
+        "prediction": 86.6,
+        "lower": 0.0,
+        "upper": 343.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      }
+    ],
+    "85099B": [
+      {
+        "date": "2011-12-09",
+        "prediction": 140.2,
+        "lower": 36.4,
+        "upper": 406.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-10",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-11",
+        "prediction": 16.0,
+        "lower": 0.0,
+        "upper": 281.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-12",
+        "prediction": 114.5,
+        "lower": 10.7,
+        "upper": 380.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-13",
+        "prediction": 102.7,
+        "lower": 0.0,
+        "upper": 368.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-14",
+        "prediction": 107.5,
+        "lower": 3.6,
+        "upper": 373.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-15",
+        "prediction": 103.6,
+        "lower": 0.0,
+        "upper": 369.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-16",
+        "prediction": 70.8,
+        "lower": 0.0,
+        "upper": 342.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-17",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-18",
+        "prediction": 7.7,
+        "lower": 0.0,
+        "upper": 279.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-19",
+        "prediction": 110.1,
+        "lower": 2.8,
+        "upper": 382.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-20",
+        "prediction": 96.4,
+        "lower": 0.0,
+        "upper": 368.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-21",
+        "prediction": 98.3,
+        "lower": 0.0,
+        "upper": 370.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-22",
+        "prediction": 56.0,
+        "lower": 0.0,
+        "upper": 328.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-23",
+        "prediction": 27.0,
+        "lower": 0.0,
+        "upper": 299.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-24",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-25",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 272.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-26",
+        "prediction": 39.3,
+        "lower": 0.0,
+        "upper": 311.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-27",
+        "prediction": 52.6,
+        "lower": 0.0,
+        "upper": 324.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-28",
+        "prediction": 48.9,
+        "lower": 0.0,
+        "upper": 320.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-29",
+        "prediction": 62.5,
+        "lower": 0.0,
+        "upper": 334.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-30",
+        "prediction": 24.6,
+        "lower": 0.0,
+        "upper": 296.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-31",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2012-01-01",
+        "prediction": 42.7,
+        "lower": 0.0,
+        "upper": 314.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-02",
+        "prediction": 59.3,
+        "lower": 0.0,
+        "upper": 331.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-03",
+        "prediction": 62.8,
+        "lower": 0.0,
+        "upper": 334.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-04",
+        "prediction": 80.3,
+        "lower": 0.0,
+        "upper": 352.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-05",
+        "prediction": 85.1,
+        "lower": 0.0,
+        "upper": 357.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      }
+    ],
+    "__ALL__": [
+      {
+        "date": "2011-12-09",
+        "prediction": 33468.9,
+        "lower": 24652.6,
+        "upper": 48292.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-10",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-11",
+        "prediction": 11071.7,
+        "lower": 2255.3,
+        "upper": 25894.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-12",
+        "prediction": 24346.5,
+        "lower": 15530.2,
+        "upper": 39169.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-13",
+        "prediction": 22445.7,
+        "lower": 13629.4,
+        "upper": 37268.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-14",
+        "prediction": 22407.3,
+        "lower": 13591.0,
+        "upper": 37230.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-15",
+        "prediction": 23709.1,
+        "lower": 14892.8,
+        "upper": 38532.2,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-16",
+        "prediction": 17466.5,
+        "lower": 8352.7,
+        "upper": 33703.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-17",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-18",
+        "prediction": 6998.6,
+        "lower": 0.0,
+        "upper": 23235.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-19",
+        "prediction": 21772.6,
+        "lower": 12658.8,
+        "upper": 38009.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-20",
+        "prediction": 21301.4,
+        "lower": 12187.6,
+        "upper": 37537.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-21",
+        "prediction": 17439.9,
+        "lower": 8326.1,
+        "upper": 33676.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-22",
+        "prediction": 14738.3,
+        "lower": 5624.5,
+        "upper": 30974.8,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-23",
+        "prediction": 8910.1,
+        "lower": 0.0,
+        "upper": 25146.6,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-24",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2011-12-25",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 16236.5,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-26",
+        "prediction": 13172.7,
+        "lower": 4058.9,
+        "upper": 29409.1,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-27",
+        "prediction": 13292.6,
+        "lower": 4178.8,
+        "upper": 29529.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-28",
+        "prediction": 13254.2,
+        "lower": 4140.4,
+        "upper": 29490.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-29",
+        "prediction": 15403.9,
+        "lower": 6290.1,
+        "upper": 31640.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-30",
+        "prediction": 8677.9,
+        "lower": 0.0,
+        "upper": 24914.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2011-12-31",
+        "prediction": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "model": "gradient_boosting",
+        "expected_non_trading": true
+      },
+      {
+        "date": "2012-01-01",
+        "prediction": 10804.4,
+        "lower": 1690.6,
+        "upper": 27040.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-02",
+        "prediction": 16585.9,
+        "lower": 7472.1,
+        "upper": 32822.4,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-03",
+        "prediction": 17812.2,
+        "lower": 8698.4,
+        "upper": 34048.7,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-04",
+        "prediction": 20162.8,
+        "lower": 11049.0,
+        "upper": 36399.3,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      },
+      {
+        "date": "2012-01-05",
+        "prediction": 24388.4,
+        "lower": 15274.6,
+        "upper": 40624.9,
+        "model": "gradient_boosting",
+        "expected_non_trading": false
+      }
+    ]
+  },
+  "charts": [
+    "analysis/forecast/test_aggregate.png",
+    "analysis/forecast/test_products.png",
+    "analysis/forecast/error_by_model.png"
+  ],
+  "limitations": [
+    "Observed sales are not unconstrained demand: no stock-out, inventory or lost-sales data exist in the source.",
+    "No prices, promotions, customer aggregates or other exogenous drivers are used.",
+    "Days without source records (including almost every Saturday and holiday gaps) are unavailable, not zero; they are forecast but never scored.",
+    "The final source day 2011-12-09 is partial and is excluded as an actual.",
+    "Only about two years of history: annual seasonality (the November peak) is seen roughly once before the test period.",
+    "Holiday closures (e.g. late December) are not modelled; the latest forecast will over-forecast days the business is closed.",
+    "Product series are intermittent and contain bulk orders, so product-level WAPE is high and intervals are wide.",
+    "Gradient-boosting configuration was chosen among 3 candidates on the same validation folds, which slightly flatters its validation score; the test period is the unbiased check."
+  ]
+}

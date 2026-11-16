@@ -1,0 +1,66 @@
+{
+  "label": "SIMULATED - assumptions, not client outcomes",
+  "cost_unit": "abstract cost units (not GBP)",
+  "review_period_days": {
+    "value": 7,
+    "status": "ASSUMED"
+  },
+  "lead_time_days": {
+    "value": 3,
+    "status": "ASSUMED"
+  },
+  "holding_cost_per_unit_day": {
+    "value": 1.0,
+    "status": "ASSUMED"
+  },
+  "shortage_cost_per_unit": {
+    "value": 100.0,
+    "status": "ASSUMED",
+    "note": "lost-sale penalty; ratio to holding = 100 (one lost unit costs as much as holding one unit for 100 days)"
+  },
+  "starting_stock_days_of_cover": {
+    "value": 14,
+    "status": "ASSUMED",
+    "note": "starting on-hand = 14 x mu0, identical for every policy"
+  },
+  "safety_z": {
+    "value": 0.84,
+    "status": "ASSUMED",
+    "note": "about an 80% one-sided normal quantile"
+  },
+  "mu0": {
+    "status": "ASSUMED",
+    "note": "calendar-day mean of observed sales in the 28 days ending at the episode start (unavailable days count as 0)"
+  },
+  "sigma0": {
+    "status": "ASSUMED",
+    "note": "std of daily observed sales on observation-available days in those 28 days"
+  },
+  "unavailable_day_demand": {
+    "value": 0,
+    "status": "ASSUMED",
+    "note": "no source records -> no recorded sales"
+  },
+  "demand_proxy": "observed positive merchandise units (censored by any historical stock-outs; not unconstrained demand)",
+  "end_of_episode": "orders still in transit at the end of the episode are ignored for every policy",
+  "grid": {
+    "lead_time_days": [
+      1,
+      3,
+      7,
+      14
+    ],
+    "shortage_to_holding_ratio": [
+      5,
+      10,
+      25,
+      100,
+      500
+    ],
+    "safety_z": [
+      0.0,
+      0.84,
+      1.28
+    ]
+  }
+}

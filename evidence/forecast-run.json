@@ -1,0 +1,199 @@
+{
+  "stage": "forecast",
+  "state": "passed",
+  "command": "PYTHONPATH=src .venv/Scripts/python.exe -m meridian.forecast --pytest",
+  "run_id": "20261116T204416-8db64317",
+  "git_sha": "3e7afbfa268e715f128e9f32032eb1edd3019ac0",
+  "source_tree_sha256": "6a9c11dbe266ab5185aae14ec56d097173ed3ed7d645634196a8914e0f2646d3",
+  "seed": 20261116,
+  "started_at": "2026-11-16T20:44:16.796464+00:00",
+  "durations_s": {
+    "load_and_config_s": 0.36,
+    "validation_s": 51.94,
+    "test_s": 6.05,
+    "latest_s": 1.3,
+    "total_s": 63.22
+  },
+  "software": {
+    "python": "3.11.9",
+    "duckdb": "1.2.2",
+    "pandas": "2.2.3",
+    "numpy": "2.2.6",
+    "scikit_learn": "1.6.1",
+    "matplotlib": "3.10.3"
+  },
+  "input": {
+    "snapshot_id": "20261116T192553-472ac294",
+    "manifest_sha256": "172e2d0bd4bc642246bdbda3330b8b5958e8623d87ae4bcdf4fcd3b6685dc112",
+    "source_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980"
+  },
+  "config_path": "analysis/forecast/config.json",
+  "config_sha256": "b2db0997dcc7ef9490352dd1cbe6828250352d95c31bfdb54513cbcf9a71d88e",
+  "outputs": {
+    "config.json": "b2db0997dcc7ef9490352dd1cbe6828250352d95c31bfdb54513cbcf9a71d88e",
+    "predictions.csv": "dd43135a4f61800545b26dc80638cebc3da3da1a697b6c3c782f682bf85956fc",
+    "metrics.json": "f74d877b739c1a2dca52d24817b322df9669a40c8a4b67fb09703168b2725506",
+    "serving.json": "b43e22d5b8f83b75cbd5ad806fc108cc737d8634f42285e034b2544a91b63f82"
+  },
+  "prediction_rows": 10584,
+  "promoted_model": "gradient_boosting",
+  "promoted_model_key": "gbm:g3",
+  "tuning_scores": {
+    "seasonal_naive": 0.6759838080811452,
+    "trailing_mean": 0.6456047652170596,
+    "gbm:g1": 0.5354194515977452,
+    "gbm:g2": 0.5383003612202524,
+    "gbm:g3": 0.524753084649972
+  },
+  "test_headline": [
+    {
+      "model": "gradient_boosting",
+      "model_key": "gbm:g3",
+      "horizon": 7,
+      "series_scope": "aggregate",
+      "mae": 6378.79144272,
+      "wape": 0.21410369693283657,
+      "wape_null_reason": null,
+      "coverage80": 0.8333333333333334,
+      "width80": 22855.82451508177,
+      "n": 24
+    },
+    {
+      "model": "gradient_boosting",
+      "model_key": "gbm:g3",
+      "horizon": 7,
+      "series_scope": "products",
+      "mae": 161.59788419897603,
+      "wape": 0.6470169865495687,
+      "wape_null_reason": null,
+      "coverage80": 0.7,
+      "width80": 418.9954769015123,
+      "n": 120
+    },
+    {
+      "model": "gradient_boosting",
+      "model_key": "gbm:g3",
+      "horizon": 28,
+      "series_scope": "aggregate",
+      "mae": 5879.83982374236,
+      "wape": 0.1973564200900332,
+      "wape_null_reason": null,
+      "coverage80": 0.7916666666666666,
+      "width80": 23272.424866491772,
+      "n": 24
+    },
+    {
+      "model": "gradient_boosting",
+      "model_key": "gbm:g3",
+      "horizon": 28,
+      "series_scope": "products",
+      "mae": 160.53317086497725,
+      "wape": 0.6427540123385028,
+      "wape_null_reason": null,
+      "coverage80": 0.7166666666666667,
+      "width80": 389.72288212921046,
+      "n": 120
+    },
+    {
+      "model": "seasonal_naive",
+      "model_key": "seasonal_naive",
+      "horizon": 7,
+      "series_scope": "aggregate",
+      "mae": 6582.291666666667,
+      "wape": 0.22093416798129314,
+      "wape_null_reason": null,
+      "coverage80": 0.8333333333333334,
+      "width80": 28295.540603521873,
+      "n": 24
+    },
+    {
+      "model": "seasonal_naive",
+      "model_key": "seasonal_naive",
+      "horizon": 7,
+      "series_scope": "products",
+      "mae": 196.73333333333332,
+      "wape": 0.7876947716125589,
+      "wape_null_reason": null,
+      "coverage80": 0.8166666666666667,
+      "width80": 467.5259647637553,
+      "n": 120
+    },
+    {
+      "model": "seasonal_naive",
+      "model_key": "seasonal_naive",
+      "horizon": 28,
+      "series_scope": "aggregate",
+      "mae": 6897.75,
+      "wape": 0.2315225052864767,
+      "wape_null_reason": null,
+      "coverage80": 0.9583333333333334,
+      "width80": 32498.016276633047,
+      "n": 24
+    },
+    {
+      "model": "seasonal_naive",
+      "model_key": "seasonal_naive",
+      "horizon": 28,
+      "series_scope": "products",
+      "mae": 299.5083333333333,
+      "wape": 1.199192552801041,
+      "wape_null_reason": null,
+      "coverage80": 0.7,
+      "width80": 443.36736596117754,
+      "n": 120
+    },
+    {
+      "model": "trailing_mean",
+      "model_key": "trailing_mean",
+      "horizon": 7,
+      "series_scope": "aggregate",
+      "mae": 6567.402777777777,
+      "wape": 0.22043442344771513,
+      "wape_null_reason": null,
+      "coverage80": 0.8333333333333334,
+      "width80": 29836.96790046497,
+      "n": 24
+    },
+    {
+      "model": "trailing_mean",
+      "model_key": "trailing_mean",
+      "horizon": 7,
+      "series_scope": "products",
+      "mae": 172.80555555555557,
+      "wape": 0.6918910502374518,
+      "wape_null_reason": null,
+      "coverage80": 0.85,
+      "width80": 471.6831501885699,
+      "n": 120
+    },
+    {
+      "model": "trailing_mean",
+      "model_key": "trailing_mean",
+      "horizon": 28,
+      "series_scope": "aggregate",
+      "mae": 7284.333333333333,
+      "wape": 0.24449814833462,
+      "wape_null_reason": null,
+      "coverage80": 0.8333333333333334,
+      "width80": 28434.375554565926,
+      "n": 24
+    },
+    {
+      "model": "trailing_mean",
+      "model_key": "trailing_mean",
+      "horizon": 28,
+      "series_scope": "products",
+      "mae": 171.6222222222222,
+      "wape": 0.687153136921246,
+      "wape_null_reason": null,
+      "coverage80": 0.8,
+      "width80": 426.55166174473635,
+      "n": 120
+    }
+  ],
+  "tests": {
+    "command": "python -m pytest -q tests/test_forecast.py",
+    "returncode": 0,
+    "summary": "7 passed in 5.12s"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "stage": "inventory",
+  "label": "SIMULATED - assumptions, not client outcomes",
+  "state": "passed",
+  "command": "PYTHONPATH=src .venv/Scripts/python.exe -m meridian.inventory --pytest",
+  "run_id": "20261116T204625-14ae9310",
+  "git_sha": "3e7afbfa268e715f128e9f32032eb1edd3019ac0",
+  "source_tree_sha256": "548cacda11b0bfbf15fd7c83686d03d370db113ffe1cea5250747d7652325ea5",
+  "duration_s": 2.48,
+  "python": "3.11.9",
+  "pandas": "2.2.3",
+  "numpy": "2.2.6",
+  "snapshot_id": "20261116T192553-472ac294",
+  "forecast_config_sha256": "b2db0997dcc7ef9490352dd1cbe6828250352d95c31bfdb54513cbcf9a71d88e",
+  "inputs": {
+    "predictions.csv": "dd43135a4f61800545b26dc80638cebc3da3da1a697b6c3c782f682bf85956fc",
+    "metrics.json": "f74d877b739c1a2dca52d24817b322df9669a40c8a4b67fb09703168b2725506"
+  },
+  "outputs": {
+    "inventory.json": "caa7ddd039dea8c065b9f1e8f7400ace433b826c1bd5b85956cbe19051c734e8",
+    "inventory_runs.csv": "2b65d1b40b27cc7ad6ac3c88a23360cc17ca2e37fd16ca1f43943ea740557d1e",
+    "inventory_assumptions.json": "2ffbb78045f1bc72aff6c86f8d5529d82c08752681ff1ee1c02a039ab0b025e1"
+  },
+  "selected_model": "gradient_boosting",
+  "scenarios": 22,
+  "episodes": 5,
+  "base_scenario": {
+    "lead_time_days": 3,
+    "shortage_to_holding_ratio": 100.0,
+    "safety_z": 0.84,
+    "lowest_total_cost_policy": "trailing_mean",
+    "policies": {
+      "fixed": {
+        "total_cost": 421462.1984,
+        "holding_cost": 319026.4382,
+        "shortage_cost": 102435.7602,
+        "lost_units": 1024.3576,
+        "fill_rate": 0.9658,
+        "mean_cost_per_demand_unit": 14.6662
+      },
+      "gradient_boosting": {
+        "total_cost": 516176.8132,
+        "holding_cost": 245420.2057,
+        "shortage_cost": 270756.6075,
+        "lost_units": 2707.5661,
+        "fill_rate": 0.9097,
+        "mean_cost_per_demand_unit": 14.3385
+      },
+      "seasonal_naive": {
+        "total_cost": 449401.2362,
+        "holding_cost": 284244.0474,
+        "shortage_cost": 165157.1888,
+        "lost_units": 1651.5719,
+        "fill_rate": 0.9449,
+        "mean_cost_per_demand_unit": 13.5304
+      },
+      "trailing_mean": {
+        "total_cost": 334570.4764,
+        "holding_cost": 321013.2877,
+        "shortage_cost": 13557.1888,
+        "lost_units": 135.5719,
+        "fill_rate": 0.9955,
+        "mean_cost_per_demand_unit": 13.1118
+      }
+    },
+    "selected_vs_fixed_cost_change": 0.2247,
+    "selected_vs_seasonal_naive_cost_change": 0.1486
+  },
+  "lowest_cost_policy_counts": {
+    "gradient_boosting": 12,
+    "trailing_mean": 6,
+    "fixed": 4
+  },
+  "tests": {
+    "command": "python -m pytest -q tests/test_inventory.py",
+    "returncode": 0,
+    "summary": "6 passed in 0.51s"
+  }
+}

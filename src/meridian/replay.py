@@ -192,6 +192,8 @@ def inject_incident(profile="demo"):
     # Withheld real rows arrive now: beyond the allowed lateness, so they must route to backfill.
     for identity in sorted(held):
         add("late_arrival_withheld_source_row", identity, envelope(by_id[identity], run_id=run_id, mode="replay", incident="late_arrival"))
+    for identity in sorted(held)[:4]:   # never-seen rows delivered twice in the same micro-batch
+        add("repeat_delivery_within_batch", identity, envelope(by_id[identity], run_id=run_id, mode="replay", incident="repeat_delivery_within_batch"))
     # Explicit correction: revision 2 of one accepted source row with a corrected unit price.
     target = sorted(candidates, key=lambda r: (r["event_time"], r["source_sheet"], r["source_row"]))[0]
     corrected_price = f"{float(target['unit_price']) * 0.5:.2f}"
