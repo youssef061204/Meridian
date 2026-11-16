@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -13,7 +14,7 @@ def spark_session():
     from delta import configure_spark_with_delta_pip
     from pyspark.sql import SparkSession
     builder = (SparkSession.builder.master("local[2]").appName("MERIDIAN")
-        .config("spark.driver.memory", "768m")
+        .config("spark.driver.memory", os.environ.get("MERIDIAN_SPARK_DRIVER_MEMORY", "768m"))
         .config("spark.driver.maxResultSize", "128m")
         .config("spark.sql.shuffle.partitions", "4")
         .config("spark.default.parallelism", "2")

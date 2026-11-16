@@ -1,0 +1,287 @@
+{
+  "run_id": "20261116T204011-c6f38781",
+  "started_at": "2026-11-16T20:40:11.266022+00:00",
+  "steps": [
+    {
+      "step": "produce_baseline_replay",
+      "producer_run_id": "producer-3ef823d4",
+      "mode": "replay",
+      "topic": "meridian.replay.20261116T204011-5bea2f",
+      "speed": 0.0,
+      "started_at": "2026-11-16T20:40:11.726198+00:00",
+      "sent": 3988,
+      "withheld": 12,
+      "finished_at": "2026-11-16T20:40:19.897997+00:00",
+      "seconds": 8.1683,
+      "events_per_second": 488.2
+    },
+    {
+      "step": "inject_synthetic_incident",
+      "incident_run_id": "incident-36219b31",
+      "mode": "synthetic",
+      "topic": "meridian.synthetic.20261116T204011-5bea2f",
+      "seed": 20261117,
+      "sent_at": "2026-11-16T20:45:04.851883+00:00",
+      "counts": {
+        "repeat_delivery": 50,
+        "additive_schema_v2": 12,
+        "malformed_json": 5,
+        "missing_required_field": 3,
+        "incompatible_schema_v3": 2,
+        "identity_payload_conflict": 1,
+        "late_arrival_withheld_source_row": 12,
+        "correction_revision_2": 1,
+        "repeat_delivery_later": 10
+      },
+      "correction": {
+        "source_identity": "05ace040d154324ad641bbb9e0b67a1f56e91ec94f9f58ca7d7936da9bb60ff6",
+        "source_sheet": "Year 2009-2010",
+        "source_row": 2,
+        "quantity": "12",
+        "original_unit_price": "6.95",
+        "corrected_unit_price": "3.48"
+      },
+      "total_events": 96
+    }
+  ],
+  "generation": "20261116T204011-5bea2f",
+  "final_manifest": {
+    "id": "replay-20261116T204726316",
+    "metrics": {
+      "gross_positive_gbp": "71141.71",
+      "negative_adjustments_gbp": "-1428.92",
+      "net_recorded_gbp": "69712.79"
+    },
+    "reconciliation": {
+      "state": "reconciled",
+      "missing_vs_batch_rows": 0,
+      "missing_vs_batch_gbp": "0.00",
+      "extra_vs_batch_rows": 0,
+      "extra_vs_batch_gbp": "0.00",
+      "uncorrected_value_differences": 0,
+      "revision1_vs_batch_mismatches": 0,
+      "synthetic_corrections": 1,
+      "correction_delta_gbp": "-41.64",
+      "bridge": "batch net + synthetic correction delta - not-yet-received + extra = replay net"
+    },
+    "delta_versions": {
+      "silver_current": 6,
+      "daily_sales": 6,
+      "quarantine": 3,
+      "revisions": 4,
+      "batch_metrics": 3
+    },
+    "batch_reference_snapshot": "20261116T191911-e734445d",
+    "batch_net_recorded_gbp": "69754.43"
+  },
+  "state": "passed",
+  "checks": [
+    {
+      "check": "consumer_killed_after_bronze_commit",
+      "passed": true,
+      "crash": "after-bronze:1",
+      "exit_code": 86,
+      "seconds": 59.82,
+      "fault_line": []
+    },
+    {
+      "check": "consumer_killed_before_checkpoint_commit",
+      "passed": true,
+      "crash": "after-silver:first",
+      "exit_code": 86,
+      "seconds": 64.54,
+      "fault_line": []
+    },
+    {
+      "check": "consumer_restart_completes",
+      "passed": true,
+      "crash": null,
+      "exit_code": 0,
+      "seconds": 87.05,
+      "fault_line": []
+    },
+    {
+      "check": "bronze_has_no_duplicate_writes_after_retries",
+      "passed": true,
+      "rows": 3988,
+      "offsets": 3988,
+      "produced": 3988
+    },
+    {
+      "check": "each_batch_recorded_exactly_once",
+      "passed": true,
+      "batches": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "check": "replay_matches_batch_except_withheld_rows",
+      "passed": true,
+      "state": "incomplete",
+      "missing_vs_batch_rows": 12,
+      "missing_vs_batch_gbp": "179.07",
+      "extra_vs_batch_rows": 0,
+      "extra_vs_batch_gbp": "0.00",
+      "uncorrected_value_differences": 0,
+      "revision1_vs_batch_mismatches": 0,
+      "synthetic_corrections": 0,
+      "correction_delta_gbp": "0.00",
+      "bridge": "batch net + synthetic correction delta - not-yet-received + extra = replay net",
+      "batch_snapshot": "20261116T191911-e734445d"
+    },
+    {
+      "check": "interrupted_publish_keeps_last_validated_pointer",
+      "passed": true,
+      "pointer": {
+        "snapshot_id": "replay-20261116T204406493",
+        "generation": "20261116T204011-5bea2f"
+      }
+    },
+    {
+      "check": "consumer_killed_during_incident_batch",
+      "passed": true,
+      "crash": "after-silver:first",
+      "exit_code": 86,
+      "seconds": 36.48,
+      "fault_line": []
+    },
+    {
+      "check": "consumer_restart_after_incident_completes",
+      "passed": true,
+      "crash": null,
+      "exit_code": 0,
+      "seconds": 26.56,
+      "fault_line": []
+    },
+    {
+      "check": "malformed_json_quarantined",
+      "passed": true,
+      "quarantine": {
+        "missing_required_field": 3,
+        "identity_payload_conflict": 1,
+        "incompatible_schema": 2,
+        "malformed_json": 5
+      }
+    },
+    {
+      "check": "missing_required_fields_quarantined",
+      "passed": true,
+      "quarantine": {
+        "missing_required_field": 3,
+        "identity_payload_conflict": 1,
+        "incompatible_schema": 2,
+        "malformed_json": 5
+      }
+    },
+    {
+      "check": "incompatible_schema_quarantined",
+      "passed": true,
+      "quarantine": {
+        "missing_required_field": 3,
+        "identity_payload_conflict": 1,
+        "incompatible_schema": 2,
+        "malformed_json": 5
+      }
+    },
+    {
+      "check": "identity_payload_conflict_quarantined",
+      "passed": true,
+      "quarantine": {
+        "missing_required_field": 3,
+        "identity_payload_conflict": 1,
+        "incompatible_schema": 2,
+        "malformed_json": 5
+      }
+    },
+    {
+      "check": "late_rows_routed_to_durable_backfill",
+      "passed": true,
+      "late": {
+        "pending": 13,
+        "applied": 0,
+        "pending_amount_hint_gbp": 220.83
+      }
+    },
+    {
+      "check": "unsafe_calculation_shows_discrepancy",
+      "passed": true,
+      "label": "UNSAFE: naive sum of quantity x price over every received delivery (no identity dedup, no envelope or business validation, no merchandise rules, synthetic included)",
+      "unsafe_net_gbp": "72617.92",
+      "discrepancy_gbp": "3042.56",
+      "trusted": "69575.36"
+    },
+    {
+      "check": "publication_blocked_while_backfill_pending",
+      "passed": true
+    },
+    {
+      "check": "backfill_applies_late_rows_for_affected_dates",
+      "passed": true,
+      "backfill_run_id": "backfill-86b9219e",
+      "force": false,
+      "selected_late_rows": 13,
+      "applied_rows": 13,
+      "applied_corrections": 1,
+      "affected_dates": [
+        "2009-12-01"
+      ],
+      "net_before": "69575.36",
+      "net_after": "69712.79",
+      "net_change": "137.43",
+      "seconds": 24.774,
+      "finished_at": "2026-11-16T20:46:59.656218+00:00"
+    },
+    {
+      "check": "backfill_rerun_is_idempotent",
+      "passed": true,
+      "backfill_run_id": "backfill-e08d408d",
+      "force": true,
+      "selected_late_rows": 13,
+      "applied_rows": 13,
+      "applied_corrections": 1,
+      "affected_dates": [
+        "2009-12-01"
+      ],
+      "net_before": "69712.79",
+      "net_after": "69712.79",
+      "net_change": "0.00",
+      "seconds": 26.578,
+      "finished_at": "2026-11-16T20:47:26.281621+00:00"
+    },
+    {
+      "check": "replay_reconciled_with_batch_after_backfill",
+      "passed": true,
+      "state": "reconciled",
+      "missing_vs_batch_rows": 0,
+      "missing_vs_batch_gbp": "0.00",
+      "extra_vs_batch_rows": 0,
+      "extra_vs_batch_gbp": "0.00",
+      "uncorrected_value_differences": 0,
+      "revision1_vs_batch_mismatches": 0,
+      "synthetic_corrections": 1,
+      "correction_delta_gbp": "-41.64",
+      "bridge": "batch net + synthetic correction delta - not-yet-received + extra = replay net"
+    },
+    {
+      "check": "correction_delta_matches_independent_calculation",
+      "passed": true,
+      "expected": "-41.64",
+      "actual": "-41.64"
+    },
+    {
+      "check": "new_snapshot_published",
+      "passed": true,
+      "snapshot": "replay-20261116T204726316",
+      "delta_versions": {
+        "silver_current": 6,
+        "daily_sales": 6,
+        "quarantine": 3,
+        "revisions": 4,
+        "batch_metrics": 3
+      }
+    }
+  ],
+  "finished_at": "2026-11-16T20:47:50.193855+00:00"
+}
