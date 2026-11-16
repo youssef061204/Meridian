@@ -151,9 +151,17 @@ def worker(poll_seconds=1.0):
     atomic_json(JOBS / "worker.json", {"state": "ready", "since": now()})
     print("MERIDIAN worker ready", flush=True)
     while True:
-        queued = sorted(p for p in JOBS.glob("*.json") if p.name != "worker.json" and read_json(p).get("state") == "queued")
-        for path in queued:
-            job = read_json(path)
+        queued = []
+        for path in sorted(JOBS.glob("*.json")):
+            if path.name == "worker.json":
+                continue
+            try:   # files are replaced atomically by the API; on a bind mount a read can briefly miss
+                job = read_json(path)
+            except (FileNotFoundError, ValueError):
+                continue
+            if job.get("state") == "queued":
+                queued.append(job)
+        for job in queued:
             atomic_json(JOBS / "worker.json", {"state": "busy", "job_id": job["job_id"], "since": now()})
             runner.run(job)
             atomic_json(JOBS / "worker.json", {"state": "ready", "since": now()})

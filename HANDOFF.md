@@ -10,7 +10,7 @@ Specification: `MERIDIAN_Codex_Project_Prompt.md`. Repository: `C:\Users\USER\Pr
 | 2. Full history, dimensional model, SQL analyses, publication checks | **passed** | `full-batch.json`, `full-snapshot-check.json`, `full-baseline.json`, `browser-gate2.json`, `analysis/report.json` |
 | 3. Kafka replay, incidents, recovery, batch/replay reconciliation | **passed** | `kafka-smoke.json`, `replay-drill.json` (21/21), `browser-demo.json` (11/11), full replay in `benchmarks.json` |
 | 4. Forecast baselines, rolling evaluation, untouched test | **passed** | `forecast-run.json`, `analysis/forecast/metrics.json` |
-| 5. Walkthrough, benchmarks, case study, interview materials | see `gates.json` | `browser-demo.json`, `benchmarks.json`, `clean-checkout.json`, `docs/` |
+| 5. Walkthrough, benchmarks, case study, interview materials | **passed** | `browser-demo.json`, `benchmarks.json`, `clean-checkout.json`, `docs/` |
 | 6. Inventory scenarios; Databricks / Power BI | inventory **passed (simulated)**; Databricks **prepared, unexecuted**; Power BI exports **verified-local**, native report **unfinished** | `inventory-run.json`, `databricks-contract-local.json`, `powerbi-export.json` |
 
 Nothing has run in Azure, Databricks or Power BI. No paid or cloud resources were used.
@@ -63,6 +63,11 @@ docker compose run --rm --no-deps tools python -m meridian.cli baseline --profil
 | foreachBatch failed | Temp views were created in the cloned micro-batch session; now uses `frame.sparkSession` throughout | first drill attempts in `runtime/runs/` |
 | Watermark type error | Watermark compared a string with a datetime; now parsed as `TIMESTAMP_NTZ` | first drill attempts in `runtime/runs/` |
 | Replay ordering not guaranteed | Replay topic was created with 3 partitions; now 1 for total order | demo and drill late counts were still exactly as expected |
+| Full replay publication refused (DuckDB out of memory at 512 MB) | `NOT IN` validation plan over 1M rows; replaced by one full outer join, 768 MB cap and spill; republished, reconciled exactly | failed attempt kept in the generation's `publications.jsonl` |
+| Synthetic DuckDB baseline out of memory twice | 768 MB cap; then the unpartitioned 10.6M-row `EXCEPT ALL`. Now a 1.4 GB cap (matching the Spark heap), spill, and an equivalence proof split into 16 partitions | `execution/synthetic-baseline-attempt{1,2}-*` |
+| API 5–10 s per request in Docker | Parquet read over the WSL2 bind mount (lineage 6.8 s vs 0.28 s local). Added a checksum-verified local snapshot cache and a view for unfiltered overview; responses proven identical | `api-serving-optimization.json` |
+| Benchmark showed a constant ~2 s per request | Windows `urllib` IPv6 fallback for `localhost`; measured on `127.0.0.1` instead | `benchmark-queries-localhost-ipv6-artifact.json` |
+| UI controls disabled; one 500 response | Killed CLI init jobs left `running` records (now resolved against the worker's busy job). An atomically replaced state file was briefly invisible on the bind mount (now read with a retry in the API and worker) | final `browser-demo.json` 11/11 with zero console errors |
 | Full replay producer stalled at ~535 events/s | Per-message `stat` of the pause file on the Windows bind mount, plus gzip; now polled every 0.25 s, uncompressed, streamed. Measured 7,168 events/s on 50k. | `execution/replay-full-attempt{1,2}-stopped.*` |
 
 ## Correctness decisions
@@ -75,6 +80,11 @@ docker compose run --rm --no-deps tools python -m meridian.cli baseline --profil
 - **Money:** decimal arithmetic, half-up per line. Source-row and delivery denominators are reported separately.
 - **Time:** source civil time is `TIMESTAMP_NTZ`. The watermark uses only earlier batches. Late rows go to durable backfill and block publication.
 - **Publication:** pinned Delta versions → explicit Parquet export → DuckDB validation → atomic pointer. Single writer (file lock).
+
+## Verification notes
+
+- The clean checkout was verified at commit `698f427`. Later commits change only API and worker robustness (stale job states, retrying state-file reads); the browser suites re-ran after them.
+- The Gate 1 browser script targets the 4,000-row demo snapshot and passed at Gate 1. The serving pointer now holds the full history, which the Gate 2 and demo suites cover.
 
 ## Remaining work and known limits
 

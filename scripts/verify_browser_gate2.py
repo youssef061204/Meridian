@@ -68,7 +68,7 @@ def main() -> int:
             page.on("pageerror", lambda error: evidence["page_errors"].append(str(error)))
 
             def ready() -> None:
-                expect(page.locator('[aria-live="polite"]')).to_have_attribute("aria-busy", "false", timeout=30000)
+                expect(page.locator('[aria-live="polite"][aria-busy]')).to_have_attribute("aria-busy", "false", timeout=30000)
                 expect(page.locator(".error-state")).to_have_count(0)
 
             def comparison_matches(data: dict) -> None:

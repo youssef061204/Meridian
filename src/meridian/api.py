@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import tempfile
+import time
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
@@ -212,17 +213,16 @@ def replay_state():
         serving_state = f"last validated snapshot retained: latest attempt {last_attempt['state']}"
     elif resets and (not last_attempt or resets[-1]["reset_at"] > last_attempt["attempted_at"]):
         serving_state = "current: restored to recorded baseline"
-    job_records = [read_json(p) for p in (RUNTIME / "jobs").glob("*.json") if p.name != "worker.json"] if (RUNTIME / "jobs").exists() else []
-    job_records = sorted(job_records, key=lambda j: j.get("requested_at", ""), reverse=True)[:8]
+    job_records = _job_records()[:8]
     worker = RUNTIME / "jobs" / "worker.json"
     timeline = folder / "incident_timeline.json"
     return {"state": "ready", "config": cfg, "snapshot": manifest, "snapshot_age_seconds": age,
             "serving_state": serving_state,
             "publications": publications, "batches": [batches[k] for k in sorted(batches)][-30:],
-            "status": read_json(folder / "status.json") if (folder / "status.json").exists() else None,
+            "status": _live_json(folder / "status.json"),
             "backfills": _jsonl(folder / "backfills.jsonl", 6), "resets": _jsonl(folder / "resets.jsonl", 3),
-            "timeline": read_json(timeline) if timeline.exists() else None,
-            "worker": read_json(worker) if worker.exists() else {"state": "not_running"},
+            "timeline": _live_json(timeline),
+            "worker": _live_json(worker, {"state": "not_running"}),
             "jobs": job_records, "controls_enabled": _controls_enabled()}
 
 
@@ -249,6 +249,40 @@ def correction():
             "lines": lines}
 
 
+def _live_json(path, default=None):
+    """Read a state file that another process replaces atomically. Over the Windows/WSL2 bind
+    mount a rename can briefly make it invisible between exists() and open(), so retry."""
+    for attempt in range(5):
+        try:
+            return read_json(path)
+        except (FileNotFoundError, json.JSONDecodeError):
+            if attempt == 4:
+                return default
+            time.sleep(0.05)
+
+
+def _job_records():
+    """Job records with stale 'running' states resolved: only the job the worker reports as busy is running.
+    A process killed mid-job (e.g. an interrupted CLI replay-init) never writes its completion record."""
+    folder = RUNTIME / "jobs"
+    if not folder.exists():
+        return []
+    worker_path = folder / "worker.json"
+    worker = _live_json(worker_path, {})
+    records = []
+    for path in folder.glob("*.json"):
+        if path.name == "worker.json":
+            continue
+        record = _live_json(path)
+        if record is None:
+            continue
+        if record.get("state") == "running" and not (worker.get("state") == "busy" and worker.get("job_id") == record.get("job_id")):
+            record["state"] = "interrupted"
+            record.setdefault("error", "Process ended without a completion record")
+        records.append(record)
+    return sorted(records, key=lambda j: j.get("requested_at", ""), reverse=True)
+
+
 def _controls_enabled():
     return os.environ.get("MERIDIAN_DEMO_CONTROLS", "1") == "1"
 
@@ -262,7 +296,7 @@ def create_job(body: dict, x_meridian_demo: str | None = Header(default=None)):
     kind = body.get("kind")
     if kind not in ALLOWED_JOBS:
         raise HTTPException(400, f"Allowed jobs: {sorted(ALLOWED_JOBS)}")
-    active = [p for p in (RUNTIME / "jobs").glob("*.json") if p.name != "worker.json" and read_json(p).get("state") in ("queued", "running")] if (RUNTIME / "jobs").exists() else []
+    active = [j for j in _job_records() if j.get("state") in ("queued", "running")]
     if active:
         raise HTTPException(409, "Another demo job is queued or running")
     return enqueue(kind, requested_by="local-ui")
@@ -275,7 +309,7 @@ def job(job_id: str):
     path = RUNTIME / "jobs" / f"{job_id}.json"
     if not path.exists():
         raise HTTPException(404, "Unknown job")
-    return read_json(path)
+    return _live_json(path)
 
 
 dist = ROOT / "frontend" / "dist"

@@ -91,7 +91,7 @@ def main():
         "dataset": {"workbook_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980", "source_rows": 1067371},
         "seeds": {"replay_and_incidents": 20261116, "bootstrap": 20261116, "synthetic_scale": (synthetic_manifest or {}).get("seed")},
         "full_real_dataset": {
-            "conversion_workbook_to_parquet_seconds": source.get("conversion_seconds") or source.get("duration_seconds"),
+            "conversion_workbook_to_parquet": {"seconds": (load("runtime/runs/20261116T190904-6cd7dfae.json") or {}).get("duration_seconds"), "run_record": "runtime/runs/20261116T190904-6cd7dfae.json", "environment": "host Python 3.11, 10,000-row chunks"},
             "spark_delta_full_pipeline": {**wrapper("full-batch"), "tables": 14, "rows": 1067371},
             "duckdb_baseline_full": {**wrapper("full-baseline"), "transform_export_seconds": full_baseline.get("transform_export_seconds"),
                                      "equivalence": full_baseline.get("equivalence"), "tables": 2},
@@ -99,7 +99,7 @@ def main():
         },
         "profiles_resource_use": {"demo_4000_rows_spark": wrapper("demo-locked"), "full_spark": wrapper("full-batch"),
                                    "full_kafka_replay": wrapper("replay-full"), "synthetic_scale_spark": wrapper("synthetic-batch")},
-        "synthetic_scale": {"manifest": synthetic_manifest, "spark_delta_batch": {**wrapper("synthetic-batch"), "spark_stage": {k: synthetic_batch.get(k) for k in ("duration_seconds", "source_rows", "counts")}},
+        "synthetic_scale": {"manifest": synthetic_manifest, "spark_delta_batch": {**wrapper("synthetic-batch"), "spark_stage": {"seconds": (load(f"runtime/runs/{synthetic_batch.get('run_id')}.json") or {}).get("duration_seconds"), **{k: synthetic_batch.get(k) for k in ("source_rows", "counts")}}},
                             "duckdb_baseline": {**wrapper("synthetic-baseline"), "transform_export_seconds": synthetic_baseline.get("transform_export_seconds"),
                                                 "equivalence": synthetic_baseline.get("equivalence")},
                             "label": "SYNTHETIC rows (relabelled copies), not observed transactions"},

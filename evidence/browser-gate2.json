@@ -1,10 +1,10 @@
 {
-  "started_at": "2026-11-16T20:01:19.864746+00:00",
+  "started_at": "2026-11-16T22:54:16.968371+00:00",
   "command": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe scripts/verify_browser_gate2.py",
   "base_url": "http://localhost:8010",
   "python": "3.11.9",
   "playwright": "1.52.0",
-  "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+  "git_sha": "698f427b878b20289edc74e29c53a7f03193ca0a",
   "verification": "Real Chromium against full historical local API, with no mocked responses",
   "steps": [
     {
@@ -111,6 +111,6 @@
   },
   "browser": "136.0.7103.25",
   "status": "passed",
-  "finished_at": "2026-11-16T20:03:29.872922+00:00",
-  "duration_seconds": 130.024
+  "finished_at": "2026-11-16T22:54:35.591490+00:00",
+  "duration_seconds": 18.624
 }

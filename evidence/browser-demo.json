@@ -1,21 +1,21 @@
 {
-  "started_at": "2026-11-16T21:02:24.467941+00:00",
+  "started_at": "2026-11-16T22:59:44.589212+00:00",
   "command": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe scripts/verify_browser_demo.py",
   "python": "3.11.9",
   "playwright": "1.52.0",
-  "git_sha": "98bbe6fcbde3dfd256a0c9937d079f7787808433",
+  "git_sha": "698f427b878b20289edc74e29c53a7f03193ca0a",
   "verification": "Real Chromium; real API, worker, Kafka, Spark and Delta; no mocked responses",
   "steps": [
     {
       "name": "kpi_opens_source_evidence",
       "status": "passed",
-      "at_seconds": 139.9,
+      "at_seconds": 10.3,
       "net": 19379245.82
     },
     {
       "name": "unsafe_calculation_isolated_with_discrepancy",
       "status": "passed",
-      "at_seconds": 207.3,
+      "at_seconds": 63.5,
       "label": "UNSAFE: naive sum of quantity x price over every received delivery (no identity dedup, no envelope or business validation, no merchandise rules, synthetic included)",
       "unsafe_net_gbp": "72642.25",
       "discrepancy_gbp": "3066.89",
@@ -24,7 +24,7 @@
     {
       "name": "incident_detected_contained_and_publication_blocked",
       "status": "passed",
-      "at_seconds": 207.4,
+      "at_seconds": 63.5,
       "detected": {
         "rejected_envelopes": 10,
         "within_batch_duplicates": 4,
@@ -48,9 +48,9 @@
     {
       "name": "repair_reconciles_and_publishes_new_snapshot",
       "status": "passed",
-      "at_seconds": 349.7,
-      "snapshot": "replay-20261116T210707630",
-      "recovery_seconds": 205.1,
+      "at_seconds": 167.6,
+      "snapshot": "replay-20261116T230142029",
+      "recovery_seconds": 151.7,
       "reconciliation": {
         "state": "reconciled",
         "missing_vs_batch_rows": 0,
@@ -67,38 +67,38 @@
     {
       "name": "explorer_shows_reconciliation_before_and_after_correction",
       "status": "passed",
-      "at_seconds": 361.4,
+      "at_seconds": 171.0,
       "delta": "-41.64",
       "lines": 2
     },
     {
       "name": "forecast_view_matches_api",
       "status": "passed",
-      "at_seconds": 365.7,
+      "at_seconds": 173.8,
       "promoted": "gradient_boosting",
       "next7_units": 137449
     },
     {
       "name": "interrupted_publish_retains_last_validated_snapshot",
       "status": "passed",
-      "at_seconds": 396.7,
-      "snapshot": "replay-20261116T210707630"
+      "at_seconds": 196.3,
+      "snapshot": "replay-20261116T230142029"
     },
     {
       "name": "reset_restores_baseline",
       "status": "passed",
-      "at_seconds": 523.1,
-      "snapshot": "replay-20261116T204945206"
+      "at_seconds": 301.1,
+      "snapshot": "replay-20261116T221315926"
     },
     {
       "name": "keyboard_navigation",
       "status": "passed",
-      "at_seconds": 535.5
+      "at_seconds": 302.3
     },
     {
       "name": "no_mobile_page_overflow",
       "status": "passed",
-      "at_seconds": 545.2,
+      "at_seconds": 307.5,
       "sizes": {
         "Forecast & planning": {
           "viewport": 390,
@@ -117,7 +117,7 @@
     {
       "name": "no_browser_errors",
       "status": "passed",
-      "at_seconds": 545.2
+      "at_seconds": 307.5
     }
   ],
   "console_errors": [],
@@ -131,8 +131,8 @@
     "evidence/screenshots/demo-6-interrupted-publish.png",
     "evidence/screenshots/demo-7-mobile-trust.png"
   ],
-  "signature_sequence_seconds": 240.8,
+  "signature_sequence_seconds": 164.3,
   "status": "passed",
-  "finished_at": "2026-11-16T21:11:30.354888+00:00",
-  "duration_seconds": 545.9
+  "finished_at": "2026-11-16T23:04:52.677118+00:00",
+  "duration_seconds": 308.1
 }

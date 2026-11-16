@@ -100,9 +100,39 @@
     ]
   },
   "gate_5": {
-    "state": "not_started"
+    "state": "passed",
+    "verified_at": "2026-11-16T23:05:00+00:00",
+    "checks": [
+      "browser-demo.json (11/11, zero console/page errors)",
+      "browser-gate2.json (9/9)",
+      "benchmarks.json",
+      "benchmark-queries.json",
+      "api-serving-optimization.json",
+      "clean-checkout.json"
+    ],
+    "delivered": [
+      "README.md",
+      "docs/case-study.md",
+      "docs/demo-script.md",
+      "docs/interview-guide.md",
+      "docs/resume-bullets.md",
+      "docs/architecture.md",
+      "docs/data-contracts.md",
+      "docs/metrics.md",
+      "HANDOFF.md"
+    ],
+    "clean_checkout_commit": "698f427b878b20289edc74e29c53a7f03193ca0a",
+    "limits": [
+      "single-machine benchmarks, one repetition per pipeline run, OS cache uncontrolled",
+      "clean checkout skipped the full-history batch and Kafka steps (verified in the working copy)",
+      "screenshots captured; no video recording"
+    ]
   },
   "gate_6": {
-    "state": "not_started"
+    "state": "passed_with_unexecuted_optional_parts",
+    "inventory_simulator": "passed (SIMULATED; evidence/inventory-run.json)",
+    "databricks": "prepared, unexecuted in Databricks: no authenticated workspace; local contract check 36/36 (evidence/databricks-contract-local.json)",
+    "power_bi": "exports, relationships, DAX and reconciliation targets verified locally (evidence/powerbi-export.json); native report unfinished because Power BI Desktop is not installed",
+    "azure": "design only (docs/azure-migration.md); nothing provisioned"
   }
 }

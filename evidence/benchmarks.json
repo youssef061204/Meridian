@@ -1,0 +1,397 @@
+{
+  "generated_by": "scripts/benchmark_summary.py (aggregates persisted evidence only)",
+  "git_sha_at_summary": "698f427b878b20289edc74e29c53a7f03193ca0a",
+  "scope": "Single-machine measurements on one Windows 11 laptop via Docker Desktop/WSL2; not distributed or cloud benchmarks. One repetition per pipeline run unless stated; OS page cache uncontrolled.",
+  "hardware": {
+    "system": "Windows",
+    "release": "10",
+    "version": "10.0.26200",
+    "machine": "AMD64",
+    "python_version": "3.11.9",
+    "python_executable": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe",
+    "resources": {
+      "cpu_logical": 28,
+      "cpu_description": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+      "disk_total_bytes": 1021821579264,
+      "disk_used_bytes": 869091123200,
+      "disk_free_bytes": 152730456064,
+      "disk_measured_at": "C:\\Users\\USER\\Projects\\Meridian",
+      "cpu_physical": 20,
+      "memory_total_bytes": 16873545728,
+      "memory_available_bytes": 360075264,
+      "memory_used_bytes": 16513470464,
+      "memory_percent": 97.9
+    }
+  },
+  "docker_resources": {
+    "memory_total_bytes": 8169594880,
+    "cpu_logical": 28
+  },
+  "dataset": {
+    "workbook_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+    "source_rows": 1067371
+  },
+  "seeds": {
+    "replay_and_incidents": 20261116,
+    "bootstrap": 20261116,
+    "synthetic_scale": 20261116
+  },
+  "full_real_dataset": {
+    "conversion_workbook_to_parquet": {
+      "seconds": 99.4512,
+      "run_record": "runtime/runs/20261116T190904-6cd7dfae.json",
+      "environment": "host Python 3.11, 10,000-row chunks"
+    },
+    "spark_delta_full_pipeline": {
+      "command": "docker compose run --rm --no-deps --name meridian-job tools python -m meridian.cli batch --profile full",
+      "exit_code": 0,
+      "wall_seconds": 128.4168,
+      "peak_container_memory_mib": 1858.6,
+      "memory_samples": 41,
+      "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+      "cache_condition": "not controlled; see run notes",
+      "tables": 14,
+      "rows": 1067371
+    },
+    "duckdb_baseline_full": {
+      "command": "docker compose run --rm --no-deps --name meridian-baseline tools python -m meridian.cli baseline --profile full",
+      "exit_code": 0,
+      "wall_seconds": 29.1718,
+      "peak_container_memory_mib": 956.0,
+      "memory_samples": 8,
+      "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+      "cache_condition": "not controlled; see run notes",
+      "transform_export_seconds": 17.269231,
+      "equivalence": "all accepted identities, quantities and exact line amounts match (EXCEPT ALL both directions)",
+      "tables": 2
+    },
+    "comparison_note": "Not like-for-like: DuckDB builds fact + daily only with no Delta history; Spark builds 14 Delta tables, dimensions, cohorts and validations."
+  },
+  "profiles_resource_use": {
+    "demo_4000_rows_spark": {
+      "command": "docker compose run --rm --no-deps --name meridian-job tools python -m meridian.cli batch --profile demo",
+      "exit_code": 0,
+      "wall_seconds": 47.9636,
+      "peak_container_memory_mib": 1262.6,
+      "memory_samples": 15,
+      "git_sha": "7d96348970a67df32dc9cc78c0d0bedcecc42689",
+      "cache_condition": "not controlled; see run notes"
+    },
+    "full_spark": {
+      "command": "docker compose run --rm --no-deps --name meridian-job tools python -m meridian.cli batch --profile full",
+      "exit_code": 0,
+      "wall_seconds": 128.4168,
+      "peak_container_memory_mib": 1858.6,
+      "memory_samples": 41,
+      "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+      "cache_condition": "not controlled; see run notes"
+    },
+    "full_kafka_replay": {
+      "command": "docker compose run --rm --no-deps -e MERIDIAN_SPARK_DRIVER_MEMORY=1400m --name meridian-replay-full tools python -m meridian.cli replay-init --profile full",
+      "exit_code": 1,
+      "wall_seconds": 560.3915,
+      "peak_container_memory_mib": 2298.9,
+      "memory_samples": 180,
+      "git_sha": "a19f48b9e2559dd5e4e1c82b758c5cdf4d95c382",
+      "cache_condition": "not controlled; see run notes"
+    },
+    "synthetic_scale_spark": {
+      "command": "docker compose run --rm --no-deps -e MERIDIAN_SPARK_DRIVER_MEMORY=1400m --name meridian-synthetic-batch tools python -m meridian.cli batch --profile synthetic",
+      "exit_code": 0,
+      "wall_seconds": 358.9181,
+      "peak_container_memory_mib": 2298.9,
+      "memory_samples": 101,
+      "git_sha": "a19f48b9e2559dd5e4e1c82b758c5cdf4d95c382",
+      "cache_condition": "not controlled; see run notes"
+    }
+  },
+  "synthetic_scale": {
+    "manifest": {
+      "mode": "synthetic",
+      "version": "synthetic-stress-v1",
+      "seed": 20261116,
+      "copies": 10,
+      "rows": 10673710,
+      "generated_at": "2026-11-16T21:40:44.056705+00:00",
+      "seconds": 538.184,
+      "derived_from_sha256": "b84aa47f9306c33e4b5bfdf140b22d9d4f15d3758fad34c53a076c54dd7934fc",
+      "parquet_sha256": "89a2afcc49af9ff26659c813a6f5154553cff1f250972eedb3c0f8c7ffb8e047",
+      "note": "Synthetic scale-test rows, never observed transactions and never served as current."
+    },
+    "spark_delta_batch": {
+      "command": "docker compose run --rm --no-deps -e MERIDIAN_SPARK_DRIVER_MEMORY=1400m --name meridian-synthetic-batch tools python -m meridian.cli batch --profile synthetic",
+      "exit_code": 0,
+      "wall_seconds": 358.9181,
+      "peak_container_memory_mib": 2298.9,
+      "memory_samples": 101,
+      "git_sha": "a19f48b9e2559dd5e4e1c82b758c5cdf4d95c382",
+      "cache_condition": "not controlled; see run notes",
+      "spark_stage": {
+        "seconds": 355.6442,
+        "source_rows": 10673710,
+        "counts": {
+          "accepted": 10616640,
+          "quarantined": 60,
+          "excluded": 57010
+        }
+      }
+    },
+    "duckdb_baseline": {
+      "command": "docker compose run --rm --no-deps -e MERIDIAN_DUCKDB_MEMORY=1400MB --name meridian-synthetic-baseline tools python -m meridian.cli baseline --profile synthetic",
+      "exit_code": 0,
+      "wall_seconds": 441.3451,
+      "peak_container_memory_mib": 1572.9,
+      "memory_samples": 143,
+      "git_sha": "a19f48b9e2559dd5e4e1c82b758c5cdf4d95c382",
+      "cache_condition": "not controlled; see run notes",
+      "transform_export_seconds": 123.293743,
+      "equivalence": "all accepted identities, quantities and exact line amounts match (EXCEPT ALL both directions, 16 line_id partitions)"
+    },
+    "label": "SYNTHETIC rows (relabelled copies), not observed transactions"
+  },
+  "replay_full_history": {
+    "wrapper": {
+      "command": "docker compose run --rm --no-deps -e MERIDIAN_SPARK_DRIVER_MEMORY=1400m --name meridian-replay-full tools python -m meridian.cli replay-init --profile full",
+      "exit_code": 1,
+      "wall_seconds": 560.3915,
+      "peak_container_memory_mib": 2298.9,
+      "memory_samples": 180,
+      "git_sha": "a19f48b9e2559dd5e4e1c82b758c5cdf4d95c382",
+      "cache_condition": "not controlled; see run notes"
+    },
+    "generation": "20261116T212012-24c5f7",
+    "partitions_replay_topic": 1,
+    "max_offsets_per_trigger": 250000,
+    "producer": {
+      "sent": 1067371,
+      "seconds": 136.1063,
+      "events_per_second": 7842.2
+    },
+    "consumer": {
+      "micro_batches": 5,
+      "deliveries": 1067371,
+      "foreach_batch_seconds": 319.4,
+      "deliveries_per_second": 3342.2,
+      "per_batch": [
+        {
+          "batch_id": 0,
+          "deliveries": 250000,
+          "processing_seconds": 65.368,
+          "deliveries_per_second": 3824.5,
+          "processing_lag_seconds": 140.113
+        },
+        {
+          "batch_id": 1,
+          "deliveries": 250000,
+          "processing_seconds": 56.047,
+          "deliveries_per_second": 4460.6,
+          "processing_lag_seconds": 172.168
+        },
+        {
+          "batch_id": 2,
+          "deliveries": 250000,
+          "processing_seconds": 69.014,
+          "deliveries_per_second": 3622.5,
+          "processing_lag_seconds": 198.308
+        },
+        {
+          "batch_id": 3,
+          "deliveries": 250000,
+          "processing_seconds": 84.866,
+          "deliveries_per_second": 2945.8,
+          "processing_lag_seconds": 241.586
+        },
+        {
+          "batch_id": 4,
+          "deliveries": 67371,
+          "processing_seconds": 44.069,
+          "deliveries_per_second": 1528.8,
+          "processing_lag_seconds": 298.331
+        }
+      ]
+    },
+    "publication_seconds": 74.025,
+    "last_event_emit_to_silver_seconds": 334.6,
+    "ingestion_to_publication_seconds": 408.6,
+    "ingestion_to_publication_definition": "last replay emit -> last micro-batch committed to Silver, plus the successful publication's duration; excludes the failed first publication attempt and the time spent fixing it",
+    "failed_publication_attempts": [
+      {
+        "attempted_at": "2026-11-16T21:28:05.659324+00:00",
+        "state": "failed",
+        "reason": "OutOfMemoryException: Out of Memory Error: failed to pin block of size 256.0 KiB (490.8 MiB/488.2 MiB used)"
+      }
+    ],
+    "reconciliation_vs_batch": {
+      "state": "reconciled",
+      "missing_vs_batch_rows": 0,
+      "missing_vs_batch_gbp": "0.00",
+      "extra_vs_batch_rows": 0,
+      "extra_vs_batch_gbp": "0.00",
+      "uncorrected_value_differences": 0,
+      "revision1_vs_batch_mismatches": 0,
+      "synthetic_corrections": 0,
+      "correction_delta_gbp": "0.00",
+      "bridge": "batch net + synthetic correction delta - not-yet-received + extra = replay net"
+    },
+    "replay_net": "19379245.82",
+    "batch_net": "19379245.82",
+    "batch_reference": "20261116T192553-472ac294",
+    "measurement_note": "Producer emitted the full replay unthrottled, then an availableNow consumer drained it; ingestion-to-publication latency is measured from the last emitted event."
+  },
+  "analytical_query_latency": {
+    "started_at": "2026-11-16T22:44:43Z",
+    "command": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe scripts/benchmark_queries.py",
+    "git_sha": "4b2174bd69a7bf9a3e92dabc19d45d8fd2b9abc0",
+    "python": "3.11.9",
+    "duckdb": "1.2.2",
+    "scope": "single-machine measurements; not a distributed benchmark",
+    "snapshot_id": "20261116T192553-472ac294",
+    "api": {
+      "cache_condition": "API process restarted before each endpoint's first request series; OS page cache not dropped",
+      "endpoints": {
+        "/api/overview": {
+          "cold_first_request_ms": 848.95,
+          "warm": {
+            "n": 20,
+            "p50_ms": 314.52,
+            "p95_ms": 338.98,
+            "max_ms": 361.33
+          }
+        },
+        "/api/overview?country=France": {
+          "cold_first_request_ms": 339.91,
+          "warm": {
+            "n": 20,
+            "p50_ms": 317.91,
+            "p95_ms": 384.01,
+            "max_ms": 403.33
+          }
+        },
+        "/api/overview?start=2011-01-01&end=2011-06-30": {
+          "cold_first_request_ms": 507.74,
+          "warm": {
+            "n": 20,
+            "p50_ms": 523.12,
+            "p95_ms": 557.83,
+            "max_ms": 563.94
+          }
+        },
+        "/api/lineage?metric=net_recorded_gbp&limit=50": {
+          "cold_first_request_ms": 292.43,
+          "warm": {
+            "n": 20,
+            "p50_ms": 301.34,
+            "p95_ms": 341.66,
+            "max_ms": 383.59
+          }
+        },
+        "/api/trust": {
+          "cold_first_request_ms": 151.23,
+          "warm": {
+            "n": 20,
+            "p50_ms": 78.57,
+            "p95_ms": 110.49,
+            "max_ms": 118.58
+          }
+        },
+        "/api/forecasts": {
+          "cold_first_request_ms": 46.88,
+          "warm": {
+            "n": 20,
+            "p50_ms": 30.12,
+            "p95_ms": 47.34,
+            "max_ms": 107.9
+          }
+        },
+        "/api/replay": {
+          "cold_first_request_ms": 83.83,
+          "warm": {
+            "n": 20,
+            "p50_ms": 72.79,
+            "p95_ms": 117.87,
+            "max_ms": 122.32
+          }
+        }
+      }
+    },
+    "duckdb_direct": {
+      "threads": 2,
+      "memory_limit": "512MB",
+      "queries": {
+        "headline_kpis": {
+          "new_connection_first_ms": 200.7,
+          "warm": {
+            "n": 20,
+            "p50_ms": 197.65,
+            "p95_ms": 213.66,
+            "max_ms": 214.99
+          }
+        },
+        "top_products_join_dimension": {
+          "new_connection_first_ms": 612.82,
+          "warm": {
+            "n": 20,
+            "p50_ms": 626.04,
+            "p95_ms": 654.97,
+            "max_ms": 659.33
+          }
+        },
+        "monthly_trend_window_growth": {
+          "new_connection_first_ms": 247.4,
+          "warm": {
+            "n": 20,
+            "p50_ms": 234.88,
+            "p95_ms": 248.19,
+            "max_ms": 254.71
+          }
+        },
+        "cohort_first_purchase_cte": {
+          "new_connection_first_ms": 341.06,
+          "warm": {
+            "n": 20,
+            "p50_ms": 333.38,
+            "p95_ms": 350.94,
+            "max_ms": 352.61
+          }
+        },
+        "country_rank_window": {
+          "new_connection_first_ms": 182.39,
+          "warm": {
+            "n": 20,
+            "p50_ms": 183.99,
+            "p95_ms": 205.27,
+            "max_ms": 209.14
+          }
+        }
+      }
+    },
+    "optimization_pre_aggregated_daily_mart": {
+      "result_equivalent": true,
+      "rows": 604,
+      "fact_scan": {
+        "n": 20,
+        "p50_ms": 239.48,
+        "p95_ms": 251.25,
+        "max_ms": 256.25
+      },
+      "daily_sales_mart": {
+        "n": 20,
+        "p50_ms": 10.23,
+        "p95_ms": 11.46,
+        "max_ms": 11.61
+      },
+      "speedup_p50": 23.4
+    },
+    "finished_at": "2026-11-16T22:46:00Z"
+  },
+  "incident_recovery": {
+    "drill": {
+      "state": "passed",
+      "checks_passed": 21,
+      "checks": 21
+    },
+    "browser_demo_recovery_seconds": 151.7,
+    "browser_signature_sequence_seconds": 164.3,
+    "note": "Recovery seconds span injection to validated publication and include queueing/operator wait; job stage durations are in runtime/jobs."
+  }
+}

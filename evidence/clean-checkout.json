@@ -1,0 +1,89 @@
+{
+  "started_at": "2026-11-16T22:46:34.694357+00:00",
+  "source_commit": "698f427b878b20289edc74e29c53a7f03193ca0a",
+  "target": "C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\776573c9173af8b6\\69bc112a-6e22-4301-b019-b4be36eef56b\\scratchpad\\clean-checkout",
+  "compose_project": "meridian-clean",
+  "api_port": 8011,
+  "steps": [
+    {
+      "step": "clone",
+      "command": "git clone --quiet C:\\Users\\USER\\Projects\\Meridian C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\776573c9173af8b6\\69bc112a-6e22-4301-b019-b4be36eef56b\\scratchpad\\clean-checkout",
+      "exit_code": 0,
+      "seconds": 0.7,
+      "tail": ""
+    },
+    {
+      "step": "build_locked_image",
+      "command": "docker compose build tools",
+      "exit_code": 0,
+      "seconds": 150.4,
+      "tail": ""
+    },
+    {
+      "step": "download_and_convert_source",
+      "command": "docker compose run --rm --no-deps tools python -m meridian.cli convert",
+      "exit_code": 0,
+      "seconds": 53.6,
+      "tail": ""
+    },
+    {
+      "step": "fixture_batch",
+      "command": "docker compose run --rm --no-deps tools python -m meridian.cli batch --profile fixture",
+      "exit_code": 0,
+      "seconds": 53.7,
+      "tail": ""
+    },
+    {
+      "step": "fixture_oracle_check",
+      "command": "docker compose run --rm --no-deps tools python tests/check_spark_fixture.py",
+      "exit_code": 0,
+      "seconds": 1.2,
+      "tail": ""
+    },
+    {
+      "step": "demo_batch",
+      "command": "docker compose run --rm --no-deps tools python -m meridian.cli batch --profile demo",
+      "exit_code": 0,
+      "seconds": 43.0,
+      "tail": ""
+    },
+    {
+      "step": "frontend_ci",
+      "command": "npm.cmd --prefix frontend ci --no-fund --no-audit",
+      "exit_code": 0,
+      "seconds": 8.3,
+      "tail": ""
+    },
+    {
+      "step": "frontend_build",
+      "command": "npm.cmd --prefix frontend run build",
+      "exit_code": 0,
+      "seconds": 1.6,
+      "tail": ""
+    },
+    {
+      "step": "api_up",
+      "command": "docker compose up -d api",
+      "exit_code": 0,
+      "seconds": 0.7,
+      "tail": ""
+    }
+  ],
+  "skipped": [
+    "batch --profile full (same code path, ~130 s; verified in the working copy)",
+    "Kafka replay steps (verified by replay-drill and browser-demo in the working copy)"
+  ],
+  "api_checks": {
+    "health": {
+      "status": "ok",
+      "has_snapshot": true,
+      "time": "2026-11-16T22:51:50.137261+00:00"
+    },
+    "snapshot_profile": "demo",
+    "net_recorded_gbp": "69754.43",
+    "accepted_rows": 3986,
+    "ui_served": true
+  },
+  "state": "passed",
+  "finished_at": "2026-11-16T22:51:55.615909+00:00"
+}

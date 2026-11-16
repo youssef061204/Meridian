@@ -68,7 +68,20 @@ docker compose run --rm --no-deps tools python -m meridian.cli replay-drill   # 
 
 ## Verified results
 
-BENCHMARK_TABLE
+| Capability | Result | Evidence |
+|---|---|---|
+| Source verification | Both sheets, 525,461 + 541,910 = 1,067,371 rows, matching UCI; SHA-256 pinned; bounded conversion in 99.5 s | [source-verification.json](evidence/source-verification.json) |
+| Full Spark + Delta pipeline | 1,067,371 rows → 1,061,664 accepted / 5,701 excluded / 6 quarantined; 14 tables; Spark stage 125.0 s; peak container memory 1.86 GiB | [full-batch.json](evidence/full-batch.json) |
+| Independent full-data check | Source coordinates 1:1, 0 civil-time mismatches (563,573 summer rows), joins preserve exact GBP, cohorts recomputed | [full-snapshot-check.json](evidence/full-snapshot-check.json) |
+| DuckDB-only baseline (same SQL) | Identical accepted lines and GBP; 17.3 s transform/export (fact + daily only, no Delta history, so not like-for-like) | [full-baseline.json](evidence/full-baseline.json) |
+| **Full-history Kafka replay** | All 1,067,371 events through a 1-partition topic; producer 7,842 events/s; consumer 3,342 deliveries/s over 5 micro-batches; **reconciled exactly with batch** (£19,379,245.82). First publication attempt hit DuckDB's memory cap and was correctly refused; fixed and republished. | [benchmarks.json](evidence/benchmarks.json) → `replay_full_history` |
+| Recovery drill | 21/21 checks: process kills after the Bronze commit and before the checkpoint commit, no duplicate writes, quarantine by reason, durable late path, blocked publication, idempotent backfill re-run, exact batch equivalence | [replay-drill.json](evidence/replay-drill.json) |
+| Signature demo in a real browser | 11/11 steps through UI → API → worker → Kafka/Spark/Delta; unsafe sum £3,066.89 too high; recovered in 151.7 s, injection to validated publication including queueing; whole sequence 164 s | [browser-demo.json](evidence/browser-demo.json), [screenshots](evidence/screenshots) |
+| Synthetic scale run (10,673,710 rows) | Spark 355.6 s at the 2.3 GiB container ceiling; DuckDB 123.3 s (1.4 GB cap + spill); exact equivalence on 10,616,640 lines. The first two DuckDB attempts ran out of memory and are retained. | [benchmarks.json](evidence/benchmarks.json) → `synthetic_scale` |
+| Query latency (full snapshot) | API warm p50: overview 315 ms, lineage 301 ms, trust 79 ms. Pre-aggregated daily mart 21× faster than a fact scan, with identical results. | [benchmark-queries.json](evidence/benchmark-queries.json), [api-serving-optimization.json](evidence/api-serving-optimization.json) |
+| Forecasting | Promoted on validation only; untouched-test WAPE vs seasonal naive −3.1% (7 d) / −14.8% (28 d) aggregate; 80% intervals under-cover in validation | [forecast-run.json](evidence/forecast-run.json) |
+| Tests | 46 pytest tests (business oracle, API, forecast leakage, inventory) plus a Spark fixture oracle | `python -m pytest -q`, [fixture-batch.json](evidence/fixture-batch.json) |
+| Clean checkout | Fresh clone followed the README: locked build, download and convert, fixture oracle, demo batch, UI build, API serving £69,754.43 (full batch and Kafka steps verified in the working copy) | [clean-checkout.json](evidence/clean-checkout.json) |
 
 All measurements were taken on one machine: an i7-14700HX laptop (28 logical CPUs, 16 GB RAM) running Docker Desktop on WSL2, with Spark `local[2]`. They are not cluster or cloud benchmarks.
 
