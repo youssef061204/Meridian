@@ -1,0 +1,25 @@
+{
+  "command": [
+    "docker",
+    "compose",
+    "run",
+    "--rm",
+    "--no-deps",
+    "--name",
+    "meridian-job",
+    "tools",
+    "python",
+    "-m",
+    "meridian.cli",
+    "smoke"
+  ],
+  "cwd": "C:\\Users\\USER\\Projects\\Meridian",
+  "started_at": "2026-11-16T19:10:35.626232+00:00",
+  "log": "evidence\\execution\\spark-smoke.log",
+  "cache_condition": "not controlled; see run notes",
+  "git_sha": "uncommitted",
+  "exit_code": 1,
+  "finished_at": "2026-11-16T19:10:37.661799+00:00",
+  "duration_seconds": 2.0354,
+  "container_samples": []
+}

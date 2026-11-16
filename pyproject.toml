@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meridian-retail"
+version = "0.1.0"
+description = "Evidence-backed local retail data reliability case study"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "duckdb==1.2.2", "pyarrow==19.0.1", "openpyxl==3.1.5",
+  "fastapi==0.115.12", "uvicorn==0.34.2", "requests==2.32.4",
+  "psutil==7.0.0", "kafka-python==2.2.10"
+]
+
+[project.optional-dependencies]
+spark = ["pyspark==3.5.7", "delta-spark==3.3.3"]
+dev = ["pytest==8.3.5", "httpx==0.28.1", "playwright==1.52.0"]
+forecast = ["scikit-learn==1.6.1", "numpy==2.2.6", "pandas==2.2.3"]
+
+[project.scripts]
+meridian = "meridian.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

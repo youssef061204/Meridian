@@ -1,0 +1,54 @@
+{
+  "source": {
+    "url": "https://archive.ics.uci.edu/static/public/502/online%2Bretail%2Bii.zip",
+    "archive_sha256": "572e36277c2390fbfde10664750731e0a86f55e33470d91919085f0408e67bfb",
+    "workbook_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+    "archive_bytes": 45622418,
+    "workbook_bytes": 45622278,
+    "license": "CC BY 4.0",
+    "attribution": "Daqing Chen, Online Retail II, UCI Machine Learning Repository, DOI 10.24432/C5CG6D"
+  },
+  "conversion_version": "xlsx-stream-v1",
+  "converted_at": "2026-11-16T19:09:04.189541+00:00",
+  "sheets": [
+    {
+      "sheet": "Year 2009-2010",
+      "headers": [
+        "Invoice",
+        "StockCode",
+        "Description",
+        "Quantity",
+        "InvoiceDate",
+        "Price",
+        "Customer ID",
+        "Country"
+      ],
+      "rows": 525461,
+      "date_min": "2009-12-01 07:45:00",
+      "date_max": "2010-12-09 20:01:00",
+      "missing_customer_rows": 107927
+    },
+    {
+      "sheet": "Year 2010-2011",
+      "headers": [
+        "Invoice",
+        "StockCode",
+        "Description",
+        "Quantity",
+        "InvoiceDate",
+        "Price",
+        "Customer ID",
+        "Country"
+      ],
+      "rows": 541910,
+      "date_min": "2010-12-01 08:26:00",
+      "date_max": "2011-12-09 12:50:00",
+      "missing_customer_rows": 135080
+    }
+  ],
+  "total_rows": 1067371,
+  "demo_rows": 4000,
+  "full_parquet_sha256": "b84aa47f9306c33e4b5bfdf140b22d9d4f15d3758fad34c53a076c54dd7934fc",
+  "demo_parquet_sha256": "850b9b3b2dd3cad945c60bb4b86f294a049df4cacf27843ea9229577e1c20c88",
+  "timezone_assumption": "Source timestamps are naive UK civil time; original values preserved; no UTC conversion or DST inference."
+}

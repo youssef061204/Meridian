@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-11-16T19:10:31.727931+00:00",
+  "exact_command_argv": [
+    "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe",
+    "scripts/capture_environment.py"
+  ],
+  "working_directory": "C:\\Users\\USER\\Projects\\Meridian",
+  "repository": "C:\\Users\\USER\\Projects\\Meridian",
+  "git_commit": null,
+  "git_working_tree_clean": false,
+  "host": {
+    "system": "Windows",
+    "release": "10",
+    "version": "10.0.26200",
+    "machine": "AMD64",
+    "python_version": "3.11.9",
+    "python_executable": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe",
+    "resources": {
+      "cpu_logical": 28,
+      "cpu_description": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+      "disk_total_bytes": 1021821579264,
+      "disk_used_bytes": 869091123200,
+      "disk_free_bytes": 152730456064,
+      "disk_measured_at": "C:\\Users\\USER\\Projects\\Meridian",
+      "cpu_physical": 20,
+      "memory_total_bytes": 16873545728,
+      "memory_available_bytes": 360075264,
+      "memory_used_bytes": 16513470464,
+      "memory_percent": 97.9
+    }
+  },
+  "docker_resources": {
+    "memory_total_bytes": 8169594880,
+    "cpu_logical": 28
+  },
+  "installed_python_packages": {
+    "meridian-retail": "0.1.0",
+    "psutil": "7.0.0",
+    "pyspark": null,
+    "delta-spark": null,
+    "duckdb": "1.2.2",
+    "pyarrow": "19.0.1",
+    "openpyxl": "3.1.5",
+    "fastapi": "0.115.12",
+    "uvicorn": "0.34.2",
+    "requests": "2.32.4",
+    "kafka-python": "2.2.10",
+    "scikit-learn": "1.6.1",
+    "numpy": "2.2.6",
+    "pandas": "2.2.3",
+    "pytest": "8.3.5"
+  },
+  "commands": {
+    "git_commit": {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "returncode": 128,
+      "stdout": "HEAD",
+      "stderr": "fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'",
+      "duration_seconds": 0.0388
+    },
+    "git_status": {
+      "argv": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "returncode": 0,
+      "stdout": "?? .dockerignore\n?? .gitignore\n?? Dockerfile\n?? HANDOFF.md\n?? MERIDIAN_Codex_Project_Prompt.md\n?? SOURCE.lock.json\n?? compose.yml\n?? docs/\n?? evidence/\n?? frontend/\n?? pyproject.toml\n?? requirements.lock\n?? scripts/\n?? sql/\n?? src/\n?? tests/\n?? uv.lock",
+      "stderr": "",
+      "duration_seconds": 0.0308
+    },
+    "git_version": {
+      "argv": [
+        "git",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "git version 2.52.0.windows.1",
+      "stderr": "",
+      "duration_seconds": 0.0274
+    },
+    "java_version": {
+      "argv": [
+        "java",
+        "-version"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "openjdk version \"21.0.9\" 2025-10-21 LTS\nOpenJDK Runtime Environment Temurin-21.0.9+10 (build 21.0.9+10-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.9+10 (build 21.0.9+10-LTS, mixed mode, sharing)",
+      "duration_seconds": 0.0892
+    },
+    "node_version": {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "v24.13.0",
+      "stderr": "",
+      "duration_seconds": 0.0859
+    },
+    "uv_version": {
+      "argv": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "uv 0.12.23 (46b84fd0b 2026-10-03 x86_64-pc-windows-msvc)",
+      "stderr": "",
+      "duration_seconds": 0.0485
+    },
+    "docker_client": {
+      "argv": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Client.Version}}"
+      ],
+      "returncode": 0,
+      "stdout": "29.3.1",
+      "stderr": "",
+      "duration_seconds": 0.0759
+    },
+    "docker_server": {
+      "argv": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "returncode": 0,
+      "stdout": "29.3.1",
+      "stderr": "",
+      "duration_seconds": 0.0769
+    },
+    "docker_memory_bytes": {
+      "argv": [
+        "docker",
+        "info",
+        "--format",
+        "{{.MemTotal}}"
+      ],
+      "returncode": 0,
+      "stdout": "8169594880",
+      "stderr": "",
+      "duration_seconds": 1.0447
+    },
+    "docker_cpu_logical": {
+      "argv": [
+        "docker",
+        "info",
+        "--format",
+        "{{.NCPU}}"
+      ],
+      "returncode": 0,
+      "stdout": "28",
+      "stderr": "",
+      "duration_seconds": 0.2538
+    },
+    "docker_os": {
+      "argv": [
+        "docker",
+        "info",
+        "--format",
+        "{{.OSType}}/{{.Architecture}}"
+      ],
+      "returncode": 0,
+      "stdout": "linux/x86_64",
+      "stderr": "",
+      "duration_seconds": 0.2227
+    },
+    "docker_compose": {
+      "argv": [
+        "docker",
+        "compose",
+        "version",
+        "--short"
+      ],
+      "returncode": 0,
+      "stdout": "5.1.0",
+      "stderr": "",
+      "duration_seconds": 0.1079
+    }
+  },
+  "scope": "Single-machine point-in-time resource availability; not peak pipeline requirements or a benchmark.",
+  "privacy": "No environment-variable dump, credentials, Docker registry configuration, or container environment inspected."
+}
