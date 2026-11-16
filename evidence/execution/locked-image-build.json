@@ -1,0 +1,17 @@
+{
+  "command": [
+    "docker",
+    "compose",
+    "build",
+    "tools"
+  ],
+  "cwd": "C:\\Users\\USER\\Projects\\Meridian",
+  "started_at": "2026-11-16T19:15:47.180336+00:00",
+  "log": "evidence\\execution\\locked-image-build.log",
+  "cache_condition": "not controlled; see run notes",
+  "git_sha": "1aa74ac7e76a589000e50c120286a11d8ad1f3a6",
+  "exit_code": 0,
+  "finished_at": "2026-11-16T19:17:59.216493+00:00",
+  "duration_seconds": 132.06,
+  "container_samples": []
+}

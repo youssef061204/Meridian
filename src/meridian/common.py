@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 import os
 import platform
@@ -49,6 +50,16 @@ def run_record(stage, **details):
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:8]
     target = RUNTIME / "runs" / (run_id + ".json")
     record = dict(run_id=run_id, stage=stage, started_at=now(), state="running", **details)
+    files = sorted([*(ROOT / "src").rglob("*.py"), *(ROOT / "sql").glob("*.sql"), ROOT / "pyproject.toml", ROOT / "requirements.lock"])
+    code_hashes = {str(p.relative_to(ROOT)).replace('\\','/'):sha256(p) for p in files if p.is_file()}
+    record["source_tree_sha256"] = hashlib.sha256(json.dumps(code_hashes, sort_keys=True).encode()).hexdigest()
+    record["code_hashes"] = code_hashes
+    record["dependencies"] = {}
+    for dependency in ["pyspark","delta-spark","duckdb","pyarrow","kafka-python"]:
+        try:
+            record["dependencies"][dependency] = importlib.metadata.version(dependency)
+        except importlib.metadata.PackageNotFoundError:
+            record["dependencies"][dependency] = None
     if shutil.which("git"):
         revision = subprocess.run(["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT, capture_output=True, text=True)
         record["git_sha"] = revision.stdout.strip() if revision.returncode == 0 else "uncommitted"

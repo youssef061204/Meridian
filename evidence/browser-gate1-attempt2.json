@@ -1,0 +1,129 @@
+{
+  "started_at": "2026-11-16T19:16:35.029500+00:00",
+  "command": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe scripts/verify_browser.py",
+  "base_url": "http://localhost:8010",
+  "python": "3.11.9",
+  "playwright": "1.52.0",
+  "git_sha": "1aa74ac7e76a589000e50c120286a11d8ad1f3a6",
+  "verification": "Real browser against live local API; no mocked responses",
+  "steps": [
+    {
+      "name": "overview_kpis_match_persisted_api",
+      "status": "passed",
+      "metrics": {
+        "gross_positive_gbp": 71183.35,
+        "negative_adjustments_gbp": -1428.92,
+        "net_recorded_gbp": 69754.43,
+        "positive_units": 37737,
+        "known_customer_rows": 3272,
+        "accepted_rows": 3986
+      },
+      "coverage_rows": 3986
+    },
+    {
+      "name": "calendar_chart_breaks_unobserved_gaps",
+      "status": "passed",
+      "observed_days": 2,
+      "segments": 2
+    },
+    {
+      "name": "country_filter_changes_kpi_and_customer_coverage",
+      "status": "passed",
+      "country": "France",
+      "metrics": {
+        "gross_positive_gbp": 1706.1,
+        "negative_adjustments_gbp": -5.95,
+        "net_recorded_gbp": 1700.15,
+        "positive_units": 1100,
+        "known_customer_rows": 58,
+        "accepted_rows": 58
+      }
+    },
+    {
+      "name": "filter_reset_restores_full_snapshot",
+      "status": "passed",
+      "net_recorded_gbp": 69754.43
+    },
+    {
+      "name": "inclusive_date_filter",
+      "status": "passed",
+      "start": "2009-12-01",
+      "end": "2009-12-01",
+      "metrics": {
+        "gross_positive_gbp": 33747.38,
+        "negative_adjustments_gbp": -1131.19,
+        "net_recorded_gbp": 32616.19,
+        "positive_units": 19159,
+        "known_customer_rows": 1808,
+        "accepted_rows": 1992
+      }
+    },
+    {
+      "name": "kpi_drillthrough_has_sql_snapshot_delta_and_source_anchors",
+      "status": "passed",
+      "metric": "net_recorded_gbp",
+      "visible_rows": 50,
+      "total_rows": 3986,
+      "delta_versions": {
+        "bronze": 0,
+        "silver": 0,
+        "fact_invoice_line": 0,
+        "daily_sales": 0,
+        "product_performance": 0,
+        "country_performance": 0
+      }
+    },
+    {
+      "name": "negative_adjustments_selector_has_only_negative_contributions",
+      "status": "passed",
+      "visible_rows": 50,
+      "total_rows": 106
+    },
+    {
+      "name": "trust_counts_and_persisted_runs",
+      "status": "passed",
+      "counts": {
+        "source_rows": 4000,
+        "accepted_rows": 3986,
+        "quarantined_rows": 0,
+        "excluded_rows": 14,
+        "repeat_deliveries": 0
+      },
+      "persisted_runs": 5
+    },
+    {
+      "name": "forecast_has_truthful_unexecuted_state",
+      "status": "passed"
+    },
+    {
+      "name": "keyboard_skip_link_and_navigation",
+      "status": "passed"
+    }
+  ],
+  "console_errors": [],
+  "page_errors": [],
+  "screenshots": [
+    "evidence/screenshots/gate1-overview.png",
+    "evidence/screenshots/gate1-explorer.png",
+    "evidence/screenshots/gate1-trust.png"
+  ],
+  "snapshot_id": "20261116T191205-18007e6e",
+  "source_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+  "expected_metrics": {
+    "gross_positive_gbp": 71183.35,
+    "negative_adjustments_gbp": -1428.92,
+    "net_recorded_gbp": 69754.43,
+    "positive_units": 37737,
+    "known_customer_rows": 3272,
+    "accepted_rows": 3986
+  },
+  "browser": "136.0.7103.25",
+  "status": "failed",
+  "failure": {
+    "type": "AssertionError",
+    "message": "Mobile document overflow: {'viewport': 390, 'document': 402, 'body': 402}",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\USER\\Projects\\Meridian\\scripts\\verify_browser.py\", line 214, in main\n    assert dimensions[\"document\"] <= dimensions[\"viewport\"], f\"Mobile document overflow: {dimensions}\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Mobile document overflow: {'viewport': 390, 'document': 402, 'body': 402}\n"
+  },
+  "finished_at": "2026-11-16T19:17:02.092588+00:00",
+  "duration_seconds": 27.069
+}

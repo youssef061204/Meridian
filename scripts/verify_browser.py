@@ -13,6 +13,7 @@ import importlib.metadata
 import json
 from pathlib import Path
 import platform
+import re
 import subprocess
 import sys
 import time
@@ -61,9 +62,15 @@ def main() -> int:
         "verification": "Real browser against live local API; no mocked responses",
         "steps": [], "console_errors": [], "page_errors": [], "screenshots": [],
     }
+    evidence["prior_attempts"] = []
+    for path in sorted((ROOT / "evidence").glob("browser-gate1-attempt*.json")):
+        previous = json.loads(path.read_text(encoding="utf-8"))
+        evidence["prior_attempts"].append({"evidence": str(path.relative_to(ROOT)).replace("\\", "/"), "status": previous["status"], "failure": previous.get("failure", {}).get("message")})
+    evidence["repair"] = "Mobile navigation now stacks each icon above its wrapping label; actual 390px viewport previously overflowed to402px. Original failure and before screenshot retained."
 
     def record(name: str, **details: object) -> None:
         evidence["steps"].append({"name": name, "status": "passed", **details})
+        print(f"PASS {name}", flush=True)
 
     def screenshot(page, name: str) -> None:
         path = shots / f"gate1-{name}.png"
@@ -125,7 +132,7 @@ def main() -> int:
 
             country = next((name for name in overview["filters"]["countries"] if name == "France"), overview["filters"]["countries"][0])
             filtered = read_api(args.base_url, "/api/overview", country=country)
-            page.get_by_label("Country", exact=True).select_option(country)
+            page.get_by_label(re.compile(r"^Country")).select_option(country)
             page.get_by_role("button", name="Apply filters", exact=True).click()
             check_overview(filtered)
             assert filtered["metrics"]["net_recorded_gbp"] != overview["metrics"]["net_recorded_gbp"], "Choose a country that changes the KPI"
@@ -133,7 +140,7 @@ def main() -> int:
 
             page.get_by_role("button", name="Reset", exact=True).click()
             check_overview(overview)
-            expect(page.get_by_label("Country", exact=True)).to_have_value("")
+            expect(page.get_by_label(re.compile(r"^Country"))).to_have_value("")
             record("filter_reset_restores_full_snapshot", net_recorded_gbp=overview["metrics"]["net_recorded_gbp"])
 
             # Inclusive date filters must use the same definition in API and UI.
@@ -162,7 +169,7 @@ def main() -> int:
             record("kpi_drillthrough_has_sql_snapshot_delta_and_source_anchors", metric="net_recorded_gbp", visible_rows=len(net["rows"]), total_rows=net["total_rows"], delta_versions=snapshot["delta_versions"])
             screenshot(page, "explorer")
 
-            page.get_by_label("Metric", exact=True).select_option("negative_adjustments_gbp")
+            page.get_by_label(re.compile(r"^Metric")).select_option("negative_adjustments_gbp")
             ready()
             expect(page.locator(".panel-heading h2").first).to_have_text("Negative adjustments")
             negative = read_api(args.base_url, "/api/lineage", metric="negative_adjustments_gbp", limit="50")
@@ -209,10 +216,15 @@ def main() -> int:
             page.set_viewport_size({"width": 390, "height": 844})
             page.get_by_role("button", name="Business overview", exact=True).click()
             check_overview(overview)
-            dimensions = page.evaluate("({viewport:innerWidth, document:document.documentElement.scrollWidth, body:document.body.scrollWidth})")
-            assert dimensions["document"] <= dimensions["viewport"], f"Mobile document overflow: {dimensions}"
             screenshot(page, "overview-mobile")
-            record("mobile_390px_has_no_horizontal_page_overflow", dimensions=dimensions)
+            mobile_dimensions = {}
+            for view in ("Business overview", "Metric explorer", "Data trust & recovery", "Forecast & planning"):
+                page.get_by_role("button", name=view, exact=True).click()
+                ready()
+                dimensions = page.evaluate("({viewport:innerWidth, document:document.documentElement.scrollWidth, body:document.body.scrollWidth})")
+                assert dimensions["document"] <= dimensions["viewport"], f"Mobile document overflow in {view}: {dimensions}"
+                mobile_dimensions[view] = dimensions
+            record("mobile_390px_all_views_have_no_horizontal_page_overflow", dimensions=mobile_dimensions)
 
             assert not evidence["console_errors"], evidence["console_errors"]
             assert not evidence["page_errors"], evidence["page_errors"]

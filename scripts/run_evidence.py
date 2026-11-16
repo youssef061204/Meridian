@@ -8,6 +8,9 @@ from pathlib import Path
 
 from meridian.common import ROOT, atomic_json, now
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 p = argparse.ArgumentParser()
 p.add_argument("label")
 p.add_argument("--container")
