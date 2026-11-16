@@ -3,3 +3,26 @@
   .sidebar nav .nav-item{min-width:0;flex-direction:column;gap:6px}
   .sidebar nav .nav-item>span{white-space:normal;text-align:center;max-width:100%}
 }
+/* Optional historical analysis panels render only with published API evidence. */
+.source-warning{display:flex;align-items:baseline;gap:12px;background:#f5f0e4;border:1px solid #e6ddc7;border-radius:4px;padding:12px 15px;margin:-9px 0 22px;font-size:9px;color:#887756;line-height:1.7}
+.source-warning strong{font-weight:600;white-space:nowrap;color:#7e6a45}
+.period-grid{display:grid;grid-template-columns:1fr 40px 1fr 1fr;gap:20px;padding:7px 24px 25px;align-items:center}
+.period-grid>div>strong{display:block;font-size:25px;letter-spacing:-.5px;font-weight:500;margin:12px 0 7px;color:#416654}
+.period-grid>div>span:last-child{font-size:9px;color:#89967e;line-height:1.7}
+.period-connector{font-size:23px;color:#a9b99e;text-align:center}
+.period-change{border-left:1px solid #e5ebdc;padding-left:25px}
+.period-change>strong{font-size:23px!important}
+.cohort-definition{max-width:1100px}
+.cohort-panel .inline-label{max-width:480px;text-align:right}
+.cohort-panel .inline-label select{min-width:116px}
+.cohort-panel table{min-width:720px}
+.retention-cell{display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.retention-track{display:block;width:70px;height:5px;border-radius:2px;background:#edf2e6;overflow:hidden}
+.retention-track i{display:block;height:100%;background:#6e947a;border-radius:2px}
+.period-coverage{font-size:8px;color:#74916c;background:#f0f5e9;display:inline-block;padding:4px 6px;border-radius:3px;white-space:nowrap}
+.period-partial{color:#997b48;background:#f8f1e3}
+.cohort-footnote{padding-top:17px}
+.unparseable-amounts{margin:0 24px 18px;border-top:1px solid #e5eadf;padding-top:17px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#829177;gap:20px}
+.unparseable-amounts strong{font-size:17px;color:#5f7857;font-weight:500}
+@media(max-width:950px){.period-grid{gap:12px;grid-template-columns:1fr 24px 1fr}.period-change{grid-column:1/-1;border-left:0;border-top:1px solid #e5ebdc;padding:17px 0 0;display:grid;grid-template-columns:1fr 1fr;align-items:center}.period-change>strong{margin:0!important;text-align:right}.period-change>span:last-child{grid-column:1/-1}.source-warning{align-items:flex-start;flex-direction:column;gap:3px}}
+@media(max-width:650px){.period-grid{padding:5px 16px 20px;gap:9px;grid-template-columns:1fr 17px 1fr}.period-grid>div>strong{font-size:21px}.period-grid .eyebrow{font-size:7px;letter-spacing:.7px}.period-grid>div>span:last-child{font-size:8px}.period-change>strong{font-size:20px!important}.period-connector{font-size:19px}.source-warning{font-size:8px;padding:11px 12px}.cohort-panel .inline-label{text-align:left;flex-wrap:wrap;gap:6px}.cohort-panel .inline-label select{min-width:100%}.unparseable-amounts{margin-left:16px;margin-right:16px;font-size:9px}}

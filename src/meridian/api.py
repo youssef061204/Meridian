@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
 
 import duckdb
 from fastapi import FastAPI, HTTPException, Query
@@ -66,7 +66,23 @@ def overview(country: str | None = None, start: date | None = None, end: date | 
         daily = rows(con, "SELECT date, sum(CASE WHEN line_amount>0 THEN line_amount ELSE 0 END) AS gross_positive_gbp, sum(CASE WHEN line_amount<0 THEN line_amount ELSE 0 END) AS negative_adjustments_gbp, sum(line_amount) AS net_recorded_gbp, sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM selected GROUP BY date ORDER BY date")
         products = rows(con, "SELECT stock_code,max(description) AS description,sum(line_amount) AS net_recorded_gbp,sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM selected GROUP BY stock_code ORDER BY net_recorded_gbp DESC LIMIT 15")
         countries = rows(con, "SELECT country,sum(line_amount) AS net_recorded_gbp,count(*) AS rows FROM selected GROUP BY country ORDER BY net_recorded_gbp DESC")
-        return {"snapshot":manifest,"metrics":metrics,"daily":daily,"products":products,"countries":countries,"filters":{"countries":[r[0] for r in con.execute("SELECT DISTINCT country FROM fact_invoice_line ORDER BY country").fetchall()]},"selected_rows":con.execute("SELECT count(*) FROM selected").fetchone()[0]}
+        cohorts = []
+        snapshot_folder = DATA / "serving" / "snapshots" / manifest["id"]
+        if (snapshot_folder/"cohort_retention").exists() and not (country or start or end):
+            con.execute(f"CREATE VIEW cohort_retention AS SELECT * FROM read_parquet('{(snapshot_folder/'cohort_retention').as_posix()}/*.parquet')")
+            cohorts = rows(con, "SELECT *,cohort_size AS cohort_customers,is_period_within_source_bounds AS is_complete_month FROM cohort_retention ORDER BY cohort_month,month_index")
+        comparison = None
+        bound = min(date.fromisoformat(manifest["date_max"])-timedelta(days=1), end or date.max)
+        previous_start = bound-timedelta(days=55)
+        if manifest.get("profile") == "full" and previous_start >= date.fromisoformat(manifest["date_min"]) and (not start or previous_start >= start):
+            current_start, previous_end = bound-timedelta(days=27),bound-timedelta(days=28)
+            def period(a,b):
+                predicate, values = filters(country,a,b)
+                return con.execute("SELECT coalesce(sum(line_amount),0) FROM fact_invoice_line WHERE "+predicate,values).fetchone()[0]
+            current_net, previous_net = period(current_start,bound),period(previous_start,previous_end)
+            comparison = dict(current_start=str(current_start),current_end=str(bound),previous_start=str(previous_start),previous_end=str(previous_end),current_net_gbp=current_net,previous_net_gbp=previous_net,change_gbp=current_net-previous_net,change_pct=(current_net-previous_net)/abs(previous_net)*100 if previous_net else None,limitation="Equal 28-calendar-day windows; source's final day excluded as potentially partial. No-source days are unavailable, not proven zero sales. This is an association within recorded exports, not a causal estimate.")
+        warning = "Original workbook coordinates are preserved. Identical transaction payloads occur across the overlapping December 2010 exports; unique real-world purchases require client reconciliation."
+        return {"snapshot":manifest,"metrics":metrics,"daily":daily,"products":products,"countries":countries,"cohorts":cohorts,"comparison":comparison,"quality":{"known_customer_rows":metrics["known_customer_rows"],"accepted_rows":metrics["accepted_rows"],"source_overlap_warning":warning if manifest.get("profile")=="full" else ""},"filters":{"countries":[r[0] for r in con.execute("SELECT DISTINCT country FROM fact_invoice_line ORDER BY country").fetchall()]},"selected_rows":metrics["accepted_rows"]}
 
 
 @app.get("/api/lineage")

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe",
+    "-m",
+    "meridian.cli",
+    "baseline",
+    "--profile",
+    "demo"
+  ],
+  "cwd": "C:\\Users\\USER\\Projects\\Meridian",
+  "started_at": "2026-11-16T19:23:17.979438+00:00",
+  "log": "evidence\\execution\\demo-baseline.log",
+  "cache_condition": "not controlled; see run notes",
+  "git_sha": "f5edd2c1768a51436192a26f39397ddd1b9903a7",
+  "exit_code": 0,
+  "finished_at": "2026-11-16T19:23:20.010355+00:00",
+  "duration_seconds": 2.0313,
+  "container_samples": []
+}

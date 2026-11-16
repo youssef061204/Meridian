@@ -5,7 +5,7 @@ WITH parsed AS (
    upper(trim(stock_code)) AS stock_code_clean,
    try_cast(quantity AS DECIMAL(18,4)) AS quantity_decimal,
    try_cast(unit_price AS DECIMAL(18,4)) AS price_decimal,
-   try_cast(event_time AS TIMESTAMP) AS timestamp_parsed,
+   try_cast(event_time AS TIMESTAMP_NTZ) AS timestamp_parsed,
    cast(round(try_cast(quantity AS DECIMAL(18,4)) * try_cast(unit_price AS DECIMAL(18,4)), 2) AS DECIMAL(20,2)) AS parsed_amount
  FROM source_lines
 ), classified AS (

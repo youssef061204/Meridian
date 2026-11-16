@@ -6,7 +6,7 @@ from pathlib import Path
 
 import duckdb
 
-from .common import DATA, ROOT, RUNTIME, atomic_json, now, read_json, run_record, sha256
+from .common import DATA, ROOT, RUNTIME, atomic_json, now, read_json, run_record, sha256, writer_lock
 
 
 def spark_session():
@@ -30,6 +30,14 @@ def spark_session():
 
 def sql(spark, name):
     return spark.sql((ROOT / "sql" / name).read_text(encoding="utf-8"))
+
+
+def write_delta(spark, frame, path):
+    from delta.tables import DeltaTable
+    # Existing LTZ tables from Gate1 need an explicit feature upgrade for civil time.
+    if any(field.dataType.simpleString() == "timestamp_ntz" for field in frame.schema.fields) and DeltaTable.isDeltaTable(spark,str(path)):
+        spark.sql(f"ALTER TABLE delta.`{path}` SET TBLPROPERTIES ('delta.feature.timestampNtz' = 'supported')")
+    frame.write.format("delta").mode("overwrite").option("overwriteSchema", "true").save(str(path))
 
 
 def smoke():
@@ -78,7 +86,7 @@ def batch(profile="demo", fail_at=None):
     from pyspark.sql import functions as F
     from delta.tables import DeltaTable
     mode = "synthetic" if profile == "fixture" else "historical"
-    with run_record("batch", profile=profile, mode=mode) as run:
+    with run_record("batch", profile=profile, mode=mode) as run, writer_lock():
         spark = spark_session()
         try:
             source = load_input(spark, profile)
@@ -91,7 +99,7 @@ def batch(profile="demo", fail_at=None):
             bronze.dropDuplicates(["line_id"]).createOrReplaceTempView("source_lines")
             silver = sql(spark, "silver.sql")
             silver_path = lake / "silver"
-            silver.write.format("delta").mode("overwrite").option("overwriteSchema", "true").save(str(silver_path))
+            write_delta(spark, silver, silver_path)
             silver = spark.read.format("delta").load(str(silver_path))
             source_rows = silver.count()
             reconciliation = [r.asDict() for r in silver.groupBy("disposition", "classification").agg(F.count("*").alias("rows"), F.sum("parsed_amount").alias("parsed_amount_gbp")).collect()]
@@ -107,16 +115,27 @@ def batch(profile="demo", fail_at=None):
             tables = {"fact_invoice_line": fact, "daily_sales": sql(spark, "daily_sales.sql"),
                 "product_performance": spark.sql("SELECT stock_code, max(description) AS description, sum(line_amount) AS net_recorded_gbp, sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM fact_invoice_line GROUP BY stock_code"),
                 "country_performance": spark.sql("SELECT country, sum(line_amount) AS net_recorded_gbp, count(*) AS rows FROM fact_invoice_line GROUP BY country")}
+            if profile == "full":
+                from .gold import build_gold
+                tables.update(build_gold(spark,fact,silver))
             versions = {"bronze": DeltaTable.forPath(spark, str(bronze_path)).history(1).first()["version"], "silver": DeltaTable.forPath(spark, str(silver_path)).history(1).first()["version"]}
             for name, frame in tables.items():
                 path = lake / name
-                frame.write.format("delta").mode("overwrite").option("overwriteSchema", "true").save(str(path))
+                write_delta(spark, frame, path)
                 versions[name] = DeltaTable.forPath(spark, str(path)).history(1).first()["version"]
+            model_checks = None
+            if profile == "full":
+                from .gold import validate_gold
+                materialized = {name: spark.read.format("delta").option("versionAsOf",versions[name]).load(str(lake/name)) for name in tables}
+                model_checks = validate_gold(spark,materialized,materialized["fact_invoice_line"])
             snapshot_dir = DATA / "serving" / "snapshots" / run["run_id"]
             snapshot_dir.mkdir(parents=True, exist_ok=False)
             (snapshot_dir / "models").mkdir()
-            for model in ["silver.sql", "daily_sales.sql"]:
-                shutil.copyfile(ROOT / "sql" / model, snapshot_dir / "models" / model)
+            model_files = sorted((ROOT / "sql").rglob("*.sql"))
+            for model in model_files:
+                target = snapshot_dir / "models" / model.relative_to(ROOT/"sql")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(model, target)
             checksums = {}
             # Each read explicitly pins a Delta version; unrelated commits are not a cross-table transaction.
             for name in tables:
@@ -147,8 +166,9 @@ def batch(profile="demo", fail_at=None):
                     accepted_rows=counts["accepted"], quarantined_rows=counts["quarantined"], excluded_rows=counts["excluded"], repeat_deliveries=deliveries-source_rows, received_deliveries=deliveries,
                     date_min=str(accepted[2]), date_max=str(accepted[3]), delta_versions=versions,
                     delta_root=str(lake.relative_to(ROOT)).replace('\\', '/'), metrics=metric_values,
-                    reconciliation=reconciliation, reconciliation_totals=balance, checksums=checksums, validation="passed", sql_sha256={n:sha256(snapshot_dir/"models"/n) for n in ["silver.sql","daily_sales.sql"]},
-                    limitations=["Recorded merchandise invoice value in GBP; not audited revenue or settled cash.", "Missing customer IDs remain in merchandise totals.", "Source civil timestamps have no recorded timezone offset."])
+                    reconciliation=reconciliation, reconciliation_totals=balance, checksums=checksums, validation="passed", sql_sha256={p.relative_to(snapshot_dir/"models").as_posix():sha256(p) for p in (snapshot_dir/"models").rglob("*.sql")},
+                    tables=list(tables),model_checks=model_checks,
+                    limitations=["Recorded merchandise invoice value in GBP; not audited revenue or settled cash.", "Missing customer IDs remain in merchandise totals.", "Source civil timestamps are stored without timezone (TIMESTAMP_NTZ); no UTC offset is inferred.", "Original workbook coordinates retained; cross-sheet repeated payloads need client reconciliation before treating rows as unique real-world purchases."])
             finally:
                 con.close()
             atomic_json(snapshot_dir / "manifest.json", manifest)

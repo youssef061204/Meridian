@@ -46,6 +46,32 @@ def sha256(path):
 
 
 @contextmanager
+def writer_lock():
+    """OS-released single-publisher lease, including after process interruption."""
+    RUNTIME.mkdir(parents=True, exist_ok=True)
+    with (RUNTIME / "writer.lock").open("a+b") as lease:
+        if os.name == "nt":
+            import msvcrt
+            lease.seek(0)
+            if not lease.read(1):
+                lease.write(b"0")
+                lease.flush()
+            lease.seek(0)
+            msvcrt.locking(lease.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lease.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            yield
+        finally:
+            if os.name == "nt":
+                lease.seek(0)
+                msvcrt.locking(lease.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(lease.fileno(), fcntl.LOCK_UN)
+
+
+@contextmanager
 def run_record(stage, **details):
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:8]
     target = RUNTIME / "runs" / (run_id + ".json")

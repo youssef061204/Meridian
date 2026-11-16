@@ -10,6 +10,8 @@ def main():
     batch.add_argument("--profile", choices=["demo", "full", "fixture"], default="demo")
     batch.add_argument("--fail-at", choices=["after-export", "before-pointer"])
     sub.add_parser("smoke")
+    baseline_parser = sub.add_parser("baseline")
+    baseline_parser.add_argument("--profile", choices=["demo","full"], default="full")
     args = parser.parse_args()
     if args.command in ("download", "convert"):
         from . import source
@@ -20,6 +22,9 @@ def main():
     elif args.command == "batch":
         from .pipeline import batch
         batch(args.profile, fail_at=args.fail_at)
+    elif args.command == "baseline":
+        from .baseline import baseline
+        baseline(args.profile)
 
 
 if __name__ == "__main__":
