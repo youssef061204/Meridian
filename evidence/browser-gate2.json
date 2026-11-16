@@ -1,0 +1,116 @@
+{
+  "started_at": "2026-11-16T20:01:19.864746+00:00",
+  "command": "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe scripts/verify_browser_gate2.py",
+  "base_url": "http://localhost:8010",
+  "python": "3.11.9",
+  "playwright": "1.52.0",
+  "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+  "verification": "Real Chromium against full historical local API, with no mocked responses",
+  "steps": [
+    {
+      "name": "full_history_kpi_and_source_overlap_caveat",
+      "status": "passed",
+      "net_recorded_gbp": 19379245.82,
+      "caveat": "Original workbook coordinates are preserved. Identical transaction payloads occur across the overlapping December 2010 exports; unique real-world purchases require client reconciliation."
+    },
+    {
+      "name": "comparable_28day_windows_match_api",
+      "status": "passed",
+      "comparison": {
+        "current_start": "2011-11-11",
+        "current_end": "2011-12-08",
+        "previous_start": "2011-10-14",
+        "previous_end": "2011-11-10",
+        "current_net_gbp": 1341077.55,
+        "previous_net_gbp": 1106818.03,
+        "change_gbp": 234259.52,
+        "change_pct": 21.16513407357486,
+        "limitation": "Equal 28-calendar-day windows; source's final day excluded as potentially partial. No-source days are unavailable, not proven zero sales. This is an association within recorded exports, not a causal estimate."
+      }
+    },
+    {
+      "name": "cohort_month_selection_and_retention_denominator",
+      "status": "passed",
+      "month_index": 1,
+      "rows": 24
+    },
+    {
+      "name": "cohort_month_selection_and_retention_denominator",
+      "status": "passed",
+      "month_index": 6,
+      "rows": 19
+    },
+    {
+      "name": "incomplete_final_month_label",
+      "status": "passed",
+      "month_index": 24,
+      "activity_month": "2011-12-01"
+    },
+    {
+      "name": "country_filter_updates_full_history_comparison",
+      "status": "passed",
+      "country": "France",
+      "comparison": {
+        "current_start": "2011-11-11",
+        "current_end": "2011-12-08",
+        "previous_start": "2011-10-14",
+        "previous_end": "2011-11-10",
+        "current_net_gbp": 25815.4,
+        "previous_net_gbp": 22958.61,
+        "change_gbp": 2856.79,
+        "change_pct": 12.443218470107729,
+        "limitation": "Equal 28-calendar-day windows; source's final day excluded as potentially partial. No-source days are unavailable, not proven zero sales. This is an association within recorded exports, not a causal estimate."
+      }
+    },
+    {
+      "name": "trust_signed_value_reconciliation_matches_persisted_manifest",
+      "status": "passed",
+      "reconciliation_totals": {
+        "source_parsed_amount_gbp": "19287250.55",
+        "unparseable_amount_rows": 0,
+        "accepted_parsed_amount_gbp": "19379245.82",
+        "quarantined_parsed_amount_gbp": "-158302.57",
+        "excluded_parsed_amount_gbp": "66307.30"
+      }
+    },
+    {
+      "name": "gate2_panels_have_no_mobile_page_overflow",
+      "status": "passed",
+      "dimensions": {
+        "Business overview": {
+          "viewport": 390,
+          "document": 390
+        },
+        "Data trust & recovery": {
+          "viewport": 390,
+          "document": 390
+        }
+      }
+    },
+    {
+      "name": "no_browser_errors",
+      "status": "passed"
+    }
+  ],
+  "console_errors": [],
+  "page_errors": [],
+  "screenshots": [
+    "evidence/screenshots/gate2-overview.png",
+    "evidence/screenshots/gate2-trust.png"
+  ],
+  "snapshot_id": "20261116T192553-472ac294",
+  "source_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+  "source_rows": 1067371,
+  "expected_metrics": {
+    "gross_positive_gbp": 20112074.02,
+    "negative_adjustments_gbp": -732828.2,
+    "net_recorded_gbp": 19379245.82,
+    "positive_units": 11648090,
+    "known_customer_rows": 820647,
+    "accepted_rows": 1061664
+  },
+  "browser": "136.0.7103.25",
+  "status": "passed",
+  "finished_at": "2026-11-16T20:03:29.872922+00:00",
+  "duration_seconds": 130.024
+}

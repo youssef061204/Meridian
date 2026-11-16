@@ -5,12 +5,59 @@
     "implementation_commit": "7d96348970a67df32dc9cc78c0d0bedcecc42689",
     "source_slice_rows": 4000,
     "net_recorded_gbp": "69754.43",
-    "checks": ["source-verification.json", "spark-smoke.json", "execution/demo-locked.json", "execution/fixture-oracle.json", "execution/gate1-tests.json", "browser-gate1.json"],
-    "limits": ["Kafka broker/replay not verified", "Full historical dimensional model not yet verified", "Forecasting not executed"]
+    "checks": [
+      "source-verification.json",
+      "spark-smoke.json",
+      "execution/demo-locked.json",
+      "execution/fixture-oracle.json",
+      "execution/gate1-tests.json",
+      "browser-gate1.json"
+    ],
+    "limits": [
+      "Kafka broker/replay not verified",
+      "Full historical dimensional model not yet verified",
+      "Forecasting not executed"
+    ]
   },
-  "gate_2": {"state": "in_progress"},
-  "gate_3": {"state": "not_started"},
-  "gate_4": {"state": "not_started"},
-  "gate_5": {"state": "not_started"},
-  "gate_6": {"state": "not_started"}
+  "gate_2": {
+    "state": "passed",
+    "verified_at": "2026-11-16T20:08:00+00:00",
+    "implementation_commit": "2939649a2dc674b051a9e5452eb3094785d3c083 (+ fixes in the Gate 2 completion commit)",
+    "snapshot_id": "20261116T192553-472ac294",
+    "source_rows": 1067371,
+    "accepted_rows": 1061664,
+    "net_recorded_gbp": "19379245.82",
+    "checks": [
+      "execution/full-batch.json",
+      "full-batch.json",
+      "full-snapshot-check.json",
+      "execution/full-baseline.json",
+      "full-baseline.json",
+      "browser-gate2.json",
+      "../analysis/report.json",
+      "../analysis/notebook-execution.json"
+    ],
+    "presentation_inspection": "All 8 EDA charts visually inspected 2026-11-16; bridge label collision and missing spaces in chart/finding text fixed and the notebook re-executed.",
+    "failed_attempts_retained": [
+      "execution/full-baseline-host-attempt1.json (host Windows DuckDB access violation, 1.38 GiB free host RAM; rerun in the same container as Spark passed)",
+      "full-snapshot-check.json first run failed on a checker SQL syntax error; fixed and rerun passed"
+    ],
+    "limits": [
+      "DuckDB baseline builds fact+daily only; no like-for-like speedup claimed against the 14-table Spark/Delta run",
+      "Cross-sheet overlap (22,202 shared payload groups) unresolved without client keys",
+      "Incremental-update SQL example carried to Gate 3 affected-date backfill"
+    ]
+  },
+  "gate_3": {
+    "state": "not_started"
+  },
+  "gate_4": {
+    "state": "not_started"
+  },
+  "gate_5": {
+    "state": "not_started"
+  },
+  "gate_6": {
+    "state": "not_started"
+  }
 }

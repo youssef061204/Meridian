@@ -1,0 +1,55 @@
+{
+  "run_id": "20261116T200035-310c5e98",
+  "stage": "duckdb_batch_baseline",
+  "started_at": "2026-11-16T20:00:35.409604+00:00",
+  "state": "passed",
+  "profile": "full",
+  "cache_condition": "OS cache uncontrolled; new DuckDB connection; same converted Parquet and business SQL; no workbook parsing included",
+  "source_tree_sha256": "0671c1125780fb12e7cb7a83efbd439dce780b5080f43f4578f9a73ede609428",
+  "code_hashes": {
+    "pyproject.toml": "6e4405f7e2ae34b52acca2278b8e076b98850f3adf583bff2265902673b56550",
+    "requirements.lock": "6c2408e06c9bd34924e54c70bb20622fa8fa2d132b35b4d7ce2ce31369253599",
+    "sql/daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+    "sql/silver.sql": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+    "src/meridian/__init__.py": "e4c75986a472b9073d2852af453f94057beae7352d8e34a0335590d2b82bf978",
+    "src/meridian/analysis.py": "7b9cec12353d7957cd368d74773e4fa77d771619014c03f66d1e9c0ab2bac07f",
+    "src/meridian/api.py": "c21c698a99e8bf204c9280b876f137468406c883c24456280ace2aaad3fc6047",
+    "src/meridian/baseline.py": "c9a1d7f010f61594458daaf31ecfe36a8f1c4405726ac6c4961008029e35b301",
+    "src/meridian/cli.py": "d698841d8edcbe82d6cc9f787b7f0e42c2a209ebb0a82d7cc8e1008ff9a7ff10",
+    "src/meridian/common.py": "bc169eb85b239986080c7f9170203b93c5634c0f66bf34cd06493109c9d48bd5",
+    "src/meridian/gold.py": "0ff69bec46e8122de6f8366c22b5142a6e8c1e1a50915c3049fcc1f5cdaa4fba",
+    "src/meridian/pipeline.py": "808d8066bfc5640a9bc4cbf8138b32d504163b5a32d1cd90fc46182687df378f",
+    "src/meridian/source.py": "f2f4b3bdf926db4eb0cdb4b7ca5eded90453e5adec86a7a638ee6ca0248d715a"
+  },
+  "dependencies": {
+    "pyspark": "3.5.7",
+    "delta-spark": "3.3.3",
+    "duckdb": "1.2.2",
+    "pyarrow": "19.0.1",
+    "kafka-python": "2.2.10"
+  },
+  "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+  "python": "3.11.11",
+  "transform_export_seconds": 17.269231,
+  "metrics": {
+    "gross_positive_gbp": "20112074.02",
+    "negative_adjustments_gbp": "-732828.20",
+    "net_recorded_gbp": "19379245.82",
+    "positive_units": 11648090,
+    "known_customer_rows": 820647
+  },
+  "counts": {
+    "accepted": 1061664,
+    "excluded": 5701,
+    "quarantined": 6
+  },
+  "accepted_identity_fingerprint": [
+    1061664,
+    8041185632532855364,
+    "19379245.82"
+  ],
+  "input_sha256": "b84aa47f9306c33e4b5bfdf140b22d9d4f15d3758fad34c53a076c54dd7934fc",
+  "workbook_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+  "spark_snapshot_id": "20261116T192553-472ac294",
+  "equivalence": "all accepted identities, quantities and exact line amounts match (EXCEPT ALL both directions)"
+}

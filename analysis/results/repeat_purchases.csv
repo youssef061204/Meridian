@@ -1,0 +1,5 @@
+purchase_band,known_customers,distinct_customer_invoices,positive_paid_gbp
+1 invoice,1618,1618,563777.04
+2 invoices,945,1890,818968.30
+3-5 invoices,1503,5708,2131715.22
+6+ invoices,1786,27378,13920004.17

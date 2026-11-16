@@ -1,0 +1,54 @@
+ Container meridian-job Creating 
+ Container meridian-job Created 
+https://repo.maven.apache.org/maven2 added as a remote repository with the name: repo-1
+:: loading settings :: url = jar:file:/usr/local/lib/python3.11/site-packages/pyspark/jars/ivy-2.5.1.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+io.delta#delta-spark_2.12 added as a dependency
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-67baf36b-1a04-4888-9dd4-bd821eb0250b;1.0
+	confs: [default]
+	found io.delta#delta-spark_2.12;3.3.3 in central
+	found io.delta#delta-storage;3.3.3 in central
+	found org.antlr#antlr4-runtime;4.9.3 in central
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.7 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.7 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.5 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+:: resolution report :: resolve 305ms :: artifacts dl 7ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	io.delta#delta-spark_2.12;3.3.3 from central in [default]
+	io.delta#delta-storage;3.3.3 from central in [default]
+	org.antlr#antlr4-runtime;4.9.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.7 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.7 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.5 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   14  |   0   |   0   |   0   ||   14  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-67baf36b-1a04-4888-9dd4-bd821eb0250b
+	confs: [default]
+	0 artifacts copied, 14 already retrieved (0kB/6ms)
+26/11/16 19:25:55 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+[Stage 1:>                                                          (0 + 2) / 2][Stage 1:=============================>                             (1 + 1) / 2]                                                                                26/11/16 19:26:08 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+[Stage 17:>                                                         (0 + 2) / 2][Stage 17:=============================>                            (1 + 1) / 2][Stage 19:>                                                         (0 + 2) / 4][Stage 19:=============================>                            (2 + 2) / 4]                                                                                [Stage 47:>                                                         (0 + 2) / 2]                                                                                [Stage 54:>                                                         (0 + 2) / 2]                                                                                [Stage 63:>                                                         (0 + 2) / 2]                                                                                [Stage 101:>                                                        (0 + 2) / 2][Stage 101:>                (0 + 2) / 2][Stage 103:>                (0 + 0) / 1]                                                                                [Stage 138:>                (0 + 2) / 2][Stage 140:>                (0 + 0) / 2]                                                                                [Stage 142:>                                                        (0 + 2) / 2][Stage 142:>  (0 + 2) / 2][Stage 144:>  (0 + 0) / 1][Stage 146:>  (0 + 0) / 1]                                                                                [Stage 168:>                (0 + 2) / 2][Stage 169:>                (0 + 0) / 2][Stage 168:========>        (1 + 1) / 2][Stage 169:>                (0 + 1) / 2]                                                                                [Stage 189:>                (0 + 2) / 2][Stage 191:>                (0 + 0) / 2]                                                                                [Stage 207:>                                                        (0 + 2) / 2]                                                                                [Stage 334:>                                                        (0 + 2) / 2]                                                                                [Stage 354:>                                                        (0 + 2) / 2][Stage 356:>                                                        (0 + 2) / 2]                                                                                [Stage 362:>                                                        (0 + 1) / 1]                                                                                [Stage 370:>                                                        (0 + 1) / 1]                                                                                [Stage 378:>                                                        (0 + 1) / 1]                                                                                [Stage 392:>                                                        (0 + 1) / 1]                                                                                [Stage 395:>                                                        (0 + 1) / 1]                                                                                {"run_id": "20261116T192553-472ac294", "stage": "batch", "started_at": "2026-11-16T19:25:53.923305+00:00", "state": "passed", "profile": "full", "mode": "historical", "source_tree_sha256": "77721f11da06fa234bf215d8de7b6c226ee7bb7724aafc3296e0e8210b4dbb90", "code_hashes": {"pyproject.toml": "6e4405f7e2ae34b52acca2278b8e076b98850f3adf583bff2265902673b56550", "requirements.lock": "6c2408e06c9bd34924e54c70bb20622fa8fa2d132b35b4d7ce2ce31369253599", "sql/daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b", "sql/silver.sql": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013", "src/meridian/__init__.py": "e4c75986a472b9073d2852af453f94057beae7352d8e34a0335590d2b82bf978", "src/meridian/api.py": "c21c698a99e8bf204c9280b876f137468406c883c24456280ace2aaad3fc6047", "src/meridian/baseline.py": "c9a1d7f010f61594458daaf31ecfe36a8f1c4405726ac6c4961008029e35b301", "src/meridian/cli.py": "d698841d8edcbe82d6cc9f787b7f0e42c2a209ebb0a82d7cc8e1008ff9a7ff10", "src/meridian/common.py": "bc169eb85b239986080c7f9170203b93c5634c0f66bf34cd06493109c9d48bd5", "src/meridian/gold.py": "0ff69bec46e8122de6f8366c22b5142a6e8c1e1a50915c3049fcc1f5cdaa4fba", "src/meridian/pipeline.py": "808d8066bfc5640a9bc4cbf8138b32d504163b5a32d1cd90fc46182687df378f", "src/meridian/source.py": "f2f4b3bdf926db4eb0cdb4b7ca5eded90453e5adec86a7a638ee6ca0248d715a"}, "dependencies": {"pyspark": "3.5.7", "delta-spark": "3.3.3", "duckdb": "1.2.2", "pyarrow": "19.0.1", "kafka-python": "2.2.10"}, "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083", "python": "3.11.11", "snapshot_id": "20261116T192553-472ac294", "source_rows": 1067371, "counts": {"accepted": 1061664, "quarantined": 6, "excluded": 5701}, "metrics": {"gross_positive_gbp": "20112074.02", "negative_adjustments_gbp": "-732828.20", "net_recorded_gbp": "19379245.82", "positive_units": 11648090, "known_customer_rows": 820647}, "delta_versions": {"bronze": 0, "silver": 0, "fact_invoice_line": 0, "daily_sales": 0, "product_performance": 0, "country_performance": 0, "dim_date": 0, "dim_product": 0, "dim_customer": 0, "dim_geography": 0, "cohort_retention": 0, "customer_summary": 0, "forecast_inputs": 0, "quality_daily": 0}, "finished_at": "2026-11-16T19:27:59.062300+00:00", "duration_seconds": 125.0434}

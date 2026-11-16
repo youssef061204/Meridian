@@ -1,52 +1,90 @@
 # MERIDIAN handoff
 
 Specification: `MERIDIAN_Codex_Project_Prompt.md` (user attachment copied unchanged).
-Dedicated local repository: `C:\Users\USER\Projects\Meridian`.
+Repository: `C:\Users\USER\Projects\Meridian`. Machine-readable gate state: `evidence/gates.json`.
 
-## Current gate
+## Gate status
 
-Gate 1 **passed**. Real source conversion, locked-container Spark/Delta source slice, actual synthetic fixture Spark batch and independent monetary oracle,32 tests, and12 real browser flows passed. Gate2 in progress: full historical dimensional model, EDA/SQL analysis and DuckDB baseline. Gates3–6 not started. Machine-readable gate state: `evidence/gates.json`.
+| Gate | State | Evidence |
+|---|---|---|
+| 1. Source slice → Spark/Delta → reconciled KPI in UI | **passed** | `evidence/gates.json` → `gate_1` |
+| 2. Full history, dimensional model, SQL analyses, publication checks | **passed** | `evidence/gates.json` → `gate_2` |
+| 3. Kafka replay, incidents, recovery, batch/replay reconciliation | not started | — |
+| 4. Forecasting baselines, rolling evaluation, untouched test | not started | — |
+| 5. Walkthrough, benchmarks, case study, interview materials | not started | — |
+| 6. Inventory scenarios, optional Databricks/Power BI | not started | — |
 
-## Environment inspected
+All cloud, Databricks, and Power BI capabilities are unexecuted. No paid or cloud services have been used.
 
-2026-11-16: Windows, Docker Desktop Linux engine 29.3.1 / WSL2, 28 logical CPUs (i7-14700HX), 15.71 GiB physical RAM, 1.70 GiB initially free, 142.61 GiB free disk. Docker VM has 7.61 GiB RAM. Other unrelated containers are running and were left alone. Host Python 3.11.9 available; default Python 3.14 unsuitable. Host Java 21 outside selected Spark 3.5 support: isolate Java 17 in Docker.
+## Environment (inspected 2026-11-16)
 
-## Execution sequence
+Windows 11, Docker Desktop 29.3.1 on WSL2, 28 logical CPUs (i7-14700HX), 15.71 GiB RAM (often only 1.4–1.7 GiB free because unrelated containers run; leave them alone), Docker VM 7.61 GiB, ~142 GiB free disk. Host Python 3.11.9 in `.venv` (default 3.14 is unsuitable). Host Java 21 is outside Spark 3.5 support, so Spark runs only in the Java 17 container.
 
-1. Verify UCI workbook, both sheets and checksum; bounded conversion.
-2. Real Spark/Delta smoke; source slice → Silver decimal semantics → Gold → validated export → API/UI.
-3. Independent fixture and browser verification. Advance gate only after evidence is recorded.
-4. Full history/model/analysis; replay/recovery; forecasts; delivery, in specification order.
+Pinned runtime (verified): Spark 3.5.7, Delta 3.3.3, Scala 2.12.18, Java 17.0.21, Python 3.11.11 (container), DuckDB 1.2.2, Kafka image `apache/kafka:4.1.2` (broker not yet executed).
 
-## Commands executed
+## Commands
 
-`git init -b main`
+```powershell
+# Source download + verified bounded conversion (host)
+.venv\Scripts\python.exe -m meridian.cli convert
+# Build locked image
+docker compose build tools
+# Spark/Delta batch: profiles demo | fixture | full
+docker compose run --rm --no-deps --name meridian-job tools python -m meridian.cli batch --profile full
+# DuckDB baseline (run in the container; host run crashed under low free RAM)
+docker compose run --rm --no-deps --name meridian-baseline tools python -m meridian.cli baseline --profile full
+# Independent checks
+.venv\Scripts\python.exe tests\check_spark_fixture.py
+.venv\Scripts\python.exe tests\check_full_snapshot.py
+.venv\Scripts\python.exe -m pytest -q
+# EDA + executed notebook (host; PYTHONPATH=src)
+.venv\Scripts\python.exe -m meridian.analysis --snapshot 20261116T192553-472ac294 --notebook
+# API + UI
+npm.cmd --prefix frontend run build
+docker compose up -d api        # http://localhost:8010 (loopback only)
+.venv\Scripts\python.exe scripts\verify_browser.py
+.venv\Scripts\python.exe scripts\verify_browser_gate2.py
+```
 
-`uv venv --python 3.11 .venv`
+Wrap long runs with `scripts/run_evidence.py <label> --container <name> -- <command>` to retain log, exit code, duration, and sampled container memory under `evidence/execution/`.
 
-Environment: `docker version`, `docker image ls`, `docker stats --no-stream`, `py -0p`, `java -version`, `wsl --list --verbose`, Windows CIM hardware inspection.
+## Verified results
 
-## Remaining
+**Source.** UCI workbook SHA-256 `bcbe73b3…2e980` pinned in `SOURCE.lock.json`. Both sheets: 525,461 + 541,910 = 1,067,371 rows, matching UCI. Date ranges 2009-12-01 07:45 to 2010-12-09 20:01 and 2010-12-01 08:26 to 2011-12-09 12:50. Conversion streamed 10,000-row chunks in 99.5 s. `evidence/source-verification.json`.
 
-Gate2: integrate dimensional SQL from `gold.py`, execute full Spark history, validate1:1 joins, compare fair DuckDB baseline, execute EDA/notebook/findings and full UI. Gates3–6 remain. Full clean-checkout startup verification scheduled for Gate5.
+**Gate 1.** 4,000-row demo slice: 3,986 accepted / 14 excluded, net £69,754.43. Fixture: 18 deliveries / 16 source coordinates, net £35.00, matched by an independent oracle. 12 browser checks passed. Details in `evidence/gates.json`.
 
-## Executed results
+**Full Spark/Delta run** (commit 2939649, snapshot `20261116T192553-472ac294`): 1,067,371 source rows → 1,061,664 accepted, 6 quarantined, 5,701 excluded. Gross £20,112,074.02, negative adjustments −£732,828.20, net £19,379,245.82. 11,648,090 positive units. 14 Delta tables at v0. Spark stage 125.0 s, wrapper 128.4 s, container memory limit 2.3 GiB. `evidence/execution/full-batch.*`.
 
-- `python -m meridian.cli convert` (host `.venv`): downloaded UCI archive, pinned archive/workbook SHA256 in `SOURCE.lock.json`, streamed workbook in 10,000-row chunks. Both sheets match UCI's 1,067,371 source rows. 525,461/541,910 rows; date ranges 2009-12-01 07:45 to 2010-12-09 20:01 / 2010-12-01 08:26 to 2011-12-09 12:50. Unknown customer IDs:107,927/135,080. Conversion99.4512s; download4.0391s. Evidence `evidence/source-verification.json`. Initial run metadata wrote git_sha="HEAD" before the empty-repository handling was corrected; no commit existed at conversion time.
-- `docker compose build tools`: passed. Initial image resolved transitives; Dockerfile now changed to enforce generated hash-locked `requirements.lock`, rebuild pending.
-- `docker compose run --rm --no-deps --name meridian-job tools python -m meridian.cli smoke`: passed on second attempt. First attempt failed because git binary was absent in container; source ref reading now supports that environment. Both failed and passed logs retained in `evidence/execution/spark-smoke*`. Actual Spark3.5.7/Delta3.3.3/Scala2.12.18/Java17.0.21/Python3.11.11. Connector class loads, Kafka broker path not executed.
-- Demo command: `docker compose run --rm --no-deps --name meridian-job tools python -m meridian.cli batch --profile demo`: 4,000 source rows, accepted3,986/excluded14/quarantined0; gross71183.35, adjustments−1428.92, net69754.43 GBP. Spark stage52.3203s / wrapper57.1155s. Sampled container memory up to1.214GiB, limit2.246GiB; warm JVM artifact cache, uncontrolled OS cache, one repetition. `evidence/execution/demo-batch.*`.
-- Fixture command: same with `--profile fixture`: passed; 18 deliveries/16 source coordinates; accepted8/quarantined7/excluded1; gross48.51, adjustments−13.51, net35.00 GBP. Spark39.3044s / wrapper41.8332s. `python tests/check_spark_fixture.py` passed all independent source identity, exact monetary, country/date assertions against actual exported Spark snapshot.
-- `python -m pytest -q`:32 tests passed after API additions. Tests distinguish isolated API snapshots from real Spark integration; fixture checker above supplies integration evidence.
-- `npm.cmd --prefix frontend install --no-fund --no-audit`, `npm.cmd --prefix frontend run build`: passed. Calendar chart leaves unavailable days blank.
-- `docker compose up -d api`: running at http://localhost:8010 bound to loopback. `GET /api/health` returned200. API restarted after immutable-lineage/date-validation code changes.
-- Locked Docker rebuild passed132.06s (`evidence/execution/locked-image-build.json`). The wrapper initially failed while printing Unicode to Windows cp1252 after saving successful exit evidence; stdout UTF8 configuration fixed. Actual Docker build exit0. Image details `evidence/container-images.json`.
-- Locked demo republish at commit7d96348 passed, snapshot`20261116T191911-e734445d`, all6 Delta versions1, immutable SQL and explicit count/money balance. Same69754.43GBP net, Spark43.7649s / wrapper47.9636s. Evidence `evidence/execution/demo-locked.*`; code fingerprint recorded.
-- `.venv\Scripts\python.exe scripts\verify_browser.py`:12 checks passed24.128s against actual API/snapshot`20261116T191205-18007e6e`; country+date filters/reset/coverage, net and negative lineage/SQL/Delta/source coordinates, persisted trust counts, truthful pending forecast, keyboard, all4 views390px, zero console/page errors. Initial selector failure and real12px mobile nav overflow retained with fixes. `evidence/browser-gate1.json`, screenshots under`evidence/screenshots/`.
+**Independent full-snapshot check** (DuckDB, 6.9 s): file and SQL checksums; one-to-one source-coordinate join; zero civil-timestamp mismatches over 563,573 April–October rows (TIMESTAMP_NTZ, no BST shift); four dimension joins preserve rows and exact GBP; unknown-customer member valid; cohort retention recomputed independently; 135 unobserved calendar days kept as unavailable (not zero); quality amount bridge balances. `evidence/full-snapshot-check.json`.
 
-## Correctness decisions and outstanding scope
+**DuckDB baseline** (same container): 17.3 s transform/export, 29.2 s wrapper. Identical 1,061,664 accepted identities, quantities, and exact line amounts versus Spark (EXCEPT ALL in both directions). It builds only fact + daily tables without Delta history, so no like-for-like speedup is claimed. The host attempt crashed (0xC0000005) and is retained as `evidence/execution/full-baseline-host-attempt1.*`.
 
-- Preserve every original sheet/row; only repeat deliveries of same source identity deduplicate. Workbook sheets overlap Dec1–9 2010; assess exact repeated content in Gate2 before broad business interpretation.
-- Source-row reconciliation and delivery counts have different denominators. Decimal half-up per line; named exclusions and quarantine retain parseable amounts. No profit/payment/inventory claims.
-- Last validated serving pointer changes only after all table exports pass validation. Concurrent publishers currently require a single writer. Conflicting payloads under the same source identity require Gate3 conflict handling.
-- All cloud/native Databricks/PowerBI capabilities are unexecuted. No paid/cloud services authorized or used.
+**EDA.** 13 versioned queries, 8 charts, executed notebook (`notebooks/eda.ipynb`, 9 cells, 0 errors), client findings `docs/findings.md`. All charts were visually inspected. A bridge label collision and missing spaces in chart/finding text were fixed, then everything was re-executed.
+
+**Gate 2 browser checks:** 9 steps passed in 130 s. Covered: full KPI with overlap caveat, comparable 28-day windows vs API, cohort selection and denominators, partial-month label, country filter, trust reconciliation vs manifest, mobile overflow, zero console errors. `evidence/browser-gate2.json`.
+
+## Correctness decisions
+
+- Line identity = sha256(source checksum | sheet | row). Only repeat deliveries of the same source identity deduplicate.
+- Workbook overlap: 34,335 extra identical-looking coordinates, and 22,202 payload groups shared across sheets (22,523 pairs). All coordinates are retained and flagged for client reconciliation. No deletion rule was invented.
+- Decimal half-up rounding per line. Named exclusions and quarantine retain parseable amounts. Source-row and delivery denominators are reported separately. No profit, payment, or inventory claims.
+- Source times are UK civil clock in TIMESTAMP_NTZ. No timezone conversion is applied.
+- The serving pointer moves only after every table export validates. A single writer is assumed for now.
+
+## Remaining work (next: Gate 3)
+
+1. **Gate 3.** Start `kafka` (compose profile `replay`, 600 MB limit). Then build:
+   - A deterministic accelerated replay producer with speed, pause/resume, and source vs replay time.
+   - A Spark Structured Streaming consumer into the Bronze envelope.
+   - An idempotent Silver MERGE keyed on line identity, with a revision for corrections.
+   - A watermark policy, with late events routed to a durable backfill table.
+   - Incident injector: duplicates within and across batches, malformed rows, incompatible and additive schema changes.
+   - Fault injection: kill around the commit/checkpoint boundary, then restart, plus an interrupted multi-stage publish that leaves the last good snapshot current.
+   - A correction plus an affected-date backfill, re-run safely. This also supplies the carried-forward incremental-update SQL example.
+   - Batch vs replay reconciliation of identities and exact GBP.
+   - An unsafe comparison calculation, isolated in the UI.
+   - Persisted metrics for the Trust view.
+2. **Gate 4.** Seasonal naive, trailing-average, and LightGBM/sklearn models over at least 4 rolling origins plus an untouched test period, with past-only interval calibration and a leakage test.
+3. **Gate 5.** Benchmarks (synthetic scaling, query latency, replay throughput, recovery time), README, case study, demo script, interview guide, resume bullets, and clean-checkout verification. Rebuild the image so the `analysis` extras are included.
+4. **Gate 6.** Inventory simulator, Databricks bundle, Power BI exports and DAX (native report unfinished unless authoring is available).

@@ -1,0 +1,145 @@
+{
+  "started_at": "2026-11-16T20:00:12.005664+00:00",
+  "command": [
+    "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe",
+    "tests/check_full_snapshot.py"
+  ],
+  "cwd": "C:\\Users\\USER\\Projects\\Meridian",
+  "git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+  "working_tree_dirty": true,
+  "python": "3.11.9",
+  "duckdb": "1.2.2",
+  "duckdb_threads": 2,
+  "duckdb_memory_limit": "384MB",
+  "cache_condition": "OS cache uncontrolled; new DuckDB connection",
+  "scope": "Independent source/serving verification after the executed full Spark/Delta publication",
+  "snapshot_id": "20261116T192553-472ac294",
+  "snapshot_manifest_sha256": "172e2d0bd4bc642246bdbda3330b8b5958e8623d87ae4bcdf4fcd3b6685dc112",
+  "workbook_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+  "source_kind": "observed historical source",
+  "dataset_profile": "full",
+  "checks": {
+    "file_integrity": {
+      "parquet_files": 12,
+      "sql_artifacts": 10,
+      "converted_source_sha256": "b84aa47f9306c33e4b5bfdf140b22d9d4f15d3758fad34c53a076c54dd7934fc",
+      "state": "passed"
+    },
+    "source_coordinate_and_civil_time": {
+      "source": {
+        "rows": 1067371,
+        "distinct_coordinates": 1067371,
+        "source_checksums": 1,
+        "source_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980"
+      },
+      "fact": {
+        "rows": 1061664,
+        "distinct_lines": 1061664,
+        "net_recorded_gbp": "19379245.82"
+      },
+      "joined_rows": 1061664,
+      "distinct_lines": 1061664,
+      "net_recorded_gbp": "19379245.82",
+      "unmatched_source_rows": 0,
+      "civil_timestamp_mismatches": 0,
+      "business_date_mismatches": 0,
+      "source_identity_mismatches": 0,
+      "summer_month_rows": 563573,
+      "state": "passed"
+    },
+    "dimension_join_preservation": {
+      "dimension_keys": {
+        "dim_date": {
+          "rows": 739,
+          "distinct_keys": 739,
+          "null_keys": 0
+        },
+        "dim_product": {
+          "rows": 5118,
+          "distinct_keys": 5118,
+          "null_keys": 0
+        },
+        "dim_customer": {
+          "rows": 5877,
+          "distinct_keys": 5877,
+          "null_keys": 0
+        },
+        "dim_geography": {
+          "rows": 43,
+          "distinct_keys": 43,
+          "null_keys": 0
+        }
+      },
+      "unknown_member": {
+        "members": 1,
+        "invalid_unknown_members": 0
+      },
+      "joined_fact": {
+        "rows": 1061664,
+        "distinct_lines": 1061664,
+        "net_recorded_gbp": "19379245.82",
+        "missing_date": 0,
+        "missing_product": 0,
+        "missing_customer": 0,
+        "missing_geography": 0,
+        "unknown_customer_fact_rows": 241017
+      },
+      "state": "passed"
+    },
+    "cohort_retention": {
+      "rows": 325,
+      "distinct_keys": 325,
+      "invalid_counts": 0,
+      "rate_mismatches": 0,
+      "independent_denominator_mismatches": 0,
+      "independent_numerator_mismatches": 0,
+      "month_zero_rows": 25,
+      "month_zero_mismatches": 0,
+      "final_partial_month_rows": 25,
+      "final_month_flag_mismatches": 0,
+      "final_month_marked_complete": 0,
+      "state": "passed"
+    },
+    "calendar_and_forecast_availability": {
+      "calendar": {
+        "rows": 739,
+        "first_date": "2009-12-01",
+        "final_date": "2011-12-09",
+        "unknown_source_days": 135,
+        "final_partial_days": 1
+      },
+      "source_day_mismatches": 0,
+      "forecast": {
+        "rows": 739,
+        "distinct_keys": 739,
+        "unexpected_series": 0,
+        "missing_calendar_rows": 0,
+        "unavailable_days": 135,
+        "unavailable_days_fabricated_as_zero": 0,
+        "final_partial_days": 1,
+        "final_days_used_as_complete": 0,
+        "availability_rule_mismatches": 0,
+        "unit_sum_mismatches": 0,
+        "observed_zero_unit_days": 0
+      },
+      "state": "passed"
+    },
+    "quality_reconciliation": {
+      "source_rows": 1067371,
+      "accepted_rows": 1061664,
+      "quarantined_rows": 6,
+      "excluded_rows": 5701,
+      "unparseable_amount_rows": 0,
+      "source_parseable_gbp": "19287250.55",
+      "accepted_parseable_gbp": "19379245.82",
+      "quarantined_parseable_gbp": "-158302.57",
+      "excluded_parseable_gbp": "66307.30",
+      "state": "passed"
+    }
+  },
+  "spark_run_git_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+  "spark_run_state": "passed",
+  "state": "passed",
+  "finished_at": "2026-11-16T20:00:18.900752+00:00",
+  "duration_seconds": 6.895883
+}

@@ -1,0 +1,17 @@
+EDA query: adjustments
+EDA query: cohort_retention
+EDA query: country_concentration
+EDA query: daily_comparison
+EDA query: extreme_lines
+EDA query: growth_contributions
+EDA query: missingness
+EDA query: monthly_sales
+EDA query: product_concentration
+EDA query: repeat_purchases
+EDA query: source_calendar
+EDA query: source_overlap
+EDA query: source_overlap_dates
+{"state": "passed", "snapshot_id": "20261116T192553-472ac294", "duration_seconds": 21.3855, "net_recorded_gbp": "19379245.82", "query_count": 13}
+C:\Users\USER\Projects\Meridian\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+  self._get_loop()
+Executed and saved notebooks/eda.ipynb; visual inspection remains a separate check.
