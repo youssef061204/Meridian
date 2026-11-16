@@ -5,7 +5,7 @@ Dedicated local repository: `C:\Users\USER\Projects\Meridian`.
 
 ## Current gate
 
-Gate 1 verification in progress. Real source conversion, Spark/Delta smoke, 4,000-row demo batch, actual synthetic fixture Spark batch, and independent fixture comparison passed. Browser verification is running. Gates 2–6 not started; do not advance until browser evidence is checked.
+Gate 1 **passed**. Real source conversion, locked-container Spark/Delta source slice, actual synthetic fixture Spark batch and independent monetary oracle,32 tests, and12 real browser flows passed. Gate2 in progress: full historical dimensional model, EDA/SQL analysis and DuckDB baseline. Gates3–6 not started. Machine-readable gate state: `evidence/gates.json`.
 
 ## Environment inspected
 
@@ -28,7 +28,7 @@ Environment: `docker version`, `docker image ls`, `docker stats --no-stream`, `p
 
 ## Remaining
 
-Gate 1: complete browser checks; repeat demo publication to include immutable SQL artifacts and explicit monetary balance fields added after the first demo run. Enforce locked Docker rebuild and test documented startup. Gates 2–6 remain.
+Gate2: integrate dimensional SQL from `gold.py`, execute full Spark history, validate1:1 joins, compare fair DuckDB baseline, execute EDA/notebook/findings and full UI. Gates3–6 remain. Full clean-checkout startup verification scheduled for Gate5.
 
 ## Executed results
 
@@ -40,6 +40,9 @@ Gate 1: complete browser checks; repeat demo publication to include immutable SQ
 - `python -m pytest -q`:32 tests passed after API additions. Tests distinguish isolated API snapshots from real Spark integration; fixture checker above supplies integration evidence.
 - `npm.cmd --prefix frontend install --no-fund --no-audit`, `npm.cmd --prefix frontend run build`: passed. Calendar chart leaves unavailable days blank.
 - `docker compose up -d api`: running at http://localhost:8010 bound to loopback. `GET /api/health` returned200. API restarted after immutable-lineage/date-validation code changes.
+- Locked Docker rebuild passed132.06s (`evidence/execution/locked-image-build.json`). The wrapper initially failed while printing Unicode to Windows cp1252 after saving successful exit evidence; stdout UTF8 configuration fixed. Actual Docker build exit0. Image details `evidence/container-images.json`.
+- Locked demo republish at commit7d96348 passed, snapshot`20261116T191911-e734445d`, all6 Delta versions1, immutable SQL and explicit count/money balance. Same69754.43GBP net, Spark43.7649s / wrapper47.9636s. Evidence `evidence/execution/demo-locked.*`; code fingerprint recorded.
+- `.venv\Scripts\python.exe scripts\verify_browser.py`:12 checks passed24.128s against actual API/snapshot`20261116T191205-18007e6e`; country+date filters/reset/coverage, net and negative lineage/SQL/Delta/source coordinates, persisted trust counts, truthful pending forecast, keyboard, all4 views390px, zero console/page errors. Initial selector failure and real12px mobile nav overflow retained with fixes. `evidence/browser-gate1.json`, screenshots under`evidence/screenshots/`.
 
 ## Correctness decisions and outstanding scope
 

@@ -1,0 +1,16 @@
+{
+  "gate_1": {
+    "state": "passed",
+    "verified_at": "2026-11-16T19:19:57+00:00",
+    "implementation_commit": "7d96348970a67df32dc9cc78c0d0bedcecc42689",
+    "source_slice_rows": 4000,
+    "net_recorded_gbp": "69754.43",
+    "checks": ["source-verification.json", "spark-smoke.json", "execution/demo-locked.json", "execution/fixture-oracle.json", "execution/gate1-tests.json", "browser-gate1.json"],
+    "limits": ["Kafka broker/replay not verified", "Full historical dimensional model not yet verified", "Forecasting not executed"]
+  },
+  "gate_2": {"state": "in_progress"},
+  "gate_3": {"state": "not_started"},
+  "gate_4": {"state": "not_started"},
+  "gate_5": {"state": "not_started"},
+  "gate_6": {"state": "not_started"}
+}

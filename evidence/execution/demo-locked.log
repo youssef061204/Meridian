@@ -1,0 +1,54 @@
+ Container meridian-job Creating 
+ Container meridian-job Created 
+https://repo.maven.apache.org/maven2 added as a remote repository with the name: repo-1
+:: loading settings :: url = jar:file:/usr/local/lib/python3.11/site-packages/pyspark/jars/ivy-2.5.1.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+io.delta#delta-spark_2.12 added as a dependency
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-80ed64c2-6a7e-4d7f-8c92-1b3cb8ae48ad;1.0
+	confs: [default]
+	found io.delta#delta-spark_2.12;3.3.3 in central
+	found io.delta#delta-storage;3.3.3 in central
+	found org.antlr#antlr4-runtime;4.9.3 in central
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.7 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.7 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.5 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+:: resolution report :: resolve 375ms :: artifacts dl 14ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	io.delta#delta-spark_2.12;3.3.3 from central in [default]
+	io.delta#delta-storage;3.3.3 from central in [default]
+	org.antlr#antlr4-runtime;4.9.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.7 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.7 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.5 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   14  |   0   |   0   |   0   ||   14  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-80ed64c2-6a7e-4d7f-8c92-1b3cb8ae48ad
+	confs: [default]
+	0 artifacts copied, 14 already retrieved (0kB/8ms)
+26/11/16 19:19:12 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/11/16 19:19:18 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+[Stage 7:>                                                          (0 + 1) / 1]                                                                                [Stage 33:>                                                         (0 + 1) / 1]                                                                                [Stage 134:>                                                        (0 + 1) / 1]                                                                                [Stage 142:>                                                        (0 + 1) / 1]                                                                                {"run_id": "20261116T191911-e734445d", "stage": "batch", "started_at": "2026-11-16T19:19:11.046193+00:00", "state": "passed", "profile": "demo", "mode": "historical", "source_tree_sha256": "8f1654fad5614bd96dcf5828cf5969df5f4918ad6bd601a8fe1bd625445fb2bb", "code_hashes": {"pyproject.toml": "de78559f4e8c84e47cdc2c9b0e68b2c825bed5096e441a3dcfb8efb712779b3b", "requirements.lock": "f863117e72267c2d9a0890995d90939bfe690e8dcbc6dde5b05a92f8d07195b7", "sql/daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b", "sql/silver.sql": "ab7e137bdfd0e27b37b6876baf8ded6fbfe5cbb2aafe49815d09407b4d508901", "src/meridian/__init__.py": "e4c75986a472b9073d2852af453f94057beae7352d8e34a0335590d2b82bf978", "src/meridian/api.py": "fa52069336f8c3d722607a66d6e28ae214ef59d410a0ae81232a7373dd1f697c", "src/meridian/cli.py": "eaa0105eb5cf7c1821f646d5c40218e5d181d72930808d7d5fa9a14608290091", "src/meridian/common.py": "270746958e06c08b14d0eaba7eda4e9503437b359c8a0d71bf4e0e77ea64761d", "src/meridian/pipeline.py": "d103079bbf20d1f71024749027f8ad60c7d3c98b4d7b3ab98d39ade714f02aab", "src/meridian/source.py": "f2f4b3bdf926db4eb0cdb4b7ca5eded90453e5adec86a7a638ee6ca0248d715a"}, "dependencies": {"pyspark": "3.5.7", "delta-spark": "3.3.3", "duckdb": "1.2.2", "pyarrow": "19.0.1", "kafka-python": "2.2.10"}, "git_sha": "7d96348970a67df32dc9cc78c0d0bedcecc42689", "python": "3.11.11", "snapshot_id": "20261116T191911-e734445d", "source_rows": 4000, "counts": {"accepted": 3986, "quarantined": 0, "excluded": 14}, "metrics": {"gross_positive_gbp": "71183.35", "negative_adjustments_gbp": "-1428.92", "net_recorded_gbp": "69754.43", "positive_units": 37737, "known_customer_rows": 3272}, "delta_versions": {"bronze": 1, "silver": 1, "fact_invoice_line": 1, "daily_sales": 1, "product_performance": 1, "country_performance": 1}, "finished_at": "2026-11-16T19:19:54.919435+00:00", "duration_seconds": 43.7649}

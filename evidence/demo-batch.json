@@ -1,13 +1,33 @@
 {
-  "run_id": "20261116T191205-18007e6e",
+  "run_id": "20261116T191911-e734445d",
   "stage": "batch",
-  "started_at": "2026-11-16T19:12:05.404261+00:00",
+  "started_at": "2026-11-16T19:19:11.046193+00:00",
   "state": "passed",
   "profile": "demo",
   "mode": "historical",
-  "git_sha": "9b3ffb10c63ad3cf0983ec91695db22e0e0668d5",
+  "source_tree_sha256": "8f1654fad5614bd96dcf5828cf5969df5f4918ad6bd601a8fe1bd625445fb2bb",
+  "code_hashes": {
+    "pyproject.toml": "de78559f4e8c84e47cdc2c9b0e68b2c825bed5096e441a3dcfb8efb712779b3b",
+    "requirements.lock": "f863117e72267c2d9a0890995d90939bfe690e8dcbc6dde5b05a92f8d07195b7",
+    "sql/daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+    "sql/silver.sql": "ab7e137bdfd0e27b37b6876baf8ded6fbfe5cbb2aafe49815d09407b4d508901",
+    "src/meridian/__init__.py": "e4c75986a472b9073d2852af453f94057beae7352d8e34a0335590d2b82bf978",
+    "src/meridian/api.py": "fa52069336f8c3d722607a66d6e28ae214ef59d410a0ae81232a7373dd1f697c",
+    "src/meridian/cli.py": "eaa0105eb5cf7c1821f646d5c40218e5d181d72930808d7d5fa9a14608290091",
+    "src/meridian/common.py": "270746958e06c08b14d0eaba7eda4e9503437b359c8a0d71bf4e0e77ea64761d",
+    "src/meridian/pipeline.py": "d103079bbf20d1f71024749027f8ad60c7d3c98b4d7b3ab98d39ade714f02aab",
+    "src/meridian/source.py": "f2f4b3bdf926db4eb0cdb4b7ca5eded90453e5adec86a7a638ee6ca0248d715a"
+  },
+  "dependencies": {
+    "pyspark": "3.5.7",
+    "delta-spark": "3.3.3",
+    "duckdb": "1.2.2",
+    "pyarrow": "19.0.1",
+    "kafka-python": "2.2.10"
+  },
+  "git_sha": "7d96348970a67df32dc9cc78c0d0bedcecc42689",
   "python": "3.11.11",
-  "snapshot_id": "20261116T191205-18007e6e",
+  "snapshot_id": "20261116T191911-e734445d",
   "source_rows": 4000,
   "counts": {
     "accepted": 3986,
@@ -22,16 +42,16 @@
     "known_customer_rows": 3272
   },
   "delta_versions": {
-    "bronze": 0,
-    "silver": 0,
-    "fact_invoice_line": 0,
-    "daily_sales": 0,
-    "product_performance": 0,
-    "country_performance": 0
+    "bronze": 1,
+    "silver": 1,
+    "fact_invoice_line": 1,
+    "daily_sales": 1,
+    "product_performance": 1,
+    "country_performance": 1
   },
   "manifest": {
-    "id": "20261116T191205-18007e6e",
-    "published_at": "2026-11-16T19:12:57.425973+00:00",
+    "id": "20261116T191911-e734445d",
+    "published_at": "2026-11-16T19:19:54.219200+00:00",
     "mode": "historical",
     "profile": "demo",
     "source_sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
@@ -44,12 +64,12 @@
     "date_min": "2009-12-01",
     "date_max": "2010-12-01",
     "delta_versions": {
-      "bronze": 0,
-      "silver": 0,
-      "fact_invoice_line": 0,
-      "daily_sales": 0,
-      "product_performance": 0,
-      "country_performance": 0
+      "bronze": 1,
+      "silver": 1,
+      "fact_invoice_line": 1,
+      "daily_sales": 1,
+      "product_performance": 1,
+      "country_performance": 1
     },
     "delta_root": "data/lake/historical/demo",
     "metrics": {
@@ -79,11 +99,18 @@
         "parsed_amount_gbp": "71183.35"
       }
     ],
+    "reconciliation_totals": {
+      "source_parsed_amount_gbp": "70901.12",
+      "unparseable_amount_rows": 0,
+      "accepted_parsed_amount_gbp": "69754.43",
+      "quarantined_parsed_amount_gbp": "0.00",
+      "excluded_parsed_amount_gbp": "1146.69"
+    },
     "checksums": {
-      "fact_invoice_line/part-00000-a9a206fc-822c-4eca-819b-b691ab9c0742-c000.snappy.parquet": "150be91cf8f3d6a49d85983aac305f8709d19e8f6ca4c46e3d9334d7e4e25546",
-      "daily_sales/part-00000-b5b0e4da-312d-4940-97bf-5741eca1d5a6-c000.snappy.parquet": "a5344f8026d87a1b7349fe35172042f9d113859359483ae81ca71189ab4c00a1",
-      "product_performance/part-00000-d42e67e5-7a00-47fa-bce0-c8bd0b42f8d3-c000.snappy.parquet": "07213d7994c4d26803af0eb24ba259ab9f4ee165d3fb802f332ddaf918c82719",
-      "country_performance/part-00000-e1bb6b7f-cf41-431a-bdd5-5ba45b893099-c000.snappy.parquet": "11611f76ac6653b103b17638dc9b28adf232c78922bf16806c8192db1e04f0af"
+      "fact_invoice_line/part-00000-b7182065-0ff1-46a3-8222-e6d7b727ec6e-c000.snappy.parquet": "ab19e4b5b066bcf5734cabe441600ea647231227fd409a1d903c5adc078c13b6",
+      "daily_sales/part-00000-3de8afbb-d9d2-4450-92fd-52e111a4efd0-c000.snappy.parquet": "6c97e86ea804423fea4bf2f69d4e0f3747c67320ca81c944334288c2337115df",
+      "product_performance/part-00000-0db0a502-2c0d-4b2f-bfee-a8912cc6d6c4-c000.snappy.parquet": "c8587dc2343817f4fabc26ab8d25091742f5e0b90e1977f3e4f1b68c2f57e65e",
+      "country_performance/part-00000-6fe1b0a2-afeb-4ab5-b78c-d2494014b2d8-c000.snappy.parquet": "bf631beab4da5ac28d242b0da82fb580196b1d1976847be9500098f90f89c056"
     },
     "validation": "passed",
     "sql_sha256": {
