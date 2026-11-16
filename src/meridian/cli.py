@@ -17,12 +17,14 @@ def main():
     sub.add_parser("download")
     sub.add_parser("convert")
     batch = sub.add_parser("batch")
-    batch.add_argument("--profile", choices=["demo", "full", "fixture"], default="demo")
+    batch.add_argument("--profile", choices=["demo", "full", "fixture", "synthetic"], default="demo")
     batch.add_argument("--fail-at", choices=["after-export", "before-pointer"])
     sub.add_parser("smoke")
     sub.add_parser("kafka-smoke")
     baseline_parser = sub.add_parser("baseline")
-    baseline_parser.add_argument("--profile", choices=["demo", "full"], default="full")
+    baseline_parser.add_argument("--profile", choices=["demo", "full", "synthetic"], default="full")
+    gen = sub.add_parser("synthetic", help="Generate the seeded synthetic scale profile")
+    gen.add_argument("--copies", type=int, default=10)
     init = sub.add_parser("replay-init", help="New replay generation: produce, consume, publish, record baseline")
     init.add_argument("--profile", choices=["demo", "full"], default="demo")
     init.add_argument("--speed", type=float, default=0.0, help="Source seconds per wall second (0 = unthrottled)")
@@ -63,6 +65,9 @@ def main():
     elif args.command == "baseline":
         from .baseline import baseline
         baseline(args.profile)
+    elif args.command == "synthetic":
+        from .synthetic import generate
+        show(generate(args.copies))
     elif args.command == "replay-init":
         from .worker import Runner
         show(_spark_job(lambda spark: Runner(spark).init(args.profile, args.speed)))

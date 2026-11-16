@@ -19,7 +19,7 @@ pages.
 | Spark 3.5.7 / Delta 3.3.3 batch Bronze → Silver → Gold, full history (1,067,371 rows) | **verified-local** | `evidence/full-batch.json`, `evidence/full-snapshot-check.json` |
 | Validated versioned snapshot + atomic pointer, DuckDB serving, FastAPI/React UI | **verified-local** | `evidence/gates.json` (Gates 1–2), `evidence/browser-gate2.json` |
 | Kafka → Spark Structured Streaming → Delta compatibility smoke | **verified-local** | `evidence/kafka-smoke.json` |
-| Kafka replay with idempotent Bronze appends, Silver MERGE with revisions, late-arrival backfill, versioned publication | **in progress locally (Gate 3)**. Treat it as unverified until `evidence/gates.json` records Gate 3 as passed | `src/meridian/replay.py`, `stream.py` |
+| Kafka replay with idempotent Bronze appends, Silver MERGE with revisions, late-arrival backfill, versioned publication | **verified-local** (single-node Kafka, Spark `local[2]`): recovery drill 21/21 checks, browser-exercised incident/repair/reset | `evidence/replay-drill.json`, `evidence/browser-demo.json`; `src/meridian/replay.py`, `stream.py` | `src/meridian/replay.py`, `stream.py` |
 | Databricks contract dataset reproduces hand-calculated totals under `sql/silver.sql` / `sql/daily_sales.sql` | **verified-local (DuckDB, not Databricks)** | `evidence/databricks-contract-local.json` |
 | Databricks notebooks + Declarative Automation Bundle for the batch contract path | **prepared, unexecuted** (no authenticated workspace) | `databricks/` |
 | Power BI Gold exports, relationships, DAX, SQL-computed reconciliation targets | exports and targets **verified-local**; DAX **prepared, never run** | `evidence/powerbi-export.json`, `powerbi/` |
@@ -77,7 +77,7 @@ Changes the local replay code needs:
 | Local behaviour | Event Hubs behaviour | Required change |
 |---|---|---|
 | Plaintext `kafka:9092`, no auth | TLS required; SASL `OAUTHBEARER` (Entra ID) recommended, or `PLAIN` with a SAS connection string | Producer and Spark source get SASL options. Use a service principal or managed identity with *Azure Event Hubs Data Sender* / *Data Receiver* roles. |
-| Producer `compression_type="gzip"` (`replay.py`) | Kafka compression is supported **only in Premium and Dedicated** (gzip) | On Standard, set `compression_type=None`. Otherwise choose Premium. |
+| Producer compression (`replay.py` now sends uncompressed; gzip was removed after it throttled local replay) | Kafka compression is supported **only in Premium and Dedicated** (gzip) | Uncompressed works on Standard. Re-enable compression only on Premium/Dedicated, and measure it. |
 | Producer `enable_idempotence=True`, `acks="all"` | Idempotent producers are supported. Kafka **transactions** are public preview in Premium/Dedicated only | MERIDIAN does not rely on Kafka transactions. End-to-end correctness still comes from line identity + idempotent Delta writes + MERGE. Event Hubs documents **at-least-once** delivery, which is the assumption the local design already makes. |
 | Topics created with `KafkaAdminClient` (`_admin_create`) | Event hubs (topics) are Azure resources with tier-specific partition, retention and size quotas | Create event hubs (`meridian-replay-<gen>`, `meridian-synthetic-<gen>`) in IaC (Bicep/Terraform) before the producer runs. Do not depend on admin-API topic creation. Check the current Event Hubs quotas before sizing partitions and retention. |
 | Broker retention set by the local container | Retention is a per-tier quota | Bronze Delta remains the durable record. Optionally enable **Event Hubs Capture** to ADLS as an independent raw archive. |
@@ -325,7 +325,7 @@ environment before quoting.
 
 ## 13. Phased migration
 
-0. **Local readiness (now).** Gates 1–2 pass locally. Gate 3 (replay and recovery) must pass before step 5. The contract dataset passes under DuckDB
+0. **Local readiness (now).** Gates 1–4 pass locally, including Gate 3 replay and recovery (see `evidence/gates.json`). The contract dataset passes under DuckDB
    (`scripts/check_databricks_contract.py`). The Power BI exports reconcile (`scripts/export_powerbi.py`).
 1. **Free contract check (optional, free).** In an existing Databricks Free Edition workspace, deploy
    `databricks/` and run the batch contract job. Then save the reconciliation JSON as

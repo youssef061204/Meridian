@@ -1,0 +1,166 @@
+{
+  "run_id": "20261116T214055-3df4d94e",
+  "stage": "batch",
+  "started_at": "2026-11-16T21:40:55.117466+00:00",
+  "state": "passed",
+  "profile": "synthetic",
+  "mode": "synthetic",
+  "source_tree_sha256": "c5bb65516c068146e51d9cd0444fd009bd2529ebccd8310af0838215cf6f90af",
+  "code_hashes": {
+    "pyproject.toml": "6e4405f7e2ae34b52acca2278b8e076b98850f3adf583bff2265902673b56550",
+    "requirements.lock": "6c2408e06c9bd34924e54c70bb20622fa8fa2d132b35b4d7ce2ce31369253599",
+    "sql/daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+    "sql/silver.sql": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+    "src/meridian/__init__.py": "e4c75986a472b9073d2852af453f94057beae7352d8e34a0335590d2b82bf978",
+    "src/meridian/analysis.py": "fb0283b9eb32974a1a32c515897070bf9deb9b49640d54720f0aa0958fc07103",
+    "src/meridian/api.py": "51b3166f07bb3d9b266d9109baf7f70f43e9948d22c434787adc8d870984bfa6",
+    "src/meridian/baseline.py": "ad7839e147505c420fe0df36c7872c5434721445e5016f9c7eed633446981382",
+    "src/meridian/cli.py": "7256ea6e74162d8ab5ef7d3ee8f92c1ee1550c63c8e4090f967ff1403e79f2ac",
+    "src/meridian/common.py": "bc169eb85b239986080c7f9170203b93c5634c0f66bf34cd06493109c9d48bd5",
+    "src/meridian/drill.py": "0118dd87beb9e1e7a074b78acf4567e2cda9dc2995efd4e4fe187cdfd702f405",
+    "src/meridian/forecast.py": "a72260e68e43ac7b0aa057ac0238ec8edf58b58f88a4ad48d8e11cc5d5549d39",
+    "src/meridian/gold.py": "0ff69bec46e8122de6f8366c22b5142a6e8c1e1a50915c3049fcc1f5cdaa4fba",
+    "src/meridian/inventory.py": "15ae1398b5ac13a89a89044012e396828144f3143c1413fd9454943aa873f46f",
+    "src/meridian/kafka_smoke.py": "11b52dca4fc724ff7746b3ad95383a90bc0617cca5f7c96df3bfbcbd048ebd7d",
+    "src/meridian/pipeline.py": "6fad084747215fc5226958efb48782ec4734d3f997948c897adf0cd97473bab9",
+    "src/meridian/replay.py": "32975fec349eee35a59d8cb3aec9b688da6839b68541722bce08604d7126314e",
+    "src/meridian/source.py": "f2f4b3bdf926db4eb0cdb4b7ca5eded90453e5adec86a7a638ee6ca0248d715a",
+    "src/meridian/stream.py": "040266e54a6b5e5804ee097c89d93c899ed786f6d7fa9f3eb7e70114395bbd94",
+    "src/meridian/synthetic.py": "f038bf4c23bf61afce203dbb624c376b2955a8fe78e5f42c95a06534f60b1afd",
+    "src/meridian/worker.py": "f3a0d84dabda820fb52020403a27088f0c6474ff1c538bdaf9d797a4fc24e8d3"
+  },
+  "dependencies": {
+    "pyspark": "3.5.7",
+    "delta-spark": "3.3.3",
+    "duckdb": "1.2.2",
+    "pyarrow": "19.0.1",
+    "kafka-python": "2.2.10"
+  },
+  "git_sha": "a19f48b9e2559dd5e4e1c82b758c5cdf4d95c382",
+  "python": "3.11.11",
+  "snapshot_id": "20261116T214055-3df4d94e",
+  "source_rows": 10673710,
+  "counts": {
+    "accepted": 10616640,
+    "quarantined": 60,
+    "excluded": 57010
+  },
+  "metrics": {
+    "gross_positive_gbp": "201120740.20",
+    "negative_adjustments_gbp": "-7328282.00",
+    "net_recorded_gbp": "193792458.20",
+    "positive_units": 116480900,
+    "known_customer_rows": 8206470
+  },
+  "delta_versions": {
+    "bronze": 0,
+    "silver": 0,
+    "fact_invoice_line": 0,
+    "daily_sales": 0,
+    "product_performance": 0,
+    "country_performance": 0
+  },
+  "manifest": {
+    "id": "20261116T214055-3df4d94e",
+    "published_at": "2026-11-16T21:46:49.442969+00:00",
+    "mode": "synthetic",
+    "profile": "synthetic",
+    "source_sha256": "synthetic-stress-v1-20261116",
+    "source_rows": 10673710,
+    "accepted_rows": 10616640,
+    "quarantined_rows": 60,
+    "excluded_rows": 57010,
+    "repeat_deliveries": 0,
+    "received_deliveries": 10673710,
+    "date_min": "2009-12-01",
+    "date_max": "2011-12-09",
+    "delta_versions": {
+      "bronze": 0,
+      "silver": 0,
+      "fact_invoice_line": 0,
+      "daily_sales": 0,
+      "product_performance": 0,
+      "country_performance": 0
+    },
+    "delta_root": "data/lake/synthetic/synthetic",
+    "metrics": {
+      "gross_positive_gbp": "201120740.20",
+      "negative_adjustments_gbp": "-7328282.00",
+      "net_recorded_gbp": "193792458.20",
+      "positive_units": 116480900,
+      "known_customer_rows": 8206470
+    },
+    "reconciliation": [
+      {
+        "disposition": "accepted",
+        "classification": "negative_adjustment",
+        "rows": 218450,
+        "parsed_amount_gbp": "-7328282.00"
+      },
+      {
+        "disposition": "excluded",
+        "classification": "non_merchandise_code",
+        "rows": 57010,
+        "parsed_amount_gbp": "663073.00"
+      },
+      {
+        "disposition": "accepted",
+        "classification": "positive_merchandise",
+        "rows": 10398190,
+        "parsed_amount_gbp": "201120740.20"
+      },
+      {
+        "disposition": "quarantined",
+        "classification": "cancellation_sign_conflict",
+        "rows": 10,
+        "parsed_amount_gbp": "3735.70"
+      },
+      {
+        "disposition": "quarantined",
+        "classification": "invalid_price",
+        "rows": 50,
+        "parsed_amount_gbp": "-1586761.40"
+      }
+    ],
+    "reconciliation_totals": {
+      "source_parsed_amount_gbp": "192872505.50",
+      "unparseable_amount_rows": 0,
+      "accepted_parsed_amount_gbp": "193792458.20",
+      "quarantined_parsed_amount_gbp": "-1583025.70",
+      "excluded_parsed_amount_gbp": "663073.00"
+    },
+    "checksums": {
+      "fact_invoice_line/part-00000-09545d1e-f399-438d-b7ba-1a658dae2175-c000.snappy.parquet": "afa5abb7991b5b8ee3e851e7f7cb4dcc14a689f8eee1505c24e2835c1a695763",
+      "daily_sales/part-00000-e7b39055-2d12-465c-abfe-7d6a942168bb-c000.snappy.parquet": "ad439643010bd3736d4168987d49625a9cea2fee27615276ae816e262c56a591",
+      "product_performance/part-00000-892a0eca-3bfd-4673-a3b9-b5a0ea11bf19-c000.snappy.parquet": "d3065f031fad8b73752ca5df459d5f2cec0af4b0fb8b5e567fc09d62852cbf28",
+      "country_performance/part-00000-9e2f2807-bdd8-4268-a964-6df5e6815a78-c000.snappy.parquet": "521e5893fdf027b40789bcd3792e7bb010296b4dd3c2da8c167656ff15fba430"
+    },
+    "validation": "passed",
+    "sql_sha256": {
+      "daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+      "silver.sql": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+      "gold/cohort_retention.sql": "288cac294e65902192581e1934f1fa42c2a5278165868af500c897ce7c1f136a",
+      "gold/customer_summary.sql": "0bd9bbe751f49829d1d4f6848668c6cc250db2bb13e7af9db4377fcd86ea1714",
+      "gold/dim_customer.sql": "c58cd1cdfd9476b018cf01437a8dcd2b3a49f142845a78bab82551586d7c3717",
+      "gold/dim_date.sql": "605f11502df813ab01ac7885585c102313339457289c5c27911304dfd9c1ff41",
+      "gold/dim_geography.sql": "38761a70ccffd420dbacd43f74ae57ca5caef7dbe7b3d46eae3950f0293effd1",
+      "gold/dim_product.sql": "330d6b819ebe42f40e7536234c03396ecf08ce573d640739bea1296fbfd9272f",
+      "gold/forecast_inputs.sql": "a58710a4b83bab82e0afb3feaab7b15b505d2aec292ea4f6e708977d6d0fa036",
+      "gold/quality_daily.sql": "710e243f8b76166b069a254f36e981816c7efeb61efc301692745fc389809c49",
+      "replay/daily_sales_incremental.sql": "7c6f718b3775f326cd35a03d852ce8ec94fbb4afd5fef04a2a1c6a0c7cc2f490"
+    },
+    "tables": [
+      "fact_invoice_line",
+      "daily_sales",
+      "product_performance",
+      "country_performance"
+    ],
+    "model_checks": null,
+    "limitations": [
+      "Recorded merchandise invoice value in GBP; not audited revenue or settled cash.",
+      "Missing customer IDs remain in merchandise totals.",
+      "Source civil timestamps are stored without timezone (TIMESTAMP_NTZ); no UTC offset is inferred.",
+      "Original workbook coordinates retained; cross-sheet repeated payloads need client reconciliation before treating rows as unique real-world purchases."
+    ]
+  }
+}

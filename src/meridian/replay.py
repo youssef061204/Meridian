@@ -45,17 +45,20 @@ def new_generation(profile):
            "replay_topic": f"meridian.replay.{generation}", "incident_topic": f"meridian.synthetic.{generation}",
            "app_id": f"meridian-replay-{generation}", "lake": f"data/lake/replay/{generation}",
            "checkpoint": f"data/lake/replay/{generation}/_checkpoint", "allowed_lateness_hours": 168,
-           "max_offsets_per_trigger": 1500, "seed": SEED, "withheld_rows": WITHHELD_ROWS, "created_at": now()}
+           "max_offsets_per_trigger": 1500 if profile == "demo" else 250000, "seed": SEED,
+           # The full profile is a throughput/equivalence benchmark: nothing is withheld.
+           "withheld_rows": WITHHELD_ROWS if profile == "demo" else 0, "created_at": now()}
     atomic_json(STATE / "config.json", cfg)
     return cfg
 
 
-def _admin_create(topics, partitions=3):
+def _admin_create(topics):
+    """topics: {name: partitions}. The replay topic uses ONE partition to keep total replay order."""
     from kafka.admin import KafkaAdminClient, NewTopic
     from kafka.errors import TopicAlreadyExistsError
     admin = KafkaAdminClient(bootstrap_servers=BOOTSTRAP, client_id="meridian-admin")
     try:
-        for topic in topics:
+        for topic, partitions in topics.items():
             try:
                 admin.create_topics([NewTopic(topic, num_partitions=partitions, replication_factor=1)])
             except TopicAlreadyExistsError:
@@ -68,25 +71,38 @@ def _producer():
     from kafka import KafkaProducer
     # Idempotent producer removes broker-level duplicates from producer retries only.
     # Application-level repeats (re-exports, replays) are handled by source identity downstream.
-    return KafkaProducer(bootstrap_servers=BOOTSTRAP, acks="all", enable_idempotence=True, linger_ms=20,
-                         batch_size=256 * 1024, compression_type="gzip", key_serializer=str.encode,
+    # No compression: pure-Python gzip throttled the 1M-row replay to a few hundred events/s.
+    return KafkaProducer(bootstrap_servers=BOOTSTRAP, acks="all", enable_idempotence=True, linger_ms=50,
+                         batch_size=1024 * 1024, max_request_size=4 * 1024 * 1024, key_serializer=str.encode,
                          value_serializer=lambda v: v if isinstance(v, bytes) else json.dumps(v, separators=(",", ":")).encode())
 
 
-def source_rows(profile):
+def _sorted_table(profile):
+    import pyarrow.compute as pc
     import pyarrow.parquet as pq
     path = DATA / "converted" / ("demo.parquet" if profile == "demo" else "historical.parquet")
     table = pq.read_table(path, columns=[*PAYLOAD_FIELDS, "source_sha256", "source_sheet", "source_row"])
-    rows = table.to_pylist()
-    # Deterministic replay order: source event time, then original coordinates.
-    rows.sort(key=lambda r: (r["event_time"] or "", r["source_sheet"], r["source_row"]))
-    return rows
+    # Deterministic replay order: source event time (nulls first), then original coordinates.
+    table = table.append_column("_t", pc.fill_null(table["event_time"], ""))
+    return table.sort_by([("_t", "ascending"), ("source_sheet", "ascending"), ("source_row", "ascending")]).drop_columns(["_t"])
+
+
+def iter_rows(profile, chunk=20000):
+    """Stream rows in replay order without materialising a million Python dicts."""
+    for batch in _sorted_table(profile).to_batches(max_chunksize=chunk):
+        yield from batch.to_pylist()
+
+
+def source_rows(profile):
+    return _sorted_table(profile).to_pylist()
 
 
 def withheld_identities(rows, cfg):
     """Seeded choice of early rows withheld from baseline replay (the late-arrival scenario)."""
     early = [r for r in rows if r["event_time"] and r["event_time"] < rows[-1]["event_time"][:4]]
     candidates = early or rows[: len(rows) // 2]
+    if not cfg["withheld_rows"]:
+        return set()
     chosen = random.Random(cfg["seed"]).sample(candidates, min(cfg["withheld_rows"], len(candidates)))
     return {line_identity(r["source_sha256"], r["source_sheet"], r["source_row"]) for r in chosen}
 
@@ -105,6 +121,10 @@ def envelope(row, *, run_id, mode="replay", revision=1, schema_version=1, incide
 
 
 def _wait_if_paused(stats):
+    # Polled at most every 0.25 s: a per-message stat on a Windows bind mount capped replay at ~500 events/s.
+    if time.perf_counter() - stats.get("_last_pause_check", 0.0) < 0.25:
+        return
+    stats["_last_pause_check"] = time.perf_counter()
     while CONTROL.exists() and read_json(CONTROL).get("paused"):
         stats["paused_polls"] = stats.get("paused_polls", 0) + 1
         time.sleep(0.2)
@@ -119,16 +139,17 @@ def replay(profile="demo", speed=0.0, max_sleep=1.0, limit=None, include_withhel
     cfg = config()
     if not cfg or cfg["profile"] != profile:
         raise RuntimeError("Initialise a replay generation for this profile first (replay-init)")
-    _admin_create([cfg["replay_topic"], cfg["incident_topic"]])
-    rows = source_rows(profile)
-    held = set() if include_withheld else withheld_identities(rows, cfg)
+    _admin_create({cfg["replay_topic"]: 1, cfg["incident_topic"]: 3})
+    held = set() if include_withheld or not cfg["withheld_rows"] else withheld_identities(source_rows(profile), cfg)
     run_id = "producer-" + uuid.uuid4().hex[:8]
     stats = {"producer_run_id": run_id, "mode": "replay", "topic": cfg["replay_topic"], "speed": speed,
              "started_at": now(), "sent": 0, "withheld": len(held)}
     producer = _producer()
     start, previous = time.perf_counter(), None
     try:
-        for row in rows[:limit] if limit else rows:
+        for index, row in enumerate(iter_rows(profile)):
+            if limit and index >= limit:
+                break
             identity = line_identity(row["source_sha256"], row["source_sheet"], row["source_row"])
             if identity in held:
                 continue
@@ -144,6 +165,7 @@ def replay(profile="demo", speed=0.0, max_sleep=1.0, limit=None, include_withhel
     finally:
         producer.close()
     elapsed = time.perf_counter() - start
+    stats.pop("_last_pause_check", None)
     stats.update(finished_at=now(), seconds=round(elapsed, 4), events_per_second=round(stats["sent"] / elapsed, 1) if elapsed else None)
     atomic_json(STATE / "producers" / f"{run_id}.json", stats)
     return stats

@@ -1,81 +1,99 @@
-﻿# Local architecture and execution boundaries
+﻿# Architecture
 
-MERIDIAN is a UK retail portfolio case study built from UCI Online Retail II. It is not a retailer integration, audited accounting system, inventory system, or deployed cloud service. The implementation follows the ordered gates in `MERIDIAN_Codex_Project_Prompt.md`; `HANDOFF.md` and machine-readable execution evidence determine which gates have passed.
+MERIDIAN is a local, free-to-run portfolio case study on the UCI Online Retail II workbook. It is not a live retailer integration, an audited accounting system or a deployed cloud service. Verified status per capability is in [HANDOFF.md](../HANDOFF.md) and [evidence/gates.json](../evidence/gates.json).
 
-## Gate 1 vertical slice
-
-The current implementation path is:
+## Components (as implemented)
 
 ```text
-Pinned UCI ZIP/workbook
-    -> streaming XLSX reader -> bounded-row-group Parquet
-    -> Spark Bronze Delta -> Spark SQL Silver Delta
-    -> Spark Gold Delta tables
-    -> reads pinned Delta versions -> immutable Parquet snapshot
-    -> validation + publication manifest -> atomic active pointer
-    -> DuckDB read-only analytical views -> FastAPI -> React/TypeScript UI
+            UCI workbook (SHA-256 pinned)
+                     │  streamed in 10,000-row chunks
+                     ▼
+         data/converted/*.parquet  (sheet/row coordinates, checksum, ingest time)
+          │                                   │
+ HISTORICAL BATCH (Spark + Delta)      REPLAY (Kafka → Spark Structured Streaming → Delta)
+  bronze → silver.sql → gold/*.sql       producer: deterministic order, speed, pause/resume
+          │                              topic meridian.replay.<gen> (1 partition)
+          │                              topic meridian.synthetic.<gen> (incidents)
+          │                              foreachBatch: bronze, quarantine, late_arrivals,
+          │                              revisions, silver_current, daily_sales (incremental)
+          ▼                                   ▼
+  pinned Delta versions → explicit Parquet snapshot → DuckDB validation → manifest
+          │                                   │
+   data/serving/current.json            data/serving/replay.json   (atomic pointer swap)
+          └──────────────► FastAPI (DuckDB read-only) ──► React/TypeScript UI
+                              ▲ allow-listed demo jobs
+                     worker container (one warm Spark session; staged, retried jobs)
 ```
 
-This describes implemented code, not proof of successful execution. A passing Spark smoke, actual source conversion, historical slice run, independent fixture reconciliation, API checks, and browser walkthrough are required before Gate 1 is complete. Resolving the Kafka connector class proves dependency loading only; it does not prove broker integration. Kafka processing, checkpoint recovery, late arrival handling, and correction/backfill are Gate 3 work and require separate executed evidence.
+| Concern | Implementation |
+|---|---|
+| Source and provenance | [source.py](../src/meridian/source.py), [SOURCE.lock.json](../SOURCE.lock.json) |
+| Business transformations | version-controlled SQL: [silver.sql](../sql/silver.sql), [daily_sales.sql](../sql/daily_sales.sql), [gold/](../sql/gold), [replay incremental MERGE](../sql/replay/daily_sales_incremental.sql) |
+| Batch orchestration | [pipeline.py](../src/meridian/pipeline.py), [gold.py](../src/meridian/gold.py); run manifests in `runtime/runs/` |
+| Replay, incidents | [replay.py](../src/meridian/replay.py) |
+| Streaming consumer, backfill, publish, reset | [stream.py](../src/meridian/stream.py) |
+| Job orchestration (stages, dependencies, retries) | [worker.py](../src/meridian/worker.py) |
+| Fault-injection drill | [drill.py](../src/meridian/drill.py) |
+| Fair simple baseline | [baseline.py](../src/meridian/baseline.py) (DuckDB, same SQL) |
+| Analysis, forecasting, inventory simulation | [analysis.py](../src/meridian/analysis.py), [forecast.py](../src/meridian/forecast.py), [inventory.py](../src/meridian/inventory.py) |
+| Serving | [api.py](../src/meridian/api.py), [frontend/src](../frontend/src) |
 
-The demo profile selects the first 2,000 original rows from each workbook sheet. This gives a small genuine source slice from both sheets. It is intentionally not representative of the whole two-year history; its discontinuous date coverage must not support seasonality, forecasting, or comparable-period claims. Full-data conversion scans both sheets while holding only one 10,000-row chunk plus the small demo slice. The complete workbook and source coordinates remain available for lineage.
+There is no orchestration framework (Airflow, Dagster). A few named stages with explicit dependencies, retries and JSON state are enough at this scale. A framework would add a scheduler, a metadata database and UI operations without solving a problem the project has.
 
-## Data paths and identities
+## Modes and isolation
 
-| Path | Grain and purpose |
-| --- | --- |
-| `data/raw/` | Preserved downloaded archive/workbook; SHA-256 pins in `SOURCE.lock.json`. |
-| `data/converted/` | Original historical rows converted to strings with source checksum, sheet, Excel row, ingestion UTC, and conversion version. |
-| `data/lake/historical/demo/` | Delta tables for the genuine small historical profile. |
-| `data/lake/historical/full/` | Delta tables for the full historical profile after Gate 2 execution. |
-| `data/lake/synthetic/fixture/` | Synthetic hand-calculated oracle path, physically separate from observed data. |
-| `data/serving/snapshots/<run_id>/` | Immutable explicit exports and manifest for one publication candidate. |
-| `data/serving/current.json` | Active validated historical snapshot pointer. |
-| `runtime/runs/<run_id>.json` | Persisted stage state, start/end, elapsed time, errors, and available git/version details. |
-| `evidence/` | Small committed verification and resource artifacts; large source/lake/runtime files stay untracked. |
+Historical, replay and synthetic data use separate lake roots, Kafka topics, checkpoints and pointers, and carry a `mode` field that the UI renders as a badge. Each replay *generation* is isolated: its own topics, `data/lake/replay/<generation>/`, checkpoint and Delta `txnAppId`. Synthetic snapshots (the fixture and the scale profile) never replace `current.json`. See [data-contracts.md](data-contracts.md).
 
-A source-line identity is SHA-256 of `workbook_sha256|sheet|source_row`. Two identical-looking original rows at different coordinates remain two records. Redelivering an original coordinate should contribute one accepted business record, while delivery counts remain separate. Immutable source checksums make historical row identity stable; corrections need explicit revisions rather than a new checksum masquerading as a new sale. The current batch overwrite path is suitable for deterministic historical rebuilds. It is not yet the durable received-envelope append log required for replay incidents.
+## Publication
 
-Gate 3 must introduce physically separate replay and synthetic incident paths, including their own Bronze logs, checkpoints, topics/run identifiers, and publication pointers. Replay represents observed records delivered on an accelerated clock; synthetic events are generated or modified test evidence. Neither may become additional observed history. A supported route for conflicting same-identity payloads, additive schema versions, malformed envelopes, and late arrivals must be implemented before claiming replay safety.
+Delta commits each table separately, so MERIDIAN does not claim a cross-table transaction. Publication does the following:
+1. Pin each table's version.
+2. Export it with a Delta-aware `versionAsOf` read. Delta Parquet files are never globbed.
+3. Validate the exported set with DuckDB (identity uniqueness, the count and GBP bridges, dimension join preservation, and, for replay, incremental-vs-full daily equality and exact batch equivalence).
+4. Write a manifest.
+5. Atomically replace one pointer file.
 
-All API responses carry the publication manifest's mode/profile; the UI must retain these labels. A fixture run must not replace `current.json`. Unpublished candidates must not be discoverable as the active business result.
+Readers resolve the pointer once per request. A failed, blocked or interrupted publication leaves the previous pointer, and the UI shows the snapshot's publication age and the failed attempt. A single writer is enforced with an OS file lock; concurrent publishers are out of scope.
 
-## Table and money semantics
+## Streaming write semantics
 
-Bronze retains the converted source columns plus line identity and run. Silver has one logical source row with typed decimal amount, classification, and a disposition: accepted, quarantined, or excluded by an explicit non-merchandise rule. Missing customer IDs remain eligible for valid merchandise sales. No cancellation is automatically linked to an original invoice.
+`foreachBatch` is at-least-once:
+- Appends use Delta idempotent writes (`txnAppId`, `txnVersion = batch_id`).
+- Silver and the revision ledger use MERGE keyed on identity and revision.
+- The watermark decision uses only metrics committed by *earlier* batches, so a retried batch is classified identically.
 
-Gold currently contains the accepted invoice-line fact, daily sales, product performance, and country performance. Daily/product/country sums reconcile to the fact. Useful date/product/customer/geography dimensions, cohorts, and join-cardinality checks belong to Gate 2. See `docs/metrics.md` and version-controlled `sql/` for formula, denominator, precision, rounding, classification, and coverage definitions.
+The recovery drill kills real processes at the Bronze and checkpoint boundaries and verifies the end state ([evidence/replay-drill.json](../evidence/replay-drill.json)). Kafka + Spark do not make business results exactly-once on their own. These idempotent effects do.
 
-Source civil invoice timestamps have no UTC offsets. Preserve their original text, interpret business dates as UK local dates, and avoid claiming the source supplied timezone-aware timestamps. Ingestion, replay, publication, and recovery times are separate UTC observations. Historical dataset age, snapshot publication age, and replay processing lag answer different questions.
+## When a simpler DuckDB-only batch is the better choice
 
-## Consistent publication
+At ~1M lines over two years, a scheduled single-process DuckDB job over the same converted Parquet and SQL is the cheaper, simpler design for a dashboard refresh. It has no JVM, broker, checkpoints or streaming failure modes. The measured comparison is in [evidence/benchmarks.json](../evidence/benchmarks.json).
 
-Delta commits each table independently. MERIDIAN does not claim a cross-table Delta transaction. A publication run records the selected version of every related Delta table, then exports each by a Delta-aware `versionAsOf` read. DuckDB reads only those exported snapshot files, never a glob over a Delta table's physical Parquet files.
+The Spark/Kafka/Delta path is justified only by what this project demonstrates:
+- deterministic replay;
+- idempotent incremental processing with revisions;
+- durable late-arrival backfill;
+- versioned tables for reproducible exports and safe reset;
+- a migration path to Databricks/Event Hubs if volumes grow.
 
-The candidate must satisfy logical-row uniqueness, row reconciliation, the GBP revenue bridge, and daily/product/country agreement before receiving its manifest. The manifest records source and SQL checksums, Delta versions, row dispositions, mode/profile, date bounds, metrics, and export file checksums. Only after these checks does an atomic JSON replacement switch the active pointer. Readers resolve that pointer once per request and load all relevant views from the same immutable directory.
+The synthetic scale run shows where each engine stands on this hardware.
 
-A failure after export or before pointer replacement leaves the previous serving snapshot intact. Its publication timestamp and latest failed run remain visible; a candidate's existence is not a current-data claim. Fault injection must actually execute to prove this behavior. This approach assumes one local publisher; concurrent publishers require a lock or compare-and-swap policy before supported use. Local file atomic replacement is not a distributed publication protocol.
+## Runtime
 
-Bronze/Silver/Gold overwrite commits can advance during a failed run without changing the last validated serving snapshot. The published manifest retains the earlier selected Delta versions; old files must not be vacuumed before the declared reproducibility horizon.
+Docker isolates Python 3.11 and Java 17 (the host has Java 21, which Spark 3.5 does not support). The containers and their memory limits:
 
-## Runtime and free execution
+| Container | Configuration | Memory limit |
+|---|---|---|
+| tools / worker | Spark `local[2]`, 768 MiB driver (1,400 MiB for the full replay and scale benchmarks) | 2,300 MiB |
+| Kafka | KRaft single node, 256 MiB heap | 600 MiB |
+| API | — | 400 MiB |
 
-Docker isolates Python 3.11 and Java 17 from the Windows defaults and supplies a Linux execution environment for Spark. The tools service uses Spark `local[2]`, four shuffle partitions, a 768MiB requested driver heap, and a 2,300MiB container cap. API and single-node Kafka have their own caps. These are configured limits, not demonstrated peak requirements. No cloud account, API credit, trial, GPU, or paid resource is needed.
+Pinned versions: Spark 3.5.7, Delta 3.3.3, Scala 2.12, spark-sql-kafka 3.5.7, Kafka 4.1.2 (digest-pinned), DuckDB 1.2.2. Python dependencies are hash-locked (`requirements.lock`, `uv.lock`). See [dependency-compatibility.md](dependency-compatibility.md).
 
-Run `python scripts/capture_environment.py` using the project's Python environment to write `evidence/environment.json`. It captures CPU, RAM availability, repository-disk space, Docker VM capacity, package/tool versions, command argv, and git state without dumping secret environment variables. Resource availability is point-in-time evidence. Full/demo peak RSS, Docker usage, durations, throughput, repetitions, and cache conditions must be measured during actual profile benchmarks.
+The API binds to `127.0.0.1` only. Demo controls can enqueue four allow-listed jobs and nothing else, and they need an `X-Meridian-Demo` header, which forces a CORS preflight that the API never grants. Kafka is also loopback-bound. Neither is safe to expose beyond a local machine.
 
-Pin direct dependencies in `pyproject.toml` and resolve transitives in `uv.lock`. A reproducible Docker strategy is to export a hash-bearing `requirements.lock.txt` from the frozen uv lock outside Docker, install it with pip `--require-hashes`, then install the local project with `--no-deps`. This requires no uv executable in the image and prevents `pip install .[extras]` from silently selecting newer transitive dependencies. The root Dockerfile must actually adopt the strategy before it can be described as enforced. The exact Java base image/build packages and pulled image digests also belong in execution evidence.
+## Cloud portability
 
-The API binds loopback through Compose. Gate 1 exposes read-only historical views. Incident controls require local-only binding and explicit local run restrictions before introduction; do not expose unauthenticated Kafka or job controls publicly.
-
-## Why also build a simpler baseline
-
-At roughly one million invoice lines, a single DuckDB process reading the same bounded Parquet conversion is likely a practical choice for an ordinary scheduled retail dashboard. It avoids a JVM, broker, checkpoint operations, and extra failure modes. This is an architectural hypothesis until measured, not an asserted speed advantage.
-
-Gate 2 must implement the DuckDB-only batch baseline with equivalent decimal classification, source identity, row dispositions, KPI filters, and output checks. Benchmark both paths on the same immutable input, hardware, cache conditions, and result-equivalence checks. Use Spark/Kafka where the demonstrated requirement is replay, distributed processing growth, or recovery semantics; names alone do not justify operational cost.
-
-## Gate boundaries and cloud portability
-
-Gate 1 establishes the genuine source slice and reconciled visible KPI. Gate 2 adds full history, dimensions, analysis, and baseline comparison. Gate 3 proves real Kafka processing and recovery. Gate 4 evaluates forecasting on defined past-only chronological origins. Gate 5 completes product/browser evidence, benchmarks, and client/interview artifacts. Only then does Gate 6 add clearly simulated inventory scenarios and optional native tools.
-
-Azure/Databricks and Power BI are portability deliverables rather than local runtime dependencies. A later migration design should map storage, compute, streaming, orchestration, identity, cost, and operational ownership to real services. Prepared notebooks, job definitions, DAX, and report setup instructions do not prove a cloud run or a native PBIX report. No paid resources or trials may be activated.
+[azure-migration.md](azure-migration.md) maps these components to ADLS Gen2, Azure Databricks (Unity Catalog, Lakeflow Jobs), Event Hubs and Power BI. Its status:
+- The Databricks bundle and notebooks are **prepared but not executed** in Databricks.
+- Their SQL contract was checked locally.
+- Power BI exports and DAX are prepared. The native report is unfinished because Power BI Desktop is not available here.

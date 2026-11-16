@@ -123,3 +123,23 @@ python -m unittest discover -s tests -p test_business_oracle.py -v
 
 Passing this oracle test alone does not prove the Spark implementation. The
 Spark/Delta path must execute the fixture and match every expected result.
+
+## Replay and operational measures
+
+All come from persisted micro-batch, publication and job records (`runtime/replay/<generation>/`, Delta `batch_metrics`). None of them is a business KPI.
+
+| Measure | Formula / grain | Limitations |
+|---|---|---|
+| Deliveries received | Count of Bronze rows (one per Kafka topic/partition/offset) | Delivery denominator; includes rejected and synthetic events. |
+| Distinct source identities | Count distinct `source_identity` in Bronze | Source-row denominator; differs from deliveries by repeats and rejects. |
+| Within-batch / cross-batch repeats | Valid deliveries whose identity + revision was already seen in the same batch / in the revision ledger, with an identical payload hash | Not applied; never added to sales. |
+| Rejected envelopes | Bronze rows with envelope status ≠ valid, by reason | Business-rule quarantine (Silver) is counted separately. |
+| Identity conflicts | Same identity + revision, different payload hash | Quarantined; requires an explicit revision to resolve. |
+| Late rows routed to backfill | New rows with event time < watermark (previous max event time − 168 h) | Pending rows block publication until backfilled. |
+| Out-of-order within window | New rows older than the previous max event time but inside the window | Applied normally. |
+| Processing lag (s) | batch processed_at − earliest replay emit time in the batch | Replay lag on an accelerated clock, not the age of 2009–2011 data. |
+| Deliveries per second | batch deliveries ÷ foreachBatch processing seconds | Single-machine, `local[2]`. |
+| Snapshot publication age | now − manifest `published_at` | Freshness of the serving snapshot, not of the source observations. |
+| Batch reconciliation state | `reconciled` when replay accepted identities and values equal the batch snapshot, apart from explicit synthetic revisions; `incomplete` when source rows have not arrived | The bridge is: batch net + correction delta − not-yet-received + extra = replay net. |
+| Recovery time (s) | validated publication time − incident injection time | Includes queueing and operator wait between demo jobs; stage durations are reported separately. |
+| **Unsafe comparison (never served)** | Σ try_cast(quantity) × try_cast(unit_price) over every Bronze delivery | Deliberately wrong: no dedup, no envelope or business validation, includes non-merchandise and synthetic events. Shown only to explain dashboard disagreement. |

@@ -1,0 +1,14 @@
+ Container meridian-synthetic-gen Creating 
+ Container meridian-synthetic-gen Created 
+{
+  "mode": "synthetic",
+  "version": "synthetic-stress-v1",
+  "seed": 20261116,
+  "copies": 10,
+  "rows": 10673710,
+  "generated_at": "2026-11-16T21:40:44.056705+00:00",
+  "seconds": 538.184,
+  "derived_from_sha256": "b84aa47f9306c33e4b5bfdf140b22d9d4f15d3758fad34c53a076c54dd7934fc",
+  "parquet_sha256": "89a2afcc49af9ff26659c813a6f5154553cff1f250972eedb3c0f8c7ffb8e047",
+  "note": "Synthetic scale-test rows, never observed transactions and never served as current."
+}

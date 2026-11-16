@@ -66,6 +66,10 @@ def load_input(spark, profile):
         path = DATA / "fixtures" / "lines.parquet"
         path.parent.mkdir(parents=True, exist_ok=True)
         pq.write_table(pa.Table.from_pylist(rows, schema=SCHEMA), path)
+    elif profile == "synthetic":
+        path = DATA / "synthetic" / "stress.parquet"
+        if sha256(path) != read_json(DATA / "synthetic" / "manifest.json")["parquet_sha256"]:
+            raise ValueError("Synthetic input checksum mismatch; refusing publication")
     else:
         path = DATA / "converted" / ("demo.parquet" if profile == "demo" else "historical.parquet")
         provenance = read_json(DATA / "converted" / "manifest.json")
@@ -86,7 +90,7 @@ def metrics_query(table="fact_invoice_line"):
 def batch(profile="demo", fail_at=None):
     from pyspark.sql import functions as F
     from delta.tables import DeltaTable
-    mode = "synthetic" if profile == "fixture" else "historical"
+    mode = "synthetic" if profile in ("fixture", "synthetic") else "historical"
     with run_record("batch", profile=profile, mode=mode) as run, writer_lock():
         spark = spark_session()
         try:
@@ -176,7 +180,7 @@ def batch(profile="demo", fail_at=None):
             if fail_at == "before-pointer":
                 raise RuntimeError("Controlled failure before publication pointer; active snapshot untouched")
             atomic_json(DATA / "serving" / f"{profile}.json", {"snapshot_id": run["run_id"]})
-            if profile != "fixture":
+            if profile in ("demo", "full"):   # synthetic and fixture snapshots are never served as current
                 atomic_json(DATA / "serving" / "current.json", {"snapshot_id": run["run_id"]})
             run.update(snapshot_id=run["run_id"], source_rows=source_rows, counts=counts, metrics=metric_values, delta_versions=versions)
             atomic_json(ROOT / "evidence" / f"{profile}-batch.json", {**run, "state":"passed", "manifest": manifest})

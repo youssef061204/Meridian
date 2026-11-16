@@ -49,10 +49,55 @@
     ]
   },
   "gate_3": {
-    "state": "not_started"
+    "state": "passed",
+    "verified_at": "2026-11-16T21:05:00+00:00",
+    "checks": [
+      "kafka-smoke.json",
+      "replay-drill.json (21/21)",
+      "browser-demo.json (11/11, real UI -> API -> worker -> Kafka/Spark/Delta)",
+      "execution/replay-init-demo.json"
+    ],
+    "demonstrated": [
+      "repeat deliveries within and across micro-batches",
+      "out-of-order and late events routed to durable backfill",
+      "malformed JSON, missing required fields, incompatible schema v3",
+      "explicitly supported additive schema v2",
+      "identity payload conflict quarantined",
+      "consumer hard-killed after Bronze commit and before checkpoint commit, then restarted",
+      "interrupted multi-stage publish keeps last validated pointer",
+      "revision-2 correction and affected-date incremental backfill, re-run idempotent (net change 0.00)",
+      "batch/replay exact equivalence on accepted identities and values after backfill"
+    ],
+    "failed_attempts_retained": [
+      "first drill runs failed on a foreachBatch cloned-session temp-view bug and a string/datetime watermark bug; fixed",
+      "replay topic was initially created with 3 partitions; fixed to 1 partition for total order (demo and drill results unaffected: late counts matched expected exactly)"
+    ],
+    "limits": [
+      "single-node Kafka, Spark local[2]",
+      "single publisher assumed (file lock)"
+    ]
   },
   "gate_4": {
-    "state": "not_started"
+    "state": "passed",
+    "verified_at": "2026-11-16T20:50:00+00:00",
+    "checks": [
+      "forecast-run.json",
+      "inventory-run.json",
+      "../analysis/forecast/metrics.json",
+      "../tests/test_forecast.py (leakage test)"
+    ],
+    "promoted_model": "gradient_boosting (validation only)",
+    "test_wape_reduction_vs_seasonal_naive": {
+      "aggregate_7d": 0.031,
+      "aggregate_28d": 0.148,
+      "products_7d": 0.179,
+      "products_28d": 0.464
+    },
+    "limits": [
+      "80% intervals under-cover in validation (~0.70-0.78)",
+      "one 28-day test window",
+      "observed sales, not demand"
+    ]
   },
   "gate_5": {
     "state": "not_started"

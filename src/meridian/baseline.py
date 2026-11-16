@@ -1,6 +1,7 @@
 """The simpler alternative: DuckDB batch over the exact same immutable inputs."""
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
 
@@ -11,15 +12,26 @@ from .pipeline import metrics_query
 
 
 def baseline(profile="full"):
-    path = DATA / "converted" / ("demo.parquet" if profile == "demo" else "historical.parquet")
-    provenance = read_json(DATA / "converted" / "manifest.json")
-    key = "demo_parquet_sha256" if profile == "demo" else "full_parquet_sha256"
+    if profile == "synthetic":
+        path = DATA / "synthetic" / "stress.parquet"
+        synthetic = read_json(DATA / "synthetic" / "manifest.json")
+        provenance = {"synthetic_parquet_sha256": synthetic["parquet_sha256"], "source": {"workbook_sha256": synthetic["version"]}}
+        key = "synthetic_parquet_sha256"
+    else:
+        path = DATA / "converted" / ("demo.parquet" if profile == "demo" else "historical.parquet")
+        provenance = read_json(DATA / "converted" / "manifest.json")
+        key = "demo_parquet_sha256" if profile == "demo" else "full_parquet_sha256"
     if sha256(path) != provenance[key]:
         raise ValueError("Input checksum mismatch")
     with run_record("duckdb_batch_baseline", profile=profile, cache_condition="OS cache uncontrolled; new DuckDB connection; same converted Parquet and business SQL; no workbook parsing included") as run:
         con = duckdb.connect()
         con.execute("SET threads=2")
-        con.execute("SET memory_limit='768MB'")
+        memory = os.environ.get("MERIDIAN_DUCKDB_MEMORY", "768MB")
+        spill = ROOT / "runtime" / "duckdb-spill"
+        spill.mkdir(parents=True, exist_ok=True)
+        con.execute(f"SET memory_limit='{memory}'")
+        con.execute(f"SET temp_directory='{spill.as_posix()}'")
+        run["duckdb_memory_limit"] = memory
         output = DATA / "baseline" / profile / run["run_id"]
         output.mkdir(parents=True)
         start = time.perf_counter()
@@ -41,10 +53,14 @@ def baseline(profile="full"):
                 spark_folder = DATA / "serving" / "snapshots" / read_json(pointer)["snapshot_id"]
                 con.execute(f"CREATE VIEW spark_fact AS SELECT * FROM read_parquet('{(spark_folder/'fact_invoice_line').as_posix()}/*.parquet')")
                 # EXCEPT ALL checks both identities and all monetary values, not just a sum.
-                difference = con.execute("SELECT count(*) FROM ((SELECT line_id,line_amount,quantity FROM fact_invoice_line EXCEPT ALL SELECT line_id,line_amount,quantity FROM spark_fact) UNION ALL (SELECT line_id,line_amount,quantity FROM spark_fact EXCEPT ALL SELECT line_id,line_amount,quantity FROM fact_invoice_line))").fetchone()[0]
+                # Exact EXCEPT ALL in both directions, partitioned by the first hex digit of line_id to bound memory.
+                difference = 0
+                for prefix in "0123456789abcdef":
+                    where = f"WHERE left(line_id, 1) = '{prefix}'"
+                    difference += con.execute(f"SELECT count(*) FROM ((SELECT line_id,line_amount,quantity FROM fact_invoice_line {where} EXCEPT ALL SELECT line_id,line_amount,quantity FROM spark_fact {where}) UNION ALL (SELECT line_id,line_amount,quantity FROM spark_fact {where} EXCEPT ALL SELECT line_id,line_amount,quantity FROM fact_invoice_line {where}))").fetchone()[0]
                 if difference:
                     raise AssertionError(f"Spark/baseline logical record difference: {difference}")
-                run.update(spark_snapshot_id=spark_folder.name, equivalence="all accepted identities, quantities and exact line amounts match (EXCEPT ALL both directions)")
+                run.update(spark_snapshot_id=spark_folder.name, equivalence="all accepted identities, quantities and exact line amounts match (EXCEPT ALL both directions, 16 line_id partitions)")
             atomic_json(output/"manifest.json", {**run,"state":"passed"})
             atomic_json(ROOT/"evidence"/f"{profile}-baseline.json", {**run,"state":"passed"})
             return run

@@ -433,7 +433,9 @@ def validate_replay_snapshot(folder, cfg):
     batch_folder = DATA / "serving" / "snapshots" / read_json(batch_pointer)["snapshot_id"]
     con = duckdb.connect()
     try:
-        con.execute("SET threads=2"); con.execute("SET memory_limit='512MB'")
+        spill = ROOT / "runtime" / "duckdb-spill"
+        spill.mkdir(parents=True, exist_ok=True)
+        con.execute("SET threads=2"); con.execute("SET memory_limit='768MB'"); con.execute(f"SET temp_directory='{spill.as_posix()}'")
         for name in ["fact_invoice_line", "daily_sales", "revisions"]:
             con.execute(f"CREATE VIEW {name} AS SELECT * FROM read_parquet('{(folder / name).as_posix()}/*.parquet')")
         con.execute(f"CREATE VIEW batch_fact AS SELECT * FROM read_parquet('{(batch_folder / 'fact_invoice_line').as_posix()}/*.parquet')")
@@ -449,22 +451,23 @@ def validate_replay_snapshot(folder, cfg):
         assert gross + adj == net and one("SELECT sum(net_recorded_gbp) FROM daily_sales")[0] == net
         corrected = [r[0] for r in con.execute("SELECT DISTINCT line_id FROM revisions WHERE revision > 1").fetchall()]
         con.execute("CREATE TEMP TABLE corrected AS SELECT DISTINCT line_id FROM revisions WHERE revision > 1")
-        missing = one("SELECT count(*), coalesce(sum(line_amount),0) FROM batch_fact WHERE line_id NOT IN (SELECT line_id FROM fact_invoice_line)")
-        extra = one("SELECT count(*), coalesce(sum(line_amount),0) FROM fact_invoice_line WHERE line_id NOT IN (SELECT line_id FROM batch_fact)")
-        uncorrected_diff = one("""SELECT count(*) FROM (
-            (SELECT line_id,quantity,line_amount FROM fact_invoice_line WHERE line_id NOT IN (SELECT line_id FROM corrected)
-              EXCEPT ALL SELECT line_id,quantity,line_amount FROM batch_fact WHERE line_id NOT IN (SELECT line_id FROM corrected))
-            UNION ALL
-            (SELECT line_id,quantity,line_amount FROM batch_fact WHERE line_id NOT IN (SELECT line_id FROM corrected)
-                AND line_id IN (SELECT line_id FROM fact_invoice_line)
-              EXCEPT ALL SELECT line_id,quantity,line_amount FROM fact_invoice_line WHERE line_id NOT IN (SELECT line_id FROM corrected)))""")[0]
+        # One full outer join replaces NOT IN subqueries (which exhausted memory on the 1M-row replay).
+        con.execute("""CREATE TEMP TABLE cmp AS
+            SELECT line_id, r.quantity AS rq, r.line_amount AS ra, b.quantity AS bq, b.line_amount AS ba,
+                   r.line_id IS NOT NULL AS in_replay, b.line_id IS NOT NULL AS in_batch,
+                   line_id IN (SELECT line_id FROM corrected) AS is_corrected
+            FROM (SELECT line_id, quantity, line_amount FROM fact_invoice_line) r
+            FULL OUTER JOIN (SELECT line_id, quantity, line_amount FROM batch_fact) b USING (line_id)""")
+        missing = one("SELECT count(*), coalesce(sum(ba),0) FROM cmp WHERE in_batch AND NOT in_replay")
+        extra = one("SELECT count(*), coalesce(sum(ra),0) FROM cmp WHERE in_replay AND NOT in_batch")
+        uncorrected_diff = one("""SELECT count(*) FROM cmp WHERE in_replay AND in_batch AND NOT is_corrected
+            AND (rq IS DISTINCT FROM bq OR ra IS DISTINCT FROM ba)""")[0]
         # Revision-1 payloads of corrected rows must equal the batch values (the original source row).
         rev1_mismatch = one("""SELECT count(*) FROM revisions r JOIN batch_fact b ON r.line_id = b.line_id
             WHERE r.revision = 1 AND r.line_id IN (SELECT line_id FROM corrected)
               AND (try_cast(r.quantity AS BIGINT) IS DISTINCT FROM b.quantity
                    OR round(try_cast(r.quantity AS DECIMAL(18,4)) * try_cast(r.unit_price AS DECIMAL(18,4)), 2) IS DISTINCT FROM b.line_amount)""")[0]
-        correction_delta = one("""SELECT coalesce(sum(f.line_amount - b.line_amount), 0) FROM fact_invoice_line f JOIN batch_fact b USING (line_id)
-            WHERE line_id IN (SELECT line_id FROM corrected)""")[0]
+        correction_delta = one("SELECT coalesce(sum(ra - ba), 0) FROM cmp WHERE in_replay AND in_batch AND is_corrected")[0]
         batch_net = one("SELECT sum(line_amount) FROM batch_fact")[0]
         reconciled = missing[0] == 0 and extra[0] == 0 and uncorrected_diff == 0 and rev1_mismatch == 0
         assert batch_net + correction_delta - missing[1] + extra[1] == net, "Replay/batch monetary bridge does not balance"

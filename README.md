@@ -1,44 +1,83 @@
 # MERIDIAN
 
-A free, local retail revenue and demand intelligence portfolio case study. Original UCI invoice rows flow through **real PySpark and Delta Lake**, then a validated versioned Parquet snapshot serves DuckDB, FastAPI and React. Recorded merchandise invoice value is not audited revenue, cash collected, or profit.
+**Retail revenue and demand intelligence, with a data-reliability demonstration you can break and repair.**
 
-## Run locally
+A portfolio case study. The client, a UK online retailer whose invoice exports, dashboard and demand plans disagree, is fictional. The data is real: [UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii), 1,067,371 invoice lines from December 2009 to December 2011 (Daqing Chen, [DOI 10.24432/C5CG6D](https://doi.org/10.24432/C5CG6D), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)).
 
-Prerequisites: Docker Desktop with WSL2 on Windows (or Docker Engine/Compose on Linux), Node 24+, roughly 3 GiB available Docker memory for the demo. Initial dependency/data download needs internet. No accounts, cloud trials or paid services.
+Everything runs locally and free: no cloud account, trial, API credit or GPU.
+
+| | |
+|---|---|
+| Business answers | [Client case study](docs/case-study.md) · [EDA findings](docs/findings.md) · [Forecasting](docs/forecasting.md) |
+| How it works | [Architecture](docs/architecture.md) · [Data contracts](docs/data-contracts.md) · [Metric dictionary](docs/metrics.md) · [Gold data model](docs/data-model.md) |
+| Demo and interview | [Two-minute demo script](docs/demo-script.md) · [Interview guide](docs/interview-guide.md) · [Resume bullets](docs/resume-bullets.md) |
+| Microsoft / Databricks | [Azure migration design](docs/azure-migration.md) · [Databricks bundle](databricks/README.md) · [Power BI setup](powerbi/SETUP.md) |
+| Status and evidence | [HANDOFF.md](HANDOFF.md) · [evidence/gates.json](evidence/gates.json) · [evidence/benchmarks.json](evidence/benchmarks.json) |
+
+## What it does
+
+- **Real Spark + Delta lakehouse.** Bronze → Silver → Gold with version-controlled SQL, decimal money, a stable source-row identity, named exclusions and quarantine. Every one of the 1,067,371 rows is accounted for, and gross £20,112,074.02 + adjustments −£732,828.20 = **net recorded £19,379,245.82**.
+- **Real Kafka replay and recovery.** Historical rows are re-emitted through local Kafka on an accelerated clock. A seeded incident adds repeated deliveries, malformed and schema-breaking events, a conflicting re-export, late rows and a correction. Spark Structured Streaming contains it: idempotent Delta writes, quarantine, a durable late-arrival backfill and a blocked publication. A repair then publishes a snapshot that reconciles exactly with batch.
+- **A deliberately unsafe calculation,** shown beside the trusted number and never served, to explain why the client's dashboards disagree.
+- **Honest forecasting.** 7- and 28-day observed-sales forecasts, evaluated on rolling origins with an untouched test month and a leakage test. Clearly labelled inventory scenarios are SIMULATED.
+- **A fair DuckDB-only baseline** on the same SQL, and an explanation of when you should just use it.
+
+## Run it
+
+Prerequisites:
+- Docker Desktop with WSL2 (Windows) or Docker Engine + Compose (Linux).
+- Node 20+.
+- About 4 GB of free Docker memory for the replay demo.
+
+The first run downloads the UCI archive (~45 MB) and the Maven packages.
 
 ```powershell
+# 1. Build the locked image and convert the verified source workbook
 docker compose build tools
 docker compose run --rm --no-deps tools python -m meridian.cli convert
-docker compose run --rm --no-deps tools python -m meridian.cli smoke
-docker compose run --rm --no-deps tools python -m meridian.cli batch --profile fixture
-docker compose run --rm --no-deps tools python tests/check_spark_fixture.py
+
+# 2. Historical batch (demo profile: 4,000 real rows; full profile: all 1,067,371)
 docker compose run --rm --no-deps tools python -m meridian.cli batch --profile demo
-npm --prefix frontend ci --no-fund --no-audit
+docker compose run --rm --no-deps tools python -m meridian.cli batch --profile full
+
+# 3. UI + API on http://localhost:8010 (bound to 127.0.0.1)
+npm --prefix frontend ci
 npm --prefix frontend run build
 docker compose up -d api
+
+# 4. Kafka replay demo: broker, worker, then a baseline replay generation
+docker compose --profile replay up -d kafka
+docker compose run --rm --no-deps tools python -m meridian.cli replay-init --profile demo
+docker compose --profile replay up -d worker
 ```
 
-Open **http://localhost:8010**. Use `npm.cmd` instead of `npm` if PowerShell blocks the npm script shim. Stop this project's services with `docker compose down`. Raw data and snapshots persist in `data/`; stop does not delete them. Gate 1 does not require the Kafka service.
+Open **http://localhost:8010** → **Data trust & recovery** → **Inject controlled incident** → **Repair and reprocess**. See the [demo script](docs/demo-script.md).
 
-For local Python tooling: `uv venv --python 3.11 .venv`, then `uv pip install -e '.[dev,forecast]'`. Spark runs in Linux Docker with Java 17. `uv.lock` and the hash-checked `requirements.lock` lock transitive dependencies; `frontend/package-lock.json` locks the UI.
+Stop everything with `docker compose --profile replay down`. Data in `data/` persists. On Windows PowerShell use `npm.cmd` if script execution is blocked. Set `MERIDIAN_PORT` or `MERIDIAN_KAFKA_PORT` to change the host ports.
 
-## Demonstrate the current slice
+**Analysis, forecasting and checks** use host Python 3.11 (`uv venv --python 3.11 .venv`, then `uv pip install -e ".[spark,forecast,analysis,dev]"`):
 
-1. Business overview: inspect the GBP bridge and the explicitly historical source dates. The demo contains 2,000 original rows per worksheet, not a representative full-period sample.
-2. Select net recorded merchandise. Metric explorer shows the contributing source coordinates, classifications, executed SQL and pinned Delta versions.
-3. Apply a country/date filter and reset it. Unknown customer identifiers remain in valid sales totals.
-4. Data trust: inspect original source rows versus received deliveries, named exclusions, quarantine, and real run manifests. Forecast/recovery controls remain visibly pending until their gates execute.
+```powershell
+python -m meridian.analysis --snapshot <full snapshot id> --notebook   # EDA notebook + findings
+python -m meridian.cli forecast                                       # rolling-origin evaluation
+python -m meridian.cli inventory                                      # SIMULATED scenarios
+python -m pytest -q                                                   # business, API, forecast tests
+python tests/check_full_snapshot.py                                   # independent full-data check
+docker compose run --rm --no-deps tools python -m meridian.cli replay-drill   # fault-injection drill
+```
 
-## Verified and pending
+## Verified results
 
-The downloaded workbook has **1,067,371 rows**: 525,461 in `Year 2009-2010` and 541,910 in `Year 2010-2011`. Both sheets were streamed and converted; workbook SHA-256 is `bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980`. Their date ranges overlap in December 2010; original coordinates are preserved, and potential repeated exports require analysis before full-period interpretation.
+BENCHMARK_TABLE
 
-The executed Spark/Delta smoke passed with Spark 3.5.7, Delta 3.3.3, Scala 2.12.18, Java 17.0.21, Python 3.11.11. The first genuine 4,000-row demo batch reconciled 3,986 accepted lines and 14 named exclusions: gross **£71,183.35**, adjustments **−£1,428.92**, net **£69,754.43**. Evidence is in `evidence/` and persisted `runtime/runs/` manifests. The Kafka connector loaded; a loaded class is **not a verified broker integration**.
+All measurements were taken on one machine: an i7-14700HX laptop (28 logical CPUs, 16 GB RAM) running Docker Desktop on WSL2, with Spark `local[2]`. They are not cluster or cloud benchmarks.
 
-Gate status, exact executed commands, failures, test results and remaining work are maintained in [HANDOFF.md](HANDOFF.md). Full-history modeling, Kafka recovery, forecasting, benchmarks and cloud/native BI work require their own executed evidence. This README does not imply those integrations have passed.
+## Honest limitations
 
-## Source and design
-
-[UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii), Daqing Chen (2012), [DOI 10.24432/C5CG6D](https://doi.org/10.24432/C5CG6D), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). This fictional consulting engagement is a portfolio case study.
-
-See [metric definitions](docs/metrics.md), [architecture and tradeoffs](docs/architecture.md), [official compatibility sources](docs/dependency-compatibility.md), [source lock](SOURCE.lock.json) and the full [project specification](MERIDIAN_Codex_Project_Prompt.md). Raw UK civil timestamps are preserved without invented UTC offsets. There are no observed inventory, costs, marketing spend or payment settlement fields.
+- **Not real revenue.** Recorded invoice value is not audited revenue, cash or profit. The source has no costs, inventory, promotions or settlement data.
+- **Possible double counting.** The two workbook sheets overlap. There are 22,202 identical-looking payload groups, kept and flagged until the client supplies line keys.
+- **Not live.** Replay is not a live integration. Synthetic incident and scale-test events are never observed sales.
+- **Forecast caveats.** Forecasts are of observed sales, not unconstrained demand. Their 80% intervals under-covered in validation.
+- **Simulated savings only.** Inventory "savings" are simulated under stated assumptions; the winning policy changes with the cost ratio.
+- **Nothing ran in Azure, Databricks or Power BI.** The notebooks, bundle and DAX are prepared; the native report is unfinished.
+- **Local-only controls.** The demo controls and Kafka are loopback-only and must not be exposed.

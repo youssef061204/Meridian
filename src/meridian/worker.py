@@ -72,9 +72,6 @@ class Runner:
         from .stream import consume, publish, record_baseline, write_status
         job = {"job_id": "init-" + uuid.uuid4().hex[:6], "kind": "init", "state": "running", "requested_at": now(), "stages": []}
         cfg = self.stage(job, "new_generation", lambda: new_generation(profile))
-        if profile == "full":
-            cfg["max_offsets_per_trigger"] = 250000
-            atomic_json(STATE / "config.json", cfg)
         self.stage(job, "produce_replay", lambda: replay(profile, speed=speed))
         self.stage(job, "consume", lambda: consume(self.spark, cfg))
         self.stage(job, "publish", lambda: publish(self.spark, cfg)["id"])

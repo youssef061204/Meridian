@@ -1,0 +1,117 @@
+ Container meridian-replay-full-publish Creating 
+ Container meridian-replay-full-publish Created 
+https://repo.maven.apache.org/maven2 added as a remote repository with the name: repo-1
+:: loading settings :: url = jar:file:/usr/local/lib/python3.11/site-packages/pyspark/jars/ivy-2.5.1.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+io.delta#delta-spark_2.12 added as a dependency
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-790ca5c3-6ce3-4da3-a67c-40133d46b5d9;1.0
+	confs: [default]
+	found io.delta#delta-spark_2.12;3.3.3 in central
+	found io.delta#delta-storage;3.3.3 in central
+	found org.antlr#antlr4-runtime;4.9.3 in central
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.7 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.7 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.5 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+:: resolution report :: resolve 438ms :: artifacts dl 7ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	io.delta#delta-spark_2.12;3.3.3 from central in [default]
+	io.delta#delta-storage;3.3.3 from central in [default]
+	org.antlr#antlr4-runtime;4.9.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.7 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.7 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.5 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   14  |   0   |   0   |   0   ||   14  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-790ca5c3-6ce3-4da3-a67c-40133d46b5d9
+	confs: [default]
+	0 artifacts copied, 14 already retrieved (0kB/6ms)
+26/11/16 21:30:06 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/11/16 21:30:15 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+[Stage 13:>                                                         (0 + 1) / 1]                                                                                [Stage 22:>                                                         (0 + 1) / 1]                                                                                [Stage 25:>                                                         (0 + 2) / 2]                                                                                [Stage 30:>                                                         (0 + 2) / 2][Stage 30:=============================>                            (1 + 1) / 2]                                                                                [Stage 35:>                                                         (0 + 1) / 1]                                                                                [Stage 53:>                                                         (0 + 1) / 1]                                                                                {
+  "id": "replay-20261116T213009304",
+  "published_at": "2026-11-16T21:31:23.290893+00:00",
+  "mode": "replay",
+  "profile": "full",
+  "generation": "20261116T212012-24c5f7",
+  "delta_versions": {
+    "silver_current": 5,
+    "daily_sales": 5,
+    "quarantine": 4,
+    "revisions": 5,
+    "batch_metrics": 4
+  },
+  "checksums": {
+    "fact_invoice_line/part-00000-e9d6f8a6-945e-494c-8684-dd58c699627d-c000.snappy.parquet": "526f914376b5efa98ec1287a7176a895d23b779cfaee1fb6f2691eadd05b73f6",
+    "daily_sales/part-00000-4f7e961b-c73b-4d48-9085-f37d2be5f1d4-c000.snappy.parquet": "f9b54295636c0a86771bf8a751ad936b8a41419a2734dc25aefb656539e8454a",
+    "product_performance/part-00000-fc68a6e2-6fb0-442f-aa1f-c0db311ad885-c000.snappy.parquet": "5306138f31c92e760eb6ab24b5ada8de06e9ce27710324ef33037d9cbb956b87",
+    "country_performance/part-00000-9184a8c7-4659-4f3e-bfe4-3372e7b90a41-c000.snappy.parquet": "5939c73226022720372544461fd9c8647ed02eb6df1d0e1879f2489b5955bd09",
+    "business_quarantine/part-00000-c1c2c57c-b487-4fc4-aa95-b25184ca5244-c000.snappy.parquet": "dd321f84232e3f348e8610ec94fee3475d0f2b9c0c56b9d07f9af3339155518e",
+    "envelope_quarantine/part-00000-05695a6f-f8d2-4888-9f40-0bf1bce07f8e-c000.snappy.parquet": "56c8bb4036667445d43428e4f950a64c9feffc0c6d68e3429a52eb628199ff90",
+    "revisions/part-00000-636e53ba-7c3c-4347-94a7-376100497dab-c000.snappy.parquet": "095b3573fcb0a37493546cf98ea0824c704eedecd2bfb2c4b828a790a5e0aef7"
+  },
+  "tables": [
+    "fact_invoice_line",
+    "daily_sales",
+    "product_performance",
+    "country_performance",
+    "business_quarantine",
+    "envelope_quarantine",
+    "revisions"
+  ],
+  "validation": "passed",
+  "accepted_rows": 1061664,
+  "metrics": {
+    "gross_positive_gbp": "20112074.02",
+    "negative_adjustments_gbp": "-732828.20",
+    "net_recorded_gbp": "19379245.82"
+  },
+  "incremental_daily_equals_full_recompute": true,
+  "batch_reference_snapshot": "20261116T192553-472ac294",
+  "batch_net_recorded_gbp": "19379245.82",
+  "reconciliation": {
+    "state": "reconciled",
+    "missing_vs_batch_rows": 0,
+    "missing_vs_batch_gbp": "0.00",
+    "extra_vs_batch_rows": 0,
+    "extra_vs_batch_gbp": "0.00",
+    "uncorrected_value_differences": 0,
+    "revision1_vs_batch_mismatches": 0,
+    "synthetic_corrections": 0,
+    "correction_delta_gbp": "0.00",
+    "bridge": "batch net + synthetic correction delta - not-yet-received + extra = replay net"
+  },
+  "sql_sha256": {
+    "silver.sql": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+    "daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+    "replay/daily_sales_incremental.sql": "7c6f718b3775f326cd35a03d852ce8ec94fbb4afd5fef04a2a1c6a0c7cc2f490"
+  },
+  "limitations": [
+    "Replay re-emits historical source rows through local Kafka on an accelerated clock; it is not a live retailer integration.",
+    "Revisions above 1 are seeded synthetic corrections for the reliability demonstration, not observed source changes.",
+    "Recorded merchandise invoice value in GBP; not audited revenue or settled cash."
+  ]
+}

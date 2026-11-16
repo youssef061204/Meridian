@@ -1,27 +1,27 @@
 {
-  "run_id": "20261116T204011-c6f38781",
-  "started_at": "2026-11-16T20:40:11.266022+00:00",
+  "run_id": "20261116T220127-b83cc18d",
+  "started_at": "2026-11-16T22:01:27.535794+00:00",
   "steps": [
     {
       "step": "produce_baseline_replay",
-      "producer_run_id": "producer-3ef823d4",
+      "producer_run_id": "producer-54071e6e",
       "mode": "replay",
-      "topic": "meridian.replay.20261116T204011-5bea2f",
+      "topic": "meridian.replay.20261116T220127-dcd398",
       "speed": 0.0,
-      "started_at": "2026-11-16T20:40:11.726198+00:00",
+      "started_at": "2026-11-16T22:01:28.734593+00:00",
       "sent": 3988,
       "withheld": 12,
-      "finished_at": "2026-11-16T20:40:19.897997+00:00",
-      "seconds": 8.1683,
-      "events_per_second": 488.2
+      "finished_at": "2026-11-16T22:01:29.332974+00:00",
+      "seconds": 0.593,
+      "events_per_second": 6725.2
     },
     {
       "step": "inject_synthetic_incident",
-      "incident_run_id": "incident-36219b31",
+      "incident_run_id": "incident-99492574",
       "mode": "synthetic",
-      "topic": "meridian.synthetic.20261116T204011-5bea2f",
+      "topic": "meridian.synthetic.20261116T220127-dcd398",
       "seed": 20261117,
-      "sent_at": "2026-11-16T20:45:04.851883+00:00",
+      "sent_at": "2026-11-16T22:05:05.104442+00:00",
       "counts": {
         "repeat_delivery": 50,
         "additive_schema_v2": 12,
@@ -30,6 +30,7 @@
         "incompatible_schema_v3": 2,
         "identity_payload_conflict": 1,
         "late_arrival_withheld_source_row": 12,
+        "repeat_delivery_within_batch": 4,
         "correction_revision_2": 1,
         "repeat_delivery_later": 10
       },
@@ -41,12 +42,12 @@
         "original_unit_price": "6.95",
         "corrected_unit_price": "3.48"
       },
-      "total_events": 96
+      "total_events": 100
     }
   ],
-  "generation": "20261116T204011-5bea2f",
+  "generation": "20261116T220127-dcd398",
   "final_manifest": {
-    "id": "replay-20261116T204726316",
+    "id": "replay-20261116T220724349",
     "metrics": {
       "gross_positive_gbp": "71141.71",
       "negative_adjustments_gbp": "-1428.92",
@@ -81,7 +82,7 @@
       "passed": true,
       "crash": "after-bronze:1",
       "exit_code": 86,
-      "seconds": 59.82,
+      "seconds": 44.75,
       "fault_line": []
     },
     {
@@ -89,7 +90,7 @@
       "passed": true,
       "crash": "after-silver:first",
       "exit_code": 86,
-      "seconds": 64.54,
+      "seconds": 41.06,
       "fault_line": []
     },
     {
@@ -97,7 +98,7 @@
       "passed": true,
       "crash": null,
       "exit_code": 0,
-      "seconds": 87.05,
+      "seconds": 72.31,
       "fault_line": []
     },
     {
@@ -135,8 +136,8 @@
       "check": "interrupted_publish_keeps_last_validated_pointer",
       "passed": true,
       "pointer": {
-        "snapshot_id": "replay-20261116T204406493",
-        "generation": "20261116T204011-5bea2f"
+        "snapshot_id": "replay-20261116T220421437",
+        "generation": "20261116T220127-dcd398"
       }
     },
     {
@@ -144,7 +145,7 @@
       "passed": true,
       "crash": "after-silver:first",
       "exit_code": 86,
-      "seconds": 36.48,
+      "seconds": 35.43,
       "fault_line": []
     },
     {
@@ -152,7 +153,7 @@
       "passed": true,
       "crash": null,
       "exit_code": 0,
-      "seconds": 26.56,
+      "seconds": 27.84,
       "fault_line": []
     },
     {
@@ -208,8 +209,8 @@
       "check": "unsafe_calculation_shows_discrepancy",
       "passed": true,
       "label": "UNSAFE: naive sum of quantity x price over every received delivery (no identity dedup, no envelope or business validation, no merchandise rules, synthetic included)",
-      "unsafe_net_gbp": "72617.92",
-      "discrepancy_gbp": "3042.56",
+      "unsafe_net_gbp": "72642.25",
+      "discrepancy_gbp": "3066.89",
       "trusted": "69575.36"
     },
     {
@@ -219,7 +220,7 @@
     {
       "check": "backfill_applies_late_rows_for_affected_dates",
       "passed": true,
-      "backfill_run_id": "backfill-86b9219e",
+      "backfill_run_id": "backfill-b693a853",
       "force": false,
       "selected_late_rows": 13,
       "applied_rows": 13,
@@ -230,13 +231,13 @@
       "net_before": "69575.36",
       "net_after": "69712.79",
       "net_change": "137.43",
-      "seconds": 24.774,
-      "finished_at": "2026-11-16T20:46:59.656218+00:00"
+      "seconds": 26.842,
+      "finished_at": "2026-11-16T22:07:00.105312+00:00"
     },
     {
       "check": "backfill_rerun_is_idempotent",
       "passed": true,
-      "backfill_run_id": "backfill-e08d408d",
+      "backfill_run_id": "backfill-5aac1116",
       "force": true,
       "selected_late_rows": 13,
       "applied_rows": 13,
@@ -247,8 +248,8 @@
       "net_before": "69712.79",
       "net_after": "69712.79",
       "net_change": "0.00",
-      "seconds": 26.578,
-      "finished_at": "2026-11-16T20:47:26.281621+00:00"
+      "seconds": 24.201,
+      "finished_at": "2026-11-16T22:07:24.330495+00:00"
     },
     {
       "check": "replay_reconciled_with_batch_after_backfill",
@@ -273,7 +274,7 @@
     {
       "check": "new_snapshot_published",
       "passed": true,
-      "snapshot": "replay-20261116T204726316",
+      "snapshot": "replay-20261116T220724349",
       "delta_versions": {
         "silver_current": 6,
         "daily_sales": 6,
@@ -283,5 +284,5 @@
       }
     }
   ],
-  "finished_at": "2026-11-16T20:47:50.193855+00:00"
+  "finished_at": "2026-11-16T22:07:48.513476+00:00"
 }

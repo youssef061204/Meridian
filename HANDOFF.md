@@ -1,92 +1,85 @@
 # MERIDIAN handoff
 
-Specification: `MERIDIAN_Codex_Project_Prompt.md` (user attachment copied unchanged).
-Repository: `C:\Users\USER\Projects\Meridian`. Machine-readable gate state: `evidence/gates.json`.
+Specification: `MERIDIAN_Codex_Project_Prompt.md`. Repository: `C:\Users\USER\Projects\Meridian`. Machine-readable gate state: [evidence/gates.json](evidence/gates.json). Benchmarks: [evidence/benchmarks.json](evidence/benchmarks.json).
 
 ## Gate status
 
-| Gate | State | Evidence |
+| Gate | State | Key evidence |
 |---|---|---|
-| 1. Source slice → Spark/Delta → reconciled KPI in UI | **passed** | `evidence/gates.json` → `gate_1` |
-| 2. Full history, dimensional model, SQL analyses, publication checks | **passed** | `evidence/gates.json` → `gate_2` |
-| 3. Kafka replay, incidents, recovery, batch/replay reconciliation | not started | — |
-| 4. Forecasting baselines, rolling evaluation, untouched test | not started | — |
-| 5. Walkthrough, benchmarks, case study, interview materials | not started | — |
-| 6. Inventory scenarios, optional Databricks/Power BI | not started | — |
+| 1. Source slice → Spark/Delta → reconciled KPI in UI | **passed** | `browser-gate1.json`, `execution/demo-locked.json`, `execution/fixture-oracle.json` |
+| 2. Full history, dimensional model, SQL analyses, publication checks | **passed** | `full-batch.json`, `full-snapshot-check.json`, `full-baseline.json`, `browser-gate2.json`, `analysis/report.json` |
+| 3. Kafka replay, incidents, recovery, batch/replay reconciliation | **passed** | `kafka-smoke.json`, `replay-drill.json` (21/21), `browser-demo.json` (11/11), full replay in `benchmarks.json` |
+| 4. Forecast baselines, rolling evaluation, untouched test | **passed** | `forecast-run.json`, `analysis/forecast/metrics.json` |
+| 5. Walkthrough, benchmarks, case study, interview materials | see `gates.json` | `browser-demo.json`, `benchmarks.json`, `clean-checkout.json`, `docs/` |
+| 6. Inventory scenarios; Databricks / Power BI | inventory **passed (simulated)**; Databricks **prepared, unexecuted**; Power BI exports **verified-local**, native report **unfinished** | `inventory-run.json`, `databricks-contract-local.json`, `powerbi-export.json` |
 
-All cloud, Databricks, and Power BI capabilities are unexecuted. No paid or cloud services have been used.
+Nothing has run in Azure, Databricks or Power BI. No paid or cloud resources were used.
 
-## Environment (inspected 2026-11-16)
+## Environment
 
-Windows 11, Docker Desktop 29.3.1 on WSL2, 28 logical CPUs (i7-14700HX), 15.71 GiB RAM (often only 1.4–1.7 GiB free because unrelated containers run; leave them alone), Docker VM 7.61 GiB, ~142 GiB free disk. Host Python 3.11.9 in `.venv` (default 3.14 is unsuitable). Host Java 21 is outside Spark 3.5 support, so Spark runs only in the Java 17 container.
-
-Pinned runtime (verified): Spark 3.5.7, Delta 3.3.3, Scala 2.12.18, Java 17.0.21, Python 3.11.11 (container), DuckDB 1.2.2, Kafka `apache/kafka:4.1.2@sha256:5cc2a2fd93fa2687b44015eee04fb2c3edd9e526bd64bf8bec5ff1e268772e0e` (executed in the Kafka smoke below).
+Windows 11, Docker Desktop 29.3.1 / WSL2, i7-14700HX (28 logical CPUs), 15.7 GiB RAM. Often only 1.4–1.7 GiB is free because unrelated containers (`atlas-*`, `forge-*`, `ledgermatch-*`) run alongside; leave them alone. Docker VM 7.6 GiB.
+- **Host:** Python 3.11.9 `.venv` for analysis, forecasting, tests and browser checks. Host Java 21 is unsupported by Spark 3.5, so Spark runs only in the Java 17 container.
+- **Pinned runtime:** Spark 3.5.7, Delta 3.3.3, Scala 2.12.18, Java 17.0.21, Python 3.11.11 (container), spark-sql-kafka 3.5.7, `apache/kafka:4.1.2@sha256:5cc2a2fd…`, DuckDB 1.2.2.
 
 ## Commands
 
+See [README.md](README.md) for the startup path. Additional commands:
+
 ```powershell
-# Source download + verified bounded conversion (host)
-.venv\Scripts\python.exe -m meridian.cli convert
-# Build locked image
-docker compose build tools
-# Spark/Delta batch: profiles demo | fixture | full
-docker compose run --rm --no-deps --name meridian-job tools python -m meridian.cli batch --profile full
-# DuckDB baseline (run in the container; host run crashed under low free RAM)
-docker compose run --rm --no-deps --name meridian-baseline tools python -m meridian.cli baseline --profile full
-# Independent checks
-.venv\Scripts\python.exe tests\check_spark_fixture.py
-.venv\Scripts\python.exe tests\check_full_snapshot.py
+# Evidence wrapper: retains log, exit code, duration, sampled container memory
+.venv\Scripts\python.exe scripts\run_evidence.py <label> --container <name> -- <command>
+
+# Replay operations (inside: docker compose run --rm --no-deps tools python -m meridian.cli ...)
+replay-init --profile demo|full | replay-produce [--speed N] | replay-consume | replay-incident
+replay-backfill [--force] | replay-publish [--fail-at after-export] | replay-reset | replay-status
+replay-control pause|resume | replay-drill | job incident|repair|reset|interrupted-publish | worker
+
+# Scale and benchmarks
+docker compose run --rm --no-deps tools python -m meridian.cli synthetic --copies 10
+docker compose run --rm --no-deps -e MERIDIAN_SPARK_DRIVER_MEMORY=1400m tools python -m meridian.cli batch --profile synthetic
+docker compose run --rm --no-deps tools python -m meridian.cli baseline --profile synthetic
+.venv\Scripts\python.exe scripts\benchmark_queries.py
+.venv\Scripts\python.exe scripts\benchmark_summary.py
+
+# Verification
 .venv\Scripts\python.exe -m pytest -q
-# EDA + executed notebook (host; PYTHONPATH=src)
-.venv\Scripts\python.exe -m meridian.analysis --snapshot 20261116T192553-472ac294 --notebook
-# API + UI
-npm.cmd --prefix frontend run build
-docker compose up -d api        # http://localhost:8010 (loopback only)
-.venv\Scripts\python.exe scripts\verify_browser.py
-.venv\Scripts\python.exe scripts\verify_browser_gate2.py
+.venv\Scripts\python.exe tests\check_full_snapshot.py
+.venv\Scripts\python.exe scripts\verify_browser.py ; scripts\verify_browser_gate2.py ; scripts\verify_browser_demo.py
+.venv\Scripts\python.exe scripts\check_databricks_contract.py
+.venv\Scripts\python.exe scripts\export_powerbi.py --format both
 ```
 
-Wrap long runs with `scripts/run_evidence.py <label> --container <name> -- <command>` to retain log, exit code, duration, and sampled container memory under `evidence/execution/`.
+## Current state
 
-## Verified results
+- **Historical serving** (`data/serving/current.json`): full snapshot `20261116T192553-472ac294`, net £19,379,245.82.
+- **Replay serving** (`data/serving/replay.json`): the demo generation recorded in `runtime/replay/config.json`. Its baseline is "incomplete: 12 withheld rows" by design. The UI's Inject / Repair / Interrupt / Reset buttons operate on it through the `worker` container.
+- **Full-replay benchmark generation:** `runtime/replay/full-benchmark-config.json`.
 
-**Source.** UCI workbook SHA-256 `bcbe73b3…2e980` pinned in `SOURCE.lock.json`. Both sheets: 525,461 + 541,910 = 1,067,371 rows, matching UCI. Date ranges 2009-12-01 07:45 to 2010-12-09 20:01 and 2010-12-01 08:26 to 2011-12-09 12:50. Conversion streamed 10,000-row chunks in 99.5 s. `evidence/source-verification.json`.
+## Notable failures, fixed and retained as evidence
 
-**Gate 1.** 4,000-row demo slice: 3,986 accepted / 14 excluded, net £69,754.43. Fixture: 18 deliveries / 16 source coordinates, net £35.00, matched by an independent oracle. 12 browser checks passed. Details in `evidence/gates.json`.
-
-**Full Spark/Delta run** (commit 2939649, snapshot `20261116T192553-472ac294`): 1,067,371 source rows → 1,061,664 accepted, 6 quarantined, 5,701 excluded. Gross £20,112,074.02, negative adjustments −£732,828.20, net £19,379,245.82. 11,648,090 positive units. 14 Delta tables at v0. Spark stage 125.0 s, wrapper 128.4 s, container memory limit 2.3 GiB. `evidence/execution/full-batch.*`.
-
-**Independent full-snapshot check** (DuckDB, 6.9 s): file and SQL checksums; one-to-one source-coordinate join; zero civil-timestamp mismatches over 563,573 April–October rows (TIMESTAMP_NTZ, no BST shift); four dimension joins preserve rows and exact GBP; unknown-customer member valid; cohort retention recomputed independently; 135 unobserved calendar days kept as unavailable (not zero); quality amount bridge balances. `evidence/full-snapshot-check.json`.
-
-**DuckDB baseline** (same container): 17.3 s transform/export, 29.2 s wrapper. Identical 1,061,664 accepted identities, quantities, and exact line amounts versus Spark (EXCEPT ALL in both directions). It builds only fact + daily tables without Delta history, so no like-for-like speedup is claimed. The host attempt crashed (0xC0000005) and is retained as `evidence/execution/full-baseline-host-attempt1.*`.
-
-**EDA.** 13 versioned queries, 8 charts, executed notebook (`notebooks/eda.ipynb`, 9 cells, 0 errors), client findings `docs/findings.md`. All charts were visually inspected. A bridge label collision and missing spaces in chart/finding text were fixed, then everything was re-executed.
-
-**Gate 2 browser checks:** 9 steps passed in 130 s. Covered: full KPI with overlap caveat, comparable 28-day windows vs API, cohort selection and denominators, partial-month label, country filter, trust reconciliation vs manifest, mobile overflow, zero console errors. `evidence/browser-gate2.json`.
-
-**Kafka compatibility smoke** (Gate 3 prerequisite, passed, commit 5b617f3 + `kafka_smoke.py`): `docker compose --profile replay up -d kafka`, then `docker compose run --rm --no-deps --name meridian-kafka-smoke tools python -m meridian.cli kafka-smoke`. 24 synthetic envelopes (20 source identities plus 4 repeat deliveries) went through an idempotent kafka-python producer, a 2-partition topic, and the Spark `spark-sql-kafka-0-10_2.12:3.5.7` `availableNow` stream into Delta. Bronze kept all 24 deliveries (24 distinct offsets and delivery IDs). Dedup by source identity gave quantity 210 = expected. A checkpoint rerun ingested 0 new rows. Duration 19.2 s. `evidence/kafka-smoke.json`. Scope: compatibility only, not the replay pipeline.
+| Failure | Cause and fix | Evidence |
+|---|---|---|
+| Host DuckDB baseline crashed (0xC0000005) | Ran under low free RAM; rerun in the Spark container | `execution/full-baseline-host-attempt1.*` |
+| foreachBatch failed | Temp views were created in the cloned micro-batch session; now uses `frame.sparkSession` throughout | first drill attempts in `runtime/runs/` |
+| Watermark type error | Watermark compared a string with a datetime; now parsed as `TIMESTAMP_NTZ` | first drill attempts in `runtime/runs/` |
+| Replay ordering not guaranteed | Replay topic was created with 3 partitions; now 1 for total order | demo and drill late counts were still exactly as expected |
+| Full replay producer stalled at ~535 events/s | Per-message `stat` of the pause file on the Windows bind mount, plus gzip; now polled every 0.25 s, uncompressed, streamed. Measured 7,168 events/s on 50k. | `execution/replay-full-attempt{1,2}-stopped.*` |
 
 ## Correctness decisions
 
-- Line identity = sha256(source checksum | sheet | row). Only repeat deliveries of the same source identity deduplicate.
-- Workbook overlap: 34,335 extra identical-looking coordinates, and 22,202 payload groups shared across sheets (22,523 pairs). All coordinates are retained and flagged for client reconciliation. No deletion rule was invented.
-- Decimal half-up rounding per line. Named exclusions and quarantine retain parseable amounts. Source-row and delivery denominators are reported separately. No profit, payment, or inventory claims.
-- Source times are UK civil clock in TIMESTAMP_NTZ. No timezone conversion is applied.
-- The serving pointer moves only after every table export validates. A single writer is assumed for now.
+- **Identity:** `sha256(workbook sha | sheet | row)`.
+  - Repeat deliveries are deduplicated by identity + revision + payload hash.
+  - The same identity + revision with different content is quarantined.
+  - Corrections use explicit revisions.
+- **Workbook overlap:** 22,202 shared payload groups are kept and flagged for client reconciliation.
+- **Money:** decimal arithmetic, half-up per line. Source-row and delivery denominators are reported separately.
+- **Time:** source civil time is `TIMESTAMP_NTZ`. The watermark uses only earlier batches. Late rows go to durable backfill and block publication.
+- **Publication:** pinned Delta versions → explicit Parquet export → DuckDB validation → atomic pointer. Single writer (file lock).
 
-## Remaining work (next: Gate 3)
+## Remaining work and known limits
 
-1. **Gate 3.** The broker and connector are verified (see the Kafka smoke above). Build:
-   - A deterministic accelerated replay producer with speed, pause/resume, and source vs replay time.
-   - A Spark Structured Streaming consumer into the Bronze envelope.
-   - An idempotent Silver MERGE keyed on line identity, with a revision for corrections.
-   - A watermark policy, with late events routed to a durable backfill table.
-   - Incident injector: duplicates within and across batches, malformed rows, incompatible and additive schema changes.
-   - Fault injection: kill around the commit/checkpoint boundary, then restart, plus an interrupted multi-stage publish that leaves the last good snapshot current.
-   - A correction plus an affected-date backfill, re-run safely. This also supplies the carried-forward incremental-update SQL example.
-   - Batch vs replay reconciliation of identities and exact GBP.
-   - An unsafe comparison calculation, isolated in the UI.
-   - Persisted metrics for the Trust view.
-2. **Gate 4.** Seasonal naive, trailing-average, and LightGBM/sklearn models over at least 4 rolling origins plus an untouched test period, with past-only interval calibration and a leakage test.
-3. **Gate 5.** Benchmarks (synthetic scaling, query latency, replay throughput, recovery time), README, case study, demo script, interview guide, resume bullets, and clean-checkout verification. Rebuild the image so the `analysis` extras are included.
-4. **Gate 6.** Inventory simulator, Databricks bundle, Power BI exports and DAX (native report unfinished unless authoring is available).
+- Databricks: run the prepared bundle in a Free Edition workspace, if one becomes available, and record evidence (`databricks/README.md`).
+- Power BI: build the native report from `powerbi/SETUP.md` in Power BI Desktop and reconcile it to `powerbi/reconciliation.json`.
+- The December 2010 overlap needs client line keys.
+- Forecast intervals under-cover and need recalibration or widening.
+- Benchmarks are single-machine with one repetition per pipeline run.

@@ -18,7 +18,7 @@ services:
     volumes: [".:/app"]
     environment:
       PYTHONPATH: /app/src
-    ports: ["127.0.0.1:8010:8010"]
+    ports: ["127.0.0.1:${MERIDIAN_PORT:-8010}:8010"]
     # Demo job controls only enqueue allow-listed jobs; the port is bound to loopback.
     mem_limit: 400m
   worker:
@@ -36,7 +36,7 @@ services:
     profiles: [replay]
   kafka:
     image: apache/kafka:4.1.2@sha256:5cc2a2fd93fa2687b44015eee04fb2c3edd9e526bd64bf8bec5ff1e268772e0e
-    ports: ["127.0.0.1:9092:9092"]
+    ports: ["127.0.0.1:${MERIDIAN_KAFKA_PORT:-9092}:9092"]
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
