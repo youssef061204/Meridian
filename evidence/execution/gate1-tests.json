@@ -1,0 +1,17 @@
+{
+  "command": [
+    "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "cwd": "C:\\Users\\USER\\Projects\\Meridian",
+  "started_at": "2026-11-16T19:15:24.897571+00:00",
+  "log": "evidence\\execution\\gate1-tests.log",
+  "cache_condition": "not controlled; see run notes",
+  "git_sha": "9b3ffb10c63ad3cf0983ec91695db22e0e0668d5",
+  "exit_code": 0,
+  "finished_at": "2026-11-16T19:15:28.935578+00:00",
+  "duration_seconds": 4.0381,
+  "container_samples": []
+}

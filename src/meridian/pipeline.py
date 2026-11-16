@@ -59,6 +59,10 @@ def load_input(spark, profile):
         pq.write_table(pa.Table.from_pylist(rows, schema=SCHEMA), path)
     else:
         path = DATA / "converted" / ("demo.parquet" if profile == "demo" else "historical.parquet")
+        provenance = read_json(DATA / "converted" / "manifest.json")
+        expected = provenance["demo_parquet_sha256" if profile == "demo" else "full_parquet_sha256"]
+        if sha256(path) != expected:
+            raise ValueError("Converted input checksum mismatch; refusing publication")
     return spark.read.parquet(str(path))
 
 
@@ -91,6 +95,11 @@ def batch(profile="demo", fail_at=None):
             silver = spark.read.format("delta").load(str(silver_path))
             source_rows = silver.count()
             reconciliation = [r.asDict() for r in silver.groupBy("disposition", "classification").agg(F.count("*").alias("rows"), F.sum("parsed_amount").alias("parsed_amount_gbp")).collect()]
+            balance = silver.agg(F.sum("parsed_amount").alias("source_parsed_amount_gbp"), F.sum(F.when(F.col("parsed_amount").isNull(),1).otherwise(0)).alias("unparseable_amount_rows")).first().asDict()
+            from decimal import Decimal
+            disposition_amounts = {d: sum((r["parsed_amount_gbp"] or Decimal("0.00") for r in reconciliation if r["disposition"] == d), Decimal("0.00")) for d in ["accepted","quarantined","excluded"]}
+            assert sum(disposition_amounts.values()) == balance["source_parsed_amount_gbp"]
+            balance.update({d+"_parsed_amount_gbp": amount for d,amount in disposition_amounts.items()})
             counts = {d: sum(r["rows"] for r in reconciliation if r["disposition"] == d) for d in ["accepted", "quarantined", "excluded"]}
             assert sum(counts.values()) == source_rows
             fact = silver.filter("disposition = 'accepted'")
@@ -105,6 +114,9 @@ def batch(profile="demo", fail_at=None):
                 versions[name] = DeltaTable.forPath(spark, str(path)).history(1).first()["version"]
             snapshot_dir = DATA / "serving" / "snapshots" / run["run_id"]
             snapshot_dir.mkdir(parents=True, exist_ok=False)
+            (snapshot_dir / "models").mkdir()
+            for model in ["silver.sql", "daily_sales.sql"]:
+                shutil.copyfile(ROOT / "sql" / model, snapshot_dir / "models" / model)
             checksums = {}
             # Each read explicitly pins a Delta version; unrelated commits are not a cross-table transaction.
             for name in tables:
@@ -124,6 +136,7 @@ def batch(profile="demo", fail_at=None):
                 daily_net = con.execute("SELECT sum(net_recorded_gbp) FROM daily_sales").fetchone()[0]
                 assert daily_net == metric_values["net_recorded_gbp"]
                 assert metric_values["gross_positive_gbp"] + metric_values["negative_adjustments_gbp"] == metric_values["net_recorded_gbp"]
+                assert disposition_amounts["accepted"] == metric_values["net_recorded_gbp"]
                 for table in ["product_performance", "country_performance"]:
                     assert con.execute(f"SELECT sum(net_recorded_gbp) FROM {table}").fetchone()[0] == daily_net
                 if profile == "fixture":
@@ -134,7 +147,7 @@ def batch(profile="demo", fail_at=None):
                     accepted_rows=counts["accepted"], quarantined_rows=counts["quarantined"], excluded_rows=counts["excluded"], repeat_deliveries=deliveries-source_rows, received_deliveries=deliveries,
                     date_min=str(accepted[2]), date_max=str(accepted[3]), delta_versions=versions,
                     delta_root=str(lake.relative_to(ROOT)).replace('\\', '/'), metrics=metric_values,
-                    reconciliation=reconciliation, checksums=checksums, validation="passed", sql_sha256={n:sha256(ROOT/"sql"/n) for n in ["silver.sql","daily_sales.sql"]},
+                    reconciliation=reconciliation, reconciliation_totals=balance, checksums=checksums, validation="passed", sql_sha256={n:sha256(snapshot_dir/"models"/n) for n in ["silver.sql","daily_sales.sql"]},
                     limitations=["Recorded merchandise invoice value in GBP; not audited revenue or settled cash.", "Missing customer IDs remain in merchandise totals.", "Source civil timestamps have no recorded timezone offset."])
             finally:
                 con.close()

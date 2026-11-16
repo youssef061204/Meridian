@@ -18,6 +18,8 @@ if command and command[0] == "--":
     command = command[1:]
 if not command:
     p.error("command required")
+if Path(command[0]).exists():
+    command[0] = str(Path(command[0]).resolve())
 folder = ROOT / "evidence" / "execution"
 folder.mkdir(parents=True, exist_ok=True)
 path = folder / (args.label + ".log")

@@ -17,10 +17,19 @@ import pytest
 from meridian import api
 
 
+MODEL_NAMES = ("silver.sql", "daily_sales.sql")
+
+
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    data = tmp_path / "data"
-    runtime = tmp_path / "runtime"
+    project_root = tmp_path / "project"
+    working_sql = project_root / "sql"
+    working_sql.mkdir(parents=True)
+    for name in MODEL_NAMES:
+        (working_sql / name).write_bytes((api.ROOT / "sql" / name).read_bytes())
+    data = project_root / "data"
+    runtime = project_root / "runtime"
+    monkeypatch.setattr(api, "ROOT", project_root)
     monkeypatch.setattr(api, "DATA", data)
     monkeypatch.setattr(api, "RUNTIME", runtime)
     with TestClient(api.app) as test_client:
@@ -79,6 +88,13 @@ def published(client):
         path = folder / name / "part-00000.parquet"
         path.parent.mkdir(parents=True, exist_ok=True)
         pq.write_table(table, path)
+    models = folder / "models"
+    models.mkdir()
+    sql_hashes = {}
+    for name in MODEL_NAMES:
+        content = (api.ROOT / "sql" / name).read_bytes()
+        (models / name).write_bytes(content)
+        sql_hashes[name] = hashlib.sha256(content).hexdigest()
     manifest = {
         "id": "api-fixture-snapshot", "published_at": "2026-11-16T19:00:00Z",
         "mode": "synthetic", "profile": "fixture", "source_sha256": source_sha,
@@ -88,7 +104,7 @@ def published(client):
         "delta_versions": {"bronze": 0, "silver": 0, "fact_invoice_line": 0},
         "metrics": {"gross_positive_gbp": "48.51", "negative_adjustments_gbp": "-13.51",
                     "net_recorded_gbp": "35.00", "positive_units": 14, "known_customer_rows": 6},
-        "validation": "passed", "sql_sha256": {"silver.sql": "test-sql-checksum"},
+        "validation": "passed", "sql_sha256": sql_hashes,
     }
     _json(folder / "manifest.json", manifest)
     _json(data / "serving" / "current.json", {"snapshot_id": manifest["id"]})
@@ -204,6 +220,36 @@ def test_lineage_rejects_unknown_metric_and_invalid_limit(published):
     assert test_client.get("/api/lineage", params={"metric": "profit"}).status_code == 400
     assert test_client.get("/api/lineage", params={"limit": 0}).status_code == 422
     assert test_client.get("/api/lineage", params={"limit": 201}).status_code == 422
+
+
+def test_lineage_serves_published_sql_after_working_model_changes(published):
+    test_client, data, _, manifest = published
+    folder = data / "serving" / "snapshots" / manifest["id"]
+    expected_sql = "\n\n".join((folder / "models" / name).read_text(encoding="utf-8") for name in MODEL_NAMES)
+    (api.ROOT / "sql" / "silver.sql").write_text("SELECT 'MUTATED WORKING COPY';", encoding="utf-8")
+    response = test_client.get("/api/lineage")
+    assert response.status_code == 200
+    assert response.json()["sql"] == expected_sql
+    assert "MUTATED WORKING COPY" not in response.json()["sql"]
+    assert response.json()["snapshot"]["sql_sha256"] == manifest["sql_sha256"]
+
+
+def test_lineage_refuses_corrupted_published_sql(published):
+    test_client, data, _, manifest = published
+    model = data / "serving" / "snapshots" / manifest["id"] / "models" / "silver.sql"
+    model.write_text("SELECT 'corrupted immutable artifact';", encoding="utf-8")
+    response = test_client.get("/api/lineage")
+    assert response.status_code == 409
+    assert "checksum mismatch" in response.json()["detail"]
+
+
+@pytest.mark.parametrize("endpoint", ["/api/overview", "/api/lineage"])
+@pytest.mark.parametrize("params", [{"start": "not-a-date"}, {"end": "2009-02-30"}])
+def test_malformed_dates_return_validation_errors(published, endpoint, params):
+    test_client, _, _, _ = published
+    response = test_client.get(endpoint, params=params)
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"][0] == "query"
 
 
 def test_trust_preserves_valid_snapshot_and_reports_later_failed_attempt(published):

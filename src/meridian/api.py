@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .common import DATA, ROOT, RUNTIME, now, read_json
+from .common import DATA, ROOT, RUNTIME, now, read_json, sha256
 from .pipeline import metrics_query
 
 app = FastAPI(title="MERIDIAN", description="Local historical retail portfolio case study")
@@ -79,7 +79,17 @@ def lineage(metric: str = "net_recorded_gbp", limit: int = Query(50, ge=1, le=20
     with serving() as (con, manifest):
         total = con.execute("SELECT count(*) FROM fact_invoice_line WHERE " + where, args).fetchone()[0]
         result = rows(con, "SELECT * FROM fact_invoice_line WHERE " + where + " ORDER BY source_sheet,source_row LIMIT ?", [*args,limit])
-        return {"snapshot":manifest,"sql":(ROOT/"sql"/"silver.sql").read_text()+"\n\n"+(ROOT/"sql"/"daily_sales.sql").read_text(),"rows":result,"total_rows":total,"metric":metric}
+        folder = DATA / "serving" / "snapshots" / manifest["id"]
+        models = []
+        for name in ["silver.sql","daily_sales.sql"]:
+            model = folder / "models" / name
+            if not model.exists():
+                model = ROOT / "sql" / name
+            expected = manifest.get("sql_sha256",{}).get(name)
+            if expected and sha256(model) != expected:
+                raise HTTPException(409,"Snapshot SQL checksum mismatch; lineage unavailable")
+            models.append(model.read_text(encoding="utf-8"))
+        return {"snapshot":manifest,"sql":"\n\n".join(models),"rows":result,"total_rows":total,"metric":metric}
 
 
 @app.get("/api/trust")

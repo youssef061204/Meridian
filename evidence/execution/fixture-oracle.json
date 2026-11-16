@@ -1,0 +1,15 @@
+{
+  "command": [
+    "C:\\Users\\USER\\Projects\\Meridian\\.venv\\Scripts\\python.exe",
+    "tests/check_spark_fixture.py"
+  ],
+  "cwd": "C:\\Users\\USER\\Projects\\Meridian",
+  "started_at": "2026-11-16T19:15:29.029838+00:00",
+  "log": "evidence\\execution\\fixture-oracle.log",
+  "cache_condition": "not controlled; see run notes",
+  "git_sha": "9b3ffb10c63ad3cf0983ec91695db22e0e0668d5",
+  "exit_code": 0,
+  "finished_at": "2026-11-16T19:15:31.060935+00:00",
+  "duration_seconds": 2.0316,
+  "container_samples": []
+}

@@ -1,0 +1,136 @@
+{
+  "run_id": "20261116T191322-dc5471b3",
+  "stage": "batch",
+  "started_at": "2026-11-16T19:13:22.048330+00:00",
+  "state": "passed",
+  "profile": "fixture",
+  "mode": "synthetic",
+  "git_sha": "9b3ffb10c63ad3cf0983ec91695db22e0e0668d5",
+  "python": "3.11.11",
+  "snapshot_id": "20261116T191322-dc5471b3",
+  "source_rows": 16,
+  "counts": {
+    "accepted": 8,
+    "quarantined": 7,
+    "excluded": 1
+  },
+  "metrics": {
+    "gross_positive_gbp": "48.51",
+    "negative_adjustments_gbp": "-13.51",
+    "net_recorded_gbp": "35.00",
+    "positive_units": 14,
+    "known_customer_rows": 6
+  },
+  "delta_versions": {
+    "bronze": 0,
+    "silver": 0,
+    "fact_invoice_line": 0,
+    "daily_sales": 0,
+    "product_performance": 0,
+    "country_performance": 0
+  },
+  "manifest": {
+    "id": "20261116T191322-dc5471b3",
+    "published_at": "2026-11-16T19:14:00.683741+00:00",
+    "mode": "synthetic",
+    "profile": "fixture",
+    "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_rows": 16,
+    "accepted_rows": 8,
+    "quarantined_rows": 7,
+    "excluded_rows": 1,
+    "repeat_deliveries": 2,
+    "received_deliveries": 18,
+    "date_min": "2009-12-01",
+    "date_max": "2009-12-03",
+    "delta_versions": {
+      "bronze": 0,
+      "silver": 0,
+      "fact_invoice_line": 0,
+      "daily_sales": 0,
+      "product_performance": 0,
+      "country_performance": 0
+    },
+    "delta_root": "data/lake/synthetic/fixture",
+    "metrics": {
+      "gross_positive_gbp": "48.51",
+      "negative_adjustments_gbp": "-13.51",
+      "net_recorded_gbp": "35.00",
+      "positive_units": 14,
+      "known_customer_rows": 6
+    },
+    "reconciliation": [
+      {
+        "disposition": "accepted",
+        "classification": "negative_adjustment",
+        "rows": 3,
+        "parsed_amount_gbp": "-13.51"
+      },
+      {
+        "disposition": "quarantined",
+        "classification": "invalid_quantity",
+        "rows": 3,
+        "parsed_amount_gbp": "1.50"
+      },
+      {
+        "disposition": "excluded",
+        "classification": "non_merchandise_code",
+        "rows": 1,
+        "parsed_amount_gbp": "5.00"
+      },
+      {
+        "disposition": "accepted",
+        "classification": "positive_merchandise",
+        "rows": 5,
+        "parsed_amount_gbp": "48.51"
+      },
+      {
+        "disposition": "quarantined",
+        "classification": "cancellation_sign_conflict",
+        "rows": 1,
+        "parsed_amount_gbp": "10.00"
+      },
+      {
+        "disposition": "quarantined",
+        "classification": "missing_invoice",
+        "rows": 1,
+        "parsed_amount_gbp": "2.00"
+      },
+      {
+        "disposition": "quarantined",
+        "classification": "invalid_timestamp",
+        "rows": 1,
+        "parsed_amount_gbp": "1.00"
+      },
+      {
+        "disposition": "quarantined",
+        "classification": "invalid_price",
+        "rows": 1,
+        "parsed_amount_gbp": "-3.00"
+      }
+    ],
+    "reconciliation_totals": {
+      "source_parsed_amount_gbp": "51.50",
+      "unparseable_amount_rows": 1,
+      "accepted_parsed_amount_gbp": "35.00",
+      "quarantined_parsed_amount_gbp": "11.50",
+      "excluded_parsed_amount_gbp": "5.00"
+    },
+    "checksums": {
+      "fact_invoice_line/part-00000-94dfc4bc-5c8c-4972-b8dd-e7dc1f22815a-c000.snappy.parquet": "7645d5c5b6f43999b662ccdc166c5cde6e902c46d25c67f8005fbe9ae1fc110e",
+      "daily_sales/part-00000-d125584e-31ee-4373-8eef-86bc70e9ed28-c000.snappy.parquet": "6d7f09fac59ed1d97de4e95a856b8e30ef02305411c7b366095d4163ebe36d14",
+      "product_performance/part-00000-0446bc3c-48e8-4850-a31a-b65d47b67143-c000.snappy.parquet": "016635bacfe867c0659fbd214e97cb9a53f3f10fe0c35e371d4b1d4359d94e11",
+      "country_performance/part-00000-08795a1e-50b9-41a2-bba3-0ab49cc279ba-c000.snappy.parquet": "d5193096b399787dd823cfd909f79667463838f66ab14f4de912578a1ace82ca"
+    },
+    "validation": "passed",
+    "sql_sha256": {
+      "silver.sql": "ab7e137bdfd0e27b37b6876baf8ded6fbfe5cbb2aafe49815d09407b4d508901",
+      "daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b"
+    },
+    "limitations": [
+      "Recorded merchandise invoice value in GBP; not audited revenue or settled cash.",
+      "Missing customer IDs remain in merchandise totals.",
+      "Source civil timestamps have no recorded timezone offset."
+    ]
+  }
+}

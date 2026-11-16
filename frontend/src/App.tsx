@@ -57,21 +57,34 @@ async function getJson<T>(path: string, signal: AbortSignal): Promise<T> {
 function SalesChart({ daily }: { daily: Daily[] }) {
   if (!daily.length) return <div className="empty compact">No recorded sales in this selection.</div>;
   const width = 850, height = 230, left = 82, right = 22, top = 16, bottom = 36;
-  const values = daily.map(row => Number(row.net_recorded_gbp));
+  const dayMilliseconds = 24 * 60 * 60 * 1000;
+  const observations = daily.map(row => ({ date: row.date, time: Date.parse(`${row.date.slice(0, 10)}T00:00:00Z`), value: Number(row.net_recorded_gbp) })).sort((a, b) => a.time - b.time);
+  const values = observations.map(row => row.value);
   const max = Math.max(0, ...values), min = Math.min(0, ...values);
   const span = max - min || 1;
   const y = (v: number) => top + (max - v) / span * (height - top - bottom);
-  const x = (i: number) => left + (daily.length === 1 ? .5 : i / (daily.length - 1)) * (width - left - right);
-  const line = values.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(2)},${y(v).toFixed(2)}`).join(' ');
-  const area = `${line} L${x(values.length - 1)},${y(0)} L${x(0)},${y(0)} Z`;
+  const first = observations[0], last = observations[observations.length - 1];
+  const timeSpan = last.time - first.time;
+  const x = (time: number) => left + (timeSpan ? (time - first.time) / timeSpan : .5) * (width - left - right);
+  const segments: typeof observations[] = [];
+  for (const observation of observations) {
+    const previousSegment = segments[segments.length - 1];
+    const previous = previousSegment?.[previousSegment.length - 1];
+    if (!previous || observation.time - previous.time > dayMilliseconds) segments.push([observation]);
+    else previousSegment.push(observation);
+  }
+  const paths = segments.map(segment => {
+    const line = segment.map((row, index) => `${index ? 'L' : 'M'}${x(row.time).toFixed(2)},${y(row.value).toFixed(2)}`).join(' ');
+    const area = `${line} L${x(segment[segment.length - 1].time)},${y(0)} L${x(segment[0].time)},${y(0)} Z`;
+    return { segment, line, area };
+  });
   const ticks = [min, min + span / 2, max];
-  return <div className="chart-wrap"><svg className="sales-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Daily net recorded merchandise sales in GBP, ${date(daily[0].date)} to ${date(daily.at(-1)?.date)}. ${daily.length} observed days.`}>
+  return <div className="chart-wrap"><svg className="sales-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Daily net recorded merchandise sales in GBP, ${date(first.date)} to ${date(last.date)}. ${daily.length} observed days. Dates use a continuous calendar axis; gaps in observations are left blank.`}>
     <defs><linearGradient id="sales-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#3d8981" stopOpacity=".22" /><stop offset="100%" stopColor="#3d8981" stopOpacity=".02" /></linearGradient></defs>
     {ticks.map((tick, i) => <g key={i}><line x1={left} x2={width - right} y1={y(tick)} y2={y(tick)} stroke="#e7ece9" /><text x={left - 12} y={y(tick) + 4} textAnchor="end">{new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', notation: 'compact', maximumFractionDigits: 1 }).format(tick)}</text></g>)}
-    <path d={area} fill="url(#sales-fill)" /><path d={line} fill="none" stroke="#2e7770" strokeWidth="2.5" />
-    {daily.length === 1 ? <circle cx={x(0)} cy={y(values[0])} r="4" fill="#2e7770" /> : null}
-    <text x={left} y={height - 6}>{date(daily[0].date)}</text><text x={width - right} y={height - 6} textAnchor="end">{date(daily.at(-1)?.date)}</text>
-  </svg><p className="chart-caption">Observed source dates · GBP · gaps are not imputed as zero sales</p></div>;
+    {paths.map(({ segment, line, area }) => <g key={segment[0].date}><path d={area} fill="url(#sales-fill)" /><path d={line} fill="none" stroke="#2e7770" strokeWidth="2.5" />{segment.length === 1 ? <circle cx={x(segment[0].time)} cy={y(segment[0].value)} r="4" fill="#2e7770" /> : null}</g>)}
+    <text x={left} y={height - 6}>{date(first.date)}</text><text x={width - right} y={height - 6} textAnchor="end">{date(last.date)}</text>
+  </svg><p className="chart-caption">Calendar dates · GBP · missing periods left blank; no zero sales imputed</p></div>;
 }
 
 function SnapshotDetails({ snapshot }: { snapshot: Snapshot }) {
