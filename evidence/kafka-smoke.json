@@ -1,0 +1,50 @@
+{
+  "run_id": "20261116T200833-5e083608",
+  "stage": "kafka_spark_delta_smoke",
+  "started_at": "2026-11-16T20:08:33.569776+00:00",
+  "state": "passed",
+  "bootstrap": "kafka:19092",
+  "topic": "meridian.smoke.a63c8f37",
+  "data_mode": "synthetic smoke envelopes; not observed transactions",
+  "source_tree_sha256": "08d62773cf5825382cf1f88c60a01b40b090cf16fe7d53a3d52051009d051dd2",
+  "code_hashes": {
+    "pyproject.toml": "6e4405f7e2ae34b52acca2278b8e076b98850f3adf583bff2265902673b56550",
+    "requirements.lock": "6c2408e06c9bd34924e54c70bb20622fa8fa2d132b35b4d7ce2ce31369253599",
+    "sql/daily_sales.sql": "645481c9fc38cb641ebd9f9cf7c22c039692060fbcc54e676b7ca849e7ddd86b",
+    "sql/silver.sql": "53d2421cd38bd2f5d1c63eb94c3fcfe586a80282a471c7b1a79006b01703b013",
+    "src/meridian/__init__.py": "e4c75986a472b9073d2852af453f94057beae7352d8e34a0335590d2b82bf978",
+    "src/meridian/analysis.py": "fb0283b9eb32974a1a32c515897070bf9deb9b49640d54720f0aa0958fc07103",
+    "src/meridian/api.py": "c21c698a99e8bf204c9280b876f137468406c883c24456280ace2aaad3fc6047",
+    "src/meridian/baseline.py": "c9a1d7f010f61594458daaf31ecfe36a8f1c4405726ac6c4961008029e35b301",
+    "src/meridian/cli.py": "400638c4fa56e34807f448243492bcc431c3a721862e76557a8528576679d699",
+    "src/meridian/common.py": "bc169eb85b239986080c7f9170203b93c5634c0f66bf34cd06493109c9d48bd5",
+    "src/meridian/gold.py": "0ff69bec46e8122de6f8366c22b5142a6e8c1e1a50915c3049fcc1f5cdaa4fba",
+    "src/meridian/kafka_smoke.py": "11b52dca4fc724ff7746b3ad95383a90bc0617cca5f7c96df3bfbcbd048ebd7d",
+    "src/meridian/pipeline.py": "808d8066bfc5640a9bc4cbf8138b32d504163b5a32d1cd90fc46182687df378f",
+    "src/meridian/source.py": "f2f4b3bdf926db4eb0cdb4b7ca5eded90453e5adec86a7a638ee6ca0248d715a"
+  },
+  "dependencies": {
+    "pyspark": "3.5.7",
+    "delta-spark": "3.3.3",
+    "duckdb": "1.2.2",
+    "pyarrow": "19.0.1",
+    "kafka-python": "2.2.10"
+  },
+  "git_sha": "5b617f3f9283d812eb0fb2d9206abd3c574ef27a",
+  "python": "3.11.11",
+  "spark_version": "3.5.7",
+  "java_version": "17.0.21",
+  "kafka_connector": "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.7",
+  "broker_cluster": "{'throttle_time_ms': 0, 'brokers': [{'node_id': 1, 'host': 'kafka', 'port': 19092, 'rack': None}], 'cluster_id': '5L6g3nShT-eMCtK--X86sw', 'controller_id': 1}",
+  "produced_deliveries": 24,
+  "bronze": {
+    "deliveries": 24,
+    "distinct_offsets": 24,
+    "distinct_source_identities": 20,
+    "distinct_delivery_ids": 24
+  },
+  "deduplicated_by_source_identity_quantity": 210,
+  "expected_quantity": 210,
+  "bronze_rows_after_checkpoint_rerun": 24,
+  "scope": "Compatibility smoke only: one broker, two partitions, availableNow trigger. Not the replay pipeline."
+}

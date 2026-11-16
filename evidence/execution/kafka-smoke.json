@@ -1,0 +1,98 @@
+{
+  "command": [
+    "docker",
+    "compose",
+    "run",
+    "--rm",
+    "--no-deps",
+    "--name",
+    "meridian-kafka-smoke",
+    "tools",
+    "python",
+    "-m",
+    "meridian.cli",
+    "kafka-smoke"
+  ],
+  "cwd": "C:\\Users\\USER\\Projects\\Meridian",
+  "started_at": "2026-11-16T20:08:32.776588+00:00",
+  "log": "evidence\\execution\\kafka-smoke.log",
+  "cache_condition": "not controlled; see run notes",
+  "git_sha": "5b617f3f9283d812eb0fb2d9206abd3c574ef27a",
+  "exit_code": 0,
+  "finished_at": "2026-11-16T20:08:53.314463+00:00",
+  "duration_seconds": 20.5372,
+  "container_samples": [
+    {
+      "at": "2026-11-16T20:08:35.924191+00:00",
+      "BlockIO": "14.5MB / 32.8kB",
+      "CPUPerc": "223.64%",
+      "Container": "meridian-kafka-smoke",
+      "ID": "24f7cd7765b8",
+      "MemPerc": "7.67%",
+      "MemUsage": "176.5MiB / 2.246GiB",
+      "Name": "meridian-kafka-smoke",
+      "NetIO": "5.06kB / 9.49kB",
+      "PIDs": "31"
+    },
+    {
+      "at": "2026-11-16T20:08:38.989741+00:00",
+      "BlockIO": "28.4MB / 132MB",
+      "CPUPerc": "153.41%",
+      "Container": "meridian-kafka-smoke",
+      "ID": "24f7cd7765b8",
+      "MemPerc": "16.95%",
+      "MemUsage": "389.8MiB / 2.246GiB",
+      "Name": "meridian-kafka-smoke",
+      "NetIO": "5.06kB / 9.49kB",
+      "PIDs": "86"
+    },
+    {
+      "at": "2026-11-16T20:08:42.056954+00:00",
+      "BlockIO": "28.7MB / 132MB",
+      "CPUPerc": "51.40%",
+      "Container": "meridian-kafka-smoke",
+      "ID": "24f7cd7765b8",
+      "MemPerc": "22.73%",
+      "MemUsage": "522.8MiB / 2.246GiB",
+      "Name": "meridian-kafka-smoke",
+      "NetIO": "7.55kB / 10.8kB",
+      "PIDs": "88"
+    },
+    {
+      "at": "2026-11-16T20:08:45.116673+00:00",
+      "BlockIO": "28.7MB / 132MB",
+      "CPUPerc": "426.89%",
+      "Container": "meridian-kafka-smoke",
+      "ID": "24f7cd7765b8",
+      "MemPerc": "27.71%",
+      "MemUsage": "637.3MiB / 2.246GiB",
+      "Name": "meridian-kafka-smoke",
+      "NetIO": "22.9kB / 18.6kB",
+      "PIDs": "92"
+    },
+    {
+      "at": "2026-11-16T20:08:48.244513+00:00",
+      "BlockIO": "28.7MB / 132MB",
+      "CPUPerc": "548.96%",
+      "Container": "meridian-kafka-smoke",
+      "ID": "24f7cd7765b8",
+      "MemPerc": "39.55%",
+      "MemUsage": "909.6MiB / 2.246GiB",
+      "Name": "meridian-kafka-smoke",
+      "NetIO": "23.7kB / 19.3kB",
+      "PIDs": "107"
+    },
+    {
+      "at": "2026-11-16T20:08:51.313889+00:00",
+      "BlockIO": "28.7MB / 132MB",
+      "CPUPerc": "473.68%",
+      "Container": "meridian-kafka-smoke",
+      "ID": "24f7cd7765b8",
+      "MemPerc": "42.13%",
+      "MemUsage": "969MiB / 2.246GiB",
+      "Name": "meridian-kafka-smoke",
+      "NetIO": "23.8kB / 19.5kB",
+      "PIDs": "146"
+    }
+  ]
+}

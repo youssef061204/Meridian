@@ -20,7 +20,7 @@ All cloud, Databricks, and Power BI capabilities are unexecuted. No paid or clou
 
 Windows 11, Docker Desktop 29.3.1 on WSL2, 28 logical CPUs (i7-14700HX), 15.71 GiB RAM (often only 1.4–1.7 GiB free because unrelated containers run; leave them alone), Docker VM 7.61 GiB, ~142 GiB free disk. Host Python 3.11.9 in `.venv` (default 3.14 is unsuitable). Host Java 21 is outside Spark 3.5 support, so Spark runs only in the Java 17 container.
 
-Pinned runtime (verified): Spark 3.5.7, Delta 3.3.3, Scala 2.12.18, Java 17.0.21, Python 3.11.11 (container), DuckDB 1.2.2, Kafka image `apache/kafka:4.1.2` (broker not yet executed).
+Pinned runtime (verified): Spark 3.5.7, Delta 3.3.3, Scala 2.12.18, Java 17.0.21, Python 3.11.11 (container), DuckDB 1.2.2, Kafka `apache/kafka:4.1.2@sha256:5cc2a2fd93fa2687b44015eee04fb2c3edd9e526bd64bf8bec5ff1e268772e0e` (executed in the Kafka smoke below).
 
 ## Commands
 
@@ -64,6 +64,8 @@ Wrap long runs with `scripts/run_evidence.py <label> --container <name> -- <comm
 
 **Gate 2 browser checks:** 9 steps passed in 130 s. Covered: full KPI with overlap caveat, comparable 28-day windows vs API, cohort selection and denominators, partial-month label, country filter, trust reconciliation vs manifest, mobile overflow, zero console errors. `evidence/browser-gate2.json`.
 
+**Kafka compatibility smoke** (Gate 3 prerequisite, passed, commit 5b617f3 + `kafka_smoke.py`): `docker compose --profile replay up -d kafka`, then `docker compose run --rm --no-deps --name meridian-kafka-smoke tools python -m meridian.cli kafka-smoke`. 24 synthetic envelopes (20 source identities plus 4 repeat deliveries) went through an idempotent kafka-python producer, a 2-partition topic, and the Spark `spark-sql-kafka-0-10_2.12:3.5.7` `availableNow` stream into Delta. Bronze kept all 24 deliveries (24 distinct offsets and delivery IDs). Dedup by source identity gave quantity 210 = expected. A checkpoint rerun ingested 0 new rows. Duration 19.2 s. `evidence/kafka-smoke.json`. Scope: compatibility only, not the replay pipeline.
+
 ## Correctness decisions
 
 - Line identity = sha256(source checksum | sheet | row). Only repeat deliveries of the same source identity deduplicate.
@@ -74,7 +76,7 @@ Wrap long runs with `scripts/run_evidence.py <label> --container <name> -- <comm
 
 ## Remaining work (next: Gate 3)
 
-1. **Gate 3.** Start `kafka` (compose profile `replay`, 600 MB limit). Then build:
+1. **Gate 3.** The broker and connector are verified (see the Kafka smoke above). Build:
    - A deterministic accelerated replay producer with speed, pause/resume, and source vs replay time.
    - A Spark Structured Streaming consumer into the Bronze envelope.
    - An idempotent Silver MERGE keyed on line identity, with a revision for corrections.
