@@ -212,6 +212,8 @@ export function Network({ nodes, edges, onSelect, selected }: { nodes: { id: str
   }, [nodes, edges]);
   useEffect(() => { sim.s.on('tick.render', () => tick(t => t + 1)); return () => { sim.s.stop(); }; }, [sim]);
   const focus = hover ?? selected ?? null;
+  // Label only the best-supported products until something is focused, so names stay legible.
+  const labelled = useMemo(() => new Set([...nodes].sort((a, b) => b.support - a.support).slice(0, 9).map(n => n.id)), [nodes]);
   const linked = new Set<string>();
   if (focus) sim.es.forEach(e => { const a = (e.source as NNode).id, b = (e.target as NNode).id; if (a === focus || b === focus) { linked.add(a); linked.add(b); } });
   const dragging = useRef<NNode | null>(null);
@@ -228,7 +230,7 @@ export function Network({ nodes, edges, onSelect, selected }: { nodes: { id: str
         onPointerEnter={() => setHover(n.id)} onPointerLeave={() => setHover(null)} onPointerDown={e => { e.stopPropagation(); dragging.current = n; }}
         onClick={e => { e.stopPropagation(); onSelect?.(n.id === selected ? null : n.id); }}>
         <circle r={r} fill={n.id === focus ? 'var(--signal)' : 'var(--sky)'} opacity={n.id === focus ? 1 : .8} />
-        {(n.id === focus || linked.has(n.id) || n.degree > 1 || n.support > .03) ? <text x={r + 4} y={4}>{(n.name || n.id).slice(0, 26).toLowerCase()}</text> : null}
+        {(focus ? n.id === focus || linked.has(n.id) : labelled.has(n.id)) ? <text x={r + 4} y={4}>{(n.name || n.id).slice(0, 26).toLowerCase()}</text> : null}
       </motion.g>; })}
   </svg>;
 }
