@@ -1,0 +1,70 @@
+{
+  "purpose": "Before publishing, history was rewritten to replace the author email with a GitHub noreply address and a local Windows username in evidence paths with USER. Evidence files recorded before the rewrite cite original_sha; the same commit is published as published_sha. Tree contents differ only in that username.",
+  "commits": [
+    {
+      "original_sha": "9b3ffb10c63ad3cf0983ec91695db22e0e0668d5",
+      "published_sha": "7f031f153b2c3f6b8468eddffc2e5ade34041276",
+      "subject": "Implement Gate 1 source provenance and Spark Delta vertical slice"
+    },
+    {
+      "original_sha": "1aa74ac7e76a589000e50c120286a11d8ad1f3a6",
+      "published_sha": "6333725680b584d0cc66d83a5eb07e8234489e8c",
+      "subject": "Verify source slice and fixture; preserve immutable model lineage"
+    },
+    {
+      "original_sha": "7d96348970a67df32dc9cc78c0d0bedcecc42689",
+      "published_sha": "455232f1ed5b44e18bfbaf0a596c38446a79d33a",
+      "subject": "Verify Gate 1 browser flows and lock container dependencies"
+    },
+    {
+      "original_sha": "f5edd2c1768a51436192a26f39397ddd1b9903a7",
+      "published_sha": "6dbb3d241b491d3cfd7bce6a06d72ca472ac8182",
+      "subject": "Record completed Gate 1 and begin full-history validation"
+    },
+    {
+      "original_sha": "2939649a2dc674b051a9e5452eb3094785d3c083",
+      "published_sha": "691e20e242dcf4e39fdba2cbd82d5f5983e5a67f",
+      "subject": "Add full-history Gold dimensions, coverage marts and DuckDB baseline"
+    },
+    {
+      "original_sha": "5b617f3f9283d812eb0fb2d9206abd3c574ef27a",
+      "published_sha": "36b92e069871588a35d2d933760a99e3394a6b52",
+      "subject": "Complete Gate 2: verified full-history model, DuckDB baseline, EDA and findings"
+    },
+    {
+      "original_sha": "3e7afbfa268e715f128e9f32032eb1edd3019ac0",
+      "published_sha": "f5178f59192a263c1f638b1fdc2f37b9a9fe2a80",
+      "subject": "Verify real Kafka -> Spark Structured Streaming -> Delta path"
+    },
+    {
+      "original_sha": "98bbe6fcbde3dfd256a0c9937d079f7787808433",
+      "published_sha": "915808894c2fff6007e9f6c0405b132537ada501",
+      "subject": "Gate 3 core: Kafka replay, incidents, idempotent foreachBatch, backfill and guarded publish"
+    },
+    {
+      "original_sha": "a19f48b9e2559dd5e4e1c82b758c5cdf4d95c382",
+      "published_sha": "b4311f070db299aefd5833fba3528a957cd15fa8",
+      "subject": "Gates 3-4: operable recovery demo, forecasting views, Databricks and Power BI packages"
+    },
+    {
+      "original_sha": "4b2174bd69a7bf9a3e92dabc19d45d8fd2b9abc0",
+      "published_sha": "49eb1b51f0f43ef2af020008ba7d07bae3243159",
+      "subject": "Gate 5: full Kafka replay, 10.7M synthetic scale run, benchmarks and delivery docs"
+    },
+    {
+      "original_sha": "698f427b878b20289edc74e29c53a7f03193ca0a",
+      "published_sha": "05818ef4e977c6e0ff6a6f46c19dd4d47572a065",
+      "subject": "Serve snapshots from a checksum-verified local cache; benchmark query latency"
+    },
+    {
+      "original_sha": "d47da4efa4d8799ee22e452f39c7527c41c6a75d",
+      "published_sha": "f197f4488b32cc5df9b04570d2aa9bcf31fe4386",
+      "subject": "Complete Gates 5-6: final verification, robustness fixes and delivery records"
+    },
+    {
+      "original_sha": "74efc1eab7c27f10400367b7dd57daeba9f065b7",
+      "published_sha": "8a867676ffb1beb4a545db61a173a08722e9f3fd",
+      "subject": "Add a static read-only showcase build and an expanded resume metrics bank"
+    }
+  ]
+}
