@@ -6,6 +6,8 @@ A portfolio case study. The client, a UK online retailer whose invoice exports, 
 
 Everything runs locally and free: no cloud account, trial, API credit or GPU.
 
+**Live read-only showcase: [meridian-chi-ivory.vercel.app](https://meridian-chi-ivory.vercel.app).** This is the real UI, serving responses recorded verbatim from the local stack (`scripts/record_showcase.py`), including a real incident-and-repair run. Spark, Kafka, DuckDB and the worker do not run on Vercel, so filters and live controls need the local setup below. Build it with `npm --prefix frontend run build:showcase`.
+
 | | |
 |---|---|
 | Business answers | [Client case study](docs/case-study.md) · [EDA findings](docs/findings.md) · [Forecasting](docs/forecasting.md) |
