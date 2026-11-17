@@ -130,3 +130,26 @@ export interface ReplayState {
 }
 export interface CorrectionData { snapshot_id: string; batch_reference_snapshot: string; batch_net_recorded_gbp: string; metrics: Record<string, string>; reconciliation: Reconciliation;
   lines: { line_id: string; revision: number; mode: string; incident: string | null; source_sheet: string; source_row: number; quantity: string; unit_price: string; line_amount: string; first_batch_id: string; is_current: boolean }[] }
+export interface Segment { cluster: number; segment: string; customers: number; median_recency_days: number; median_frequency: number; median_monetary_gbp: number; total_monetary_gbp: number; share_of_customers: number; share_of_value: number; mean_return_probability: number }
+export interface Rule { lhs: string; lhs_name: string; rhs: string; rhs_name: string; n_ab: number; support: number; confidence: number; lift: number }
+export interface Anomaly { date: string; net: number; expected: number; z: number; invoices: number; direction: 'spike' | 'drop'; drivers: { invoice: string; stock_code: string; description: string; customer_id: string | null; country: string; line_amount: number }[]; top_customer: { customer_id: string; share: number } }
+export interface Insights {
+  state: string; message?: string; version: string; generated_at: string; seed: number; input: { kind: string; path: string; sha256?: string };
+  population: { identified_positive_lines: number; identified_buyers: number; identified_positive_gbp: number };
+  segmentation: { method: string; reference_day: string; customers: number; k: number; k_trials: { k: number; inertia: number; silhouette: number }[]; segments: Segment[]; scatter: { r: number; f: number; m: number; s: string }[] };
+  basket: { method: string; invoices: number; frequent_items: number; rules_found: number; rules: Rule[]; graph: { nodes: { id: string; name: string; degree: number; support: number }[]; edges: { source: string; target: string; lift: number; support: number }[] } };
+  return_model: { question: string; design: { train_cutoff: string; test_cutoff: string; train_label_window: string[]; test_label_window: string[]; leakage_guard: string; train_customers: number; test_customers: number; train_base_rate: number; test_base_rate: number };
+    features: string[]; models: Record<string, { auc: number; brier: number | null; roc: { fpr: number; tpr: number }[] }>; selected: string;
+    importance: { feature: string; auc_drop: number; std: number }[]; deciles: { decile: number; customers: number; mean_predicted: number; observed_rate: number; cumulative_capture: number }[];
+    limitations: string[]; value_at_risk: { rule: string; customers: number; historical_value_gbp: number; by_segment: Record<string, number> } };
+  anomalies: { method: string; threshold: number; series: { date: string; net: number; expected: number | null; z?: number; invoices: number }[]; anomalies: Anomaly[] };
+  statistics: {
+    weekday: { test: string; H: number; p_value: number; k: number; n_days: number; epsilon_squared: number; by_weekday: { dow: number; days: number; median_net: number; mean_net: number }[]; note: string };
+    heatmap: { dow: number; hour: number; net: number; invoices: number }[];
+    invoice_value: { test: string; U: number; p_value: number; median_y1: number; median_y2: number; mean_y1: number; mean_y2: number; invoices_y1: number; invoices_y2: number; mean_diff_ci95: [number, number]; note: string };
+    pareto: Record<'products' | 'customers', { count: number; gini: number; top_20pct_share: number; curve: { x: number; y: number }[] }>;
+    monthly: { month: string; net: number; invoices: number; customers: number }[];
+  };
+  product_names?: Record<string, string>;
+  timings_seconds: Record<string, number>;
+}

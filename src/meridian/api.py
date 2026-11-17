@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -109,7 +110,7 @@ def overview(country: str | None = None, start: date | None = None, end: date | 
         metrics = rows(con, metrics_query("selected"))[0]
         metrics["accepted_rows"] = con.execute("SELECT count(*) FROM selected").fetchone()[0]
         daily = rows(con, "SELECT date, sum(CASE WHEN line_amount>0 THEN line_amount ELSE 0 END) AS gross_positive_gbp, sum(CASE WHEN line_amount<0 THEN line_amount ELSE 0 END) AS negative_adjustments_gbp, sum(line_amount) AS net_recorded_gbp, sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM selected GROUP BY date ORDER BY date")
-        products = rows(con, "SELECT stock_code,max(description) AS description,sum(line_amount) AS net_recorded_gbp,sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM selected GROUP BY stock_code ORDER BY net_recorded_gbp DESC LIMIT 15")
+        products = rows(con, "SELECT stock_code,coalesce(mode(CASE WHEN quantity>0 THEN description END),max(description)) AS description,sum(line_amount) AS net_recorded_gbp,sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM selected GROUP BY stock_code ORDER BY net_recorded_gbp DESC LIMIT 15")
         countries = rows(con, "SELECT country,sum(line_amount) AS net_recorded_gbp,count(*) AS rows FROM selected GROUP BY country ORDER BY net_recorded_gbp DESC")
         cohorts = []
         snapshot_folder = local_snapshot(DATA / "serving" / "snapshots" / manifest["id"])
@@ -177,6 +178,76 @@ def forecasts():
         data = read_json(inventory)
         result["inventory"] = {k: data.get(k) for k in ["label", "selected_model", "assumptions", "base_scenario", "lowest_cost_policy_counts", "sensitivity", "limitations", "episodes"]}
     return result
+
+
+ASK_SPEC = ROOT / "frontend" / "shared" / "ask.json"
+ASK_SCHEMA = {"type": "object", "additionalProperties": False, "required": ["answerable", "sql", "explanation", "chart"],
+              "properties": {"answerable": {"type": "boolean"}, "sql": {"type": "string"}, "explanation": {"type": "string"},
+                             "chart": {"type": "string", "enum": ["line", "bar", "table"]}}}
+_FORBIDDEN_SQL = re.compile(r"\b(copy|attach|detach|install|load|pragma|set|reset|create|insert|update|delete|drop|alter|export|import|call|checkpoint|vacuum|read_csv\w*|read_json\w*|read_parquet|read_text|read_blob|glob|httpfs)\b", re.I)
+
+
+def check_sql(sql: str) -> str | None:
+    """Python twin of frontend/shared/sqlguard.ts: one read-only statement."""
+    text = sql.strip().rstrip(";").strip()
+    if not text:
+        return "Empty query."
+    if len(text) > 4000:
+        return "Query is too long."
+    if ";" in text:
+        return "Only one statement is allowed."
+    if not re.match(r"^(select|with|from)\b", text, re.I):
+        return "Only SELECT queries are allowed."
+    bad = _FORBIDDEN_SQL.search(re.sub(r"'(?:[^']|'')*'", "''", text))
+    return f'"{bad.group(0)}" is not allowed in the SQL Lab.' if bad else None
+
+
+@app.post("/api/ask")
+def ask(body: dict):
+    """Natural-language question -> one read-only SELECT. Returns SQL only; the browser executes it."""
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise HTTPException(501, "AI translation is not configured (set ANTHROPIC_API_KEY). Curated queries still work.")
+    question = str(body.get("question", "")).strip()
+    if not question or len(question) > 300:
+        raise HTTPException(400, "Ask a question of 1-300 characters.")
+    import anthropic
+    spec = read_json(ASK_SPEC)
+    system = f"{spec['system']}\n\n{spec['schema']}\n\nExamples:\n" + "\n\n".join(f"Q: {e['q']}\nSQL: {e['sql']}\nchart: {e['chart']}" for e in spec["examples"])
+    client = anthropic.Anthropic()
+    try:
+        response = client.beta.messages.create(
+            model=os.environ.get("MERIDIAN_ASK_MODEL", "claude-opus-5-5"), max_tokens=4000,
+            betas=["server-side-fallback-2026-07-01"], fallbacks="default",
+            output_config={"effort": "low", "format": {"type": "json_schema", "schema": ASK_SCHEMA}},
+            system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
+            messages=[{"role": "user", "content": question}])
+    except anthropic.RateLimitError:
+        raise HTTPException(429, "The AI service is rate limited. Try again shortly.")
+    except anthropic.AuthenticationError:
+        raise HTTPException(501, "The AI service key is invalid.")
+    except anthropic.APIStatusError as error:
+        raise HTTPException(502, f"AI service error ({error.status_code}).")
+    except anthropic.APIConnectionError:
+        raise HTTPException(502, "AI service unreachable.")
+    if response.stop_reason == "refusal":
+        raise HTTPException(422, "The model declined this question.")
+    if response.stop_reason == "max_tokens":
+        raise HTTPException(502, "The model ran out of room before finishing. Try a simpler question.")
+    text = next((b.text for b in response.content if b.type == "text"), None)
+    if text is None:
+        raise HTTPException(502, "No answer returned.")
+    out = json.loads(text)
+    if out["answerable"] and (problem := check_sql(out["sql"])):
+        raise HTTPException(422, f"Generated SQL was rejected: {problem}")
+    return {**out, "model": response.model, "source": "claude"}
+
+
+@app.get("/api/insights")
+def insights():
+    path = ROOT / "analysis" / "insights" / "insights.json"
+    if not path.exists():
+        return {"state": "not_executed", "message": "Run python -m meridian.cli insights to produce customer, basket and statistical insights."}
+    return read_json(path)
 
 
 def _jsonl(path, limit=None):

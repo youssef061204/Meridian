@@ -1,0 +1,58 @@
+{
+  "method": "Fallback source path when archive.ics.uci.edu is unreachable.",
+  "marker": "mirror-reconstruction-v1",
+  "inputs": {
+    "sheet_2009_2010_csv_sha256": "199cec36dec7c61060004c33a9ae83bb495a55f00dbe6e7657a48b2f3fc141d2",
+    "sheet_2010_2011_xlsx_sha256": "43465a06f2ccf7c8b5bd2892bc7defb52f97487934fe93b16ae4c3936424676d"
+  },
+  "output_parquet_sha256": "04c56a89c3c101a07cc6003048604f724fb40bd46980786e0650ef36eb1fbbef",
+  "rows_per_sheet": {
+    "Year 2009-2010": 525461,
+    "Year 2010-2011": 541909
+  },
+  "observed": {
+    "source_rows": 1067370,
+    "accepted_rows": 1061664,
+    "excluded_rows": 5700,
+    "quarantined_rows": 6,
+    "gross_positive_gbp": "20112074.02",
+    "negative_adjustments_gbp": "-732828.20",
+    "net_recorded_gbp": "19379245.82"
+  },
+  "pinned": {
+    "source_rows": 1067371,
+    "accepted_rows": 1061664,
+    "excluded_rows": 5701,
+    "quarantined_rows": 6,
+    "gross_positive_gbp": "20112074.02",
+    "negative_adjustments_gbp": "-732828.20",
+    "net_recorded_gbp": "19379245.82"
+  },
+  "differences": {
+    "source_rows": {
+      "pinned": 1067371,
+      "observed": 1067370
+    },
+    "excluded_rows": {
+      "pinned": 5701,
+      "observed": 5700
+    }
+  },
+  "accepted_lines_exact": true,
+  "excluded_by_code": {
+    "ADJUST": 67,
+    "ADJUST2": 3,
+    "AMAZONFEE": 43,
+    "B": 1,
+    "BANK CHARGES": 102,
+    "C2": 282,
+    "CRUK": 16,
+    "D": 177,
+    "DOT": 1446,
+    "M": 1425,
+    "POST": 2121,
+    "TEST001": 15,
+    "TEST002": 2
+  },
+  "note": "Gate: accepted rows, quarantine and every GBP total must match the pinned Spark run exactly. Row-count differences confined to excluded non-merchandise codes are recorded, not hidden."
+}
