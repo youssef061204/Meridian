@@ -56,6 +56,7 @@ def main() -> None:
     for metric in METRICS:
         save(f"lineage-{metric}", get(f"/api/lineage?metric={metric}&limit=50"))
     save("forecasts", get("/api/forecasts"))
+    save("insights", get("/api/insights"))
     save("trust", get("/api/trust"))
     record_replay("baseline")
     jobs = {"incident": run_job("incident")}

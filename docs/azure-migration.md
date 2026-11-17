@@ -25,6 +25,8 @@ pages.
 | Power BI Gold exports, relationships, DAX, SQL-computed reconciliation targets | exports and targets **verified-local**; DAX **prepared, never run** | `evidence/powerbi-export.json`, `powerbi/` |
 | Native Power BI report | **unfinished** (Power BI Desktop not installed) | `powerbi/SETUP.md` |
 | ADLS Gen2, Azure Databricks, Unity Catalog, Event Hubs, Key Vault, private networking, Power BI service / Fabric | **planned** (this document) | none |
+| Low-cost deployable footprint: ADLS Gen2 + Synapse serverless SQL (no dedicated or Spark pools), optional Event Hubs Kafka endpoint (off by default), resource-group budget alert, Entra-ID-only storage access | **prepared, not compiled or deployed** | `infra/azure/main.bicep`, `scripts/azure_publish.sh` |
+| Synapse serverless views over Gold Parquet, with the £19,379,245.82 reconciliation query | **prepared, never executed** | `synapse/serverless_views.sql` |
 | Any verified-cloud capability | **none** | none |
 
 ## 2. Component mapping

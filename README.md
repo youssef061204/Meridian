@@ -6,14 +6,20 @@ A portfolio case study. The client, a UK online retailer whose invoice exports, 
 
 Everything runs locally and free: no cloud account, trial, API credit or GPU.
 
-**Live read-only showcase: [meridian-chi-ivory.vercel.app](https://meridian-chi-ivory.vercel.app).** This is the real UI, serving responses recorded verbatim from the local stack (`scripts/record_showcase.py`), including a real incident-and-repair run. Spark, Kafka, DuckDB and the worker do not run on Vercel, so filters and live controls need the local setup below. Build it with `npm --prefix frontend run build:showcase`.
+**Live showcase: [meridian-chi-ivory.vercel.app](https://meridian-chi-ivory.vercel.app).** This is the real UI, serving responses recorded verbatim from the local stack (`scripts/record_showcase.py`), including a real incident-and-repair run. On the public site:
+- **Filters** run live in your browser with DuckDB-WASM over the validated accepted lines.
+- **The SQL Lab** runs live in the browser the same way.
+- **"Ask the data"** turns plain English into SQL through Claude when the deployment has an `ANTHROPIC_API_KEY`, and falls back to curated queries when it doesn't.
+- **Spark, Kafka and the worker** still run only locally.
+
+Build it with `npm --prefix frontend run build:showcase`.
 
 | | |
 |---|---|
-| Business answers | [Client case study](docs/case-study.md) · [EDA findings](docs/findings.md) · [Forecasting](docs/forecasting.md) |
+| Business answers | [Client case study](docs/case-study.md) · [EDA findings](docs/findings.md) · [Customer, basket & statistical insights](docs/insights.md) · [Forecasting](docs/forecasting.md) |
 | How it works | [Architecture](docs/architecture.md) · [Data contracts](docs/data-contracts.md) · [Metric dictionary](docs/metrics.md) · [Gold data model](docs/data-model.md) |
 | Demo and interview | [Two-minute demo script](docs/demo-script.md) · [Interview guide](docs/interview-guide.md) · [Resume bullets](docs/resume-bullets.md) |
-| Microsoft / Databricks | [Azure migration design](docs/azure-migration.md) · [Databricks bundle](databricks/README.md) · [Power BI setup](powerbi/SETUP.md) |
+| Microsoft / Databricks | [Azure migration design](docs/azure-migration.md) · [Low-cost Azure Bicep](infra/azure/main.bicep) · [Synapse serverless views](synapse/serverless_views.sql) · [Databricks bundle](databricks/README.md) · [Power BI setup](powerbi/SETUP.md) |
 | Status and evidence | [HANDOFF.md](HANDOFF.md) · [evidence/gates.json](evidence/gates.json) · [evidence/benchmarks.json](evidence/benchmarks.json) |
 
 ## What it does
@@ -23,6 +29,16 @@ Everything runs locally and free: no cloud account, trial, API credit or GPU.
 - **A deliberately unsafe calculation,** shown beside the trusted number and never served, to explain why the client's dashboards disagree.
 - **Honest forecasting.** 7- and 28-day observed-sales forecasts, evaluated on rolling origins with an untouched test month and a leakage test. Clearly labelled inventory scenarios are SIMULATED.
 - **A fair DuckDB-only baseline** on the same SQL, and an explanation of when you should just use it.
+- **Customer analytics and data mining.**
+  - RFM segmentation with k-means; k is chosen by silhouette.
+  - A time-split repeat-purchase model: test AUC 0.793 against 0.762 for a recency rule, with a leakage test.
+  - Market-basket association rules with an interactive product network.
+- **Statistics.** Robust anomaly detection that explains each flagged day by its driving invoice lines, plus Kruskal–Wallis, Mann–Whitney with a bootstrap CI, and Gini/Pareto concentration.
+- **SQL Lab in the browser.** DuckDB-WASM over 1.06M accepted lines, natural language → SQL through Claude, a read-only SQL guard, and CSV export.
+- **A deployable low-cost Azure footprint (prepared).**
+  - ADLS Gen2 and Synapse *serverless* SQL only, so idle cost is zero.
+  - An optional Event Hubs Kafka endpoint, off by default.
+  - A budget alert, plus views that re-check the £19,379,245.82 reconciliation.
 
 ## Run it
 
@@ -63,6 +79,7 @@ Stop everything with `docker compose --profile replay down`. Data in `data/` per
 python -m meridian.analysis --snapshot <full snapshot id> --notebook   # EDA notebook + findings
 python -m meridian.cli forecast                                       # rolling-origin evaluation
 python -m meridian.cli inventory                                      # SIMULATED scenarios
+python -m meridian.cli insights                                       # segments, basket rules, return model, anomalies, tests, browser marts
 python -m pytest -q                                                   # business, API, forecast tests
 python tests/check_full_snapshot.py                                   # independent full-data check
 docker compose run --rm --no-deps tools python -m meridian.cli replay-drill   # fault-injection drill
@@ -82,7 +99,9 @@ docker compose run --rm --no-deps tools python -m meridian.cli replay-drill   # 
 | Synthetic scale run (10,673,710 rows) | Spark 355.6 s at the 2.3 GiB container ceiling; DuckDB 123.3 s (1.4 GB cap + spill); exact equivalence on 10,616,640 lines. The first two DuckDB attempts ran out of memory and are retained. | [benchmarks.json](evidence/benchmarks.json) → `synthetic_scale` |
 | Query latency (full snapshot) | API warm p50: overview 315 ms, lineage 301 ms, trust 79 ms. Pre-aggregated daily mart 23.4× faster (p50) than a fact scan, with identical results. | [benchmark-queries.json](evidence/benchmark-queries.json), [api-serving-optimization.json](evidence/api-serving-optimization.json) |
 | Forecasting | Promoted on validation only; untouched-test WAPE vs seasonal naive −3.1% (7 d) / −14.8% (28 d) aggregate; 80% intervals under-cover in validation | [forecast-run.json](evidence/forecast-run.json) |
-| Tests | 46 pytest tests (business oracle, API, forecast leakage, inventory) plus a Spark fixture oracle | `python -m pytest -q`, [fixture-batch.json](evidence/fixture-batch.json) |
+| Customer & statistical insights | k = 4 segments (Champions: 20% of buyers, 73% of value); repeat-purchase AUC 0.793 on an untouched window; 940 basket rules (top lift 48×); 17 anomalous days with drivers; full run 17 s. Computed from a two-mirror rebuild whose accepted lines and GBP totals match the pinned run exactly (see [docs/insights.md](docs/insights.md)) | [analysis/insights/insights.json](analysis/insights/insights.json), [mirror-reconstruction.json](evidence/mirror-reconstruction.json) |
+| Browser marts | 5.9 MB gzip CSV; the export asserts the browser SQL reproduces 1,061,664 lines and £19,379,245.82 exactly. In-browser Germany filter £379,900.91 = recorded country total | `browser_marts` in insights.json |
+| Tests | 65 pytest tests (business oracle, API, forecast leakage, inventory, insights oracles and leakage, SQL guard and ask contract) plus a Spark fixture oracle; CI runs pytest and the web build | `python -m pytest -q`, [fixture-batch.json](evidence/fixture-batch.json) |
 | Clean checkout | Fresh clone followed the README: locked build, download and convert, fixture oracle, demo batch, UI build, API serving £69,754.43 (full batch and Kafka steps verified in the working copy) | [clean-checkout.json](evidence/clean-checkout.json) |
 
 All measurements were taken on one machine: an i7-14700HX laptop (28 logical CPUs, 16 GB RAM) running Docker Desktop on WSL2, with Spark `local[2]`. They are not cluster or cloud benchmarks.
@@ -94,5 +113,10 @@ All measurements were taken on one machine: an i7-14700HX laptop (28 logical CPU
 - **Not live.** Replay is not a live integration. Synthetic incident and scale-test events are never observed sales.
 - **Forecast caveats.** Forecasts are of observed sales, not unconstrained demand. Their 80% intervals under-covered in validation.
 - **Simulated savings only.** Inventory "savings" are simulated under stated assumptions; the winning policy changes with the cost ratio.
-- **Nothing ran in Azure, Databricks or Power BI.** The notebooks, bundle and DAX are prepared; the native report is unfinished.
+- **Nothing ran in Azure, Databricks or Power BI.**
+  - The notebooks, bundle, DAX, Bicep template and Synapse views are prepared.
+  - The Bicep template has not been compiled here; run `az bicep build` first.
+  - The native Power BI report is unfinished.
+- **Insights came from a mirror rebuild.** The UCI host was unreachable when they were computed. The rebuild matches every accepted line and GBP total but has one fewer excluded row. Line identities differ from the pinned snapshot, so insights are not joined to snapshot lineage. Re-run `meridian.cli insights` against the pinned snapshot to replace them.
+- **The AI endpoint was not exercised against a live key here.** The request shape was checked, and it reached the API and failed at authentication with a dummy key. On Vercel, set `ANTHROPIC_API_KEY`, and optionally `MERIDIAN_ASK_MODEL` (default `claude-opus-5-5`). The function only returns SQL; queries execute in the viewer's browser.
 - **Local-only controls.** The demo controls and Kafka are loopback-only and must not be exposed.

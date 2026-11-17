@@ -19,11 +19,11 @@ function BandChart({ points, comparison, label }: { points: ForecastPoint[]; com
     ? `M${points.map((p, i) => `${x(i).toFixed(1)},${y(p.upper as number).toFixed(1)}`).join(' L')} L${[...points].reverse().map((p, j) => `${x(points.length - 1 - j).toFixed(1)},${y(p.lower as number).toFixed(1)}`).join(' L')} Z` : '';
   const ticks = [0, max / 2, max];
   return <div className="chart-wrap"><svg className="sales-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
-    {ticks.map((t, i) => <g key={i}><line x1={left} x2={width - right} y1={y(t)} y2={y(t)} stroke="#e7ece9" /><text x={left - 10} y={y(t) + 4} textAnchor="end">{fmt(t)}</text></g>)}
-    {band ? <path d={band} fill="#3d8981" opacity=".14" /> : null}
-    {comparison ? <path d={line(comparison, 'prediction')} fill="none" stroke="#b08a4a" strokeWidth="1.6" strokeDasharray="5 4" /> : null}
-    <path d={line(points, 'prediction')} fill="none" stroke="#2e7770" strokeWidth="2.2" />
-    {points.map((p, i) => p.actual != null && p.available !== false ? <circle key={p.date} cx={x(i)} cy={y(p.actual)} r="3" fill="#243b3a" /> : p.available === false ? <line key={p.date} x1={x(i)} x2={x(i)} y1={height - bottom - 6} y2={height - bottom} stroke="#c9a46a" strokeWidth="2" /> : null)}
+    {ticks.map((t, i) => <g key={i}><line x1={left} x2={width - right} y1={y(t)} y2={y(t)} stroke="var(--line)" strokeDasharray="2 4" /><text x={left - 10} y={y(t) + 4} textAnchor="end">{fmt(t)}</text></g>)}
+    {band ? <path d={band} fill="var(--signal)" opacity=".16" /> : null}
+    {comparison ? <path d={line(comparison, 'prediction')} fill="none" stroke="var(--amber)" strokeWidth="1.6" strokeDasharray="5 4" /> : null}
+    <path d={line(points, 'prediction')} fill="none" stroke="var(--signal)" strokeWidth="2.2" />
+    {points.map((p, i) => p.actual != null && p.available !== false ? <circle key={p.date} cx={x(i)} cy={y(p.actual)} r="3" fill="var(--text)" /> : p.available === false ? <line key={p.date} x1={x(i)} x2={x(i)} y1={height - bottom - 6} y2={height - bottom} stroke="var(--amber)" strokeWidth="2" /> : null)}
     <text x={left} y={height - 8}>{points[0].date}</text><text x={width - right} y={height - 8} textAnchor="end">{points[points.length - 1].date}</text>
   </svg></div>;
 }

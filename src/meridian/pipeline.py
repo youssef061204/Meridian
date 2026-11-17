@@ -118,7 +118,7 @@ def batch(profile="demo", fail_at=None):
             fact = silver.filter("disposition = 'accepted'")
             fact.createOrReplaceTempView("fact_invoice_line")
             tables = {"fact_invoice_line": fact, "daily_sales": sql(spark, "daily_sales.sql"),
-                "product_performance": spark.sql("SELECT stock_code, max(description) AS description, sum(line_amount) AS net_recorded_gbp, sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM fact_invoice_line GROUP BY stock_code"),
+                "product_performance": spark.sql("SELECT stock_code, coalesce(mode(CASE WHEN quantity>0 THEN description END), max(description)) AS description, sum(line_amount) AS net_recorded_gbp, sum(CASE WHEN quantity>0 THEN quantity ELSE 0 END) AS positive_units FROM fact_invoice_line GROUP BY stock_code"),
                 "country_performance": spark.sql("SELECT country, sum(line_amount) AS net_recorded_gbp, count(*) AS rows FROM fact_invoice_line GROUP BY country")}
             if profile == "full":
                 from .gold import build_gold

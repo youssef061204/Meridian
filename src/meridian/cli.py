@@ -46,6 +46,10 @@ def main():
     sub.add_parser("worker")
     sub.add_parser("forecast", help="Rolling-origin forecasting evaluation (Gate 4)")
     sub.add_parser("inventory", help="SIMULATED inventory scenarios from held-out forecasts")
+    ins = sub.add_parser("insights", help="Segmentation, market basket, return model, anomalies and statistical tests")
+    ins_src = ins.add_mutually_exclusive_group()
+    ins_src.add_argument("--fact", help="glob of a published fact_invoice_line snapshot (default: the current serving snapshot)")
+    ins_src.add_argument("--converted", help="converted source Parquet, run through sql/silver.sql")
     job = sub.add_parser("job", help="Enqueue an allow-listed demo job for the worker")
     job.add_argument("kind", choices=["incident", "repair", "reset", "interrupted-publish"])
     args = parser.parse_args()
@@ -101,6 +105,14 @@ def main():
     elif args.command == "worker":
         from .worker import worker
         worker()
+    elif args.command == "insights":
+        from . import insights
+        from .common import DATA, read_json
+        fact = args.fact
+        if not fact and not args.converted:
+            fact = (DATA / "serving" / "snapshots" / read_json(DATA / "serving" / "current.json")["snapshot_id"] / "fact_invoice_line" / "*.parquet").as_posix()
+        result = insights.run(fact, args.converted)
+        show({"state": result["state"], "timings_seconds": result["timings_seconds"]})
     elif args.command in ("forecast", "inventory"):
         import importlib
         importlib.import_module(f"meridian.{args.command}").main([])
