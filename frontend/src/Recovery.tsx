@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { CorrectionData, ReplayState, Job } from './types';
+import { SHOWCASE, showcaseAllows } from './showcase';
 
 const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 2 });
 const integer = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 });
@@ -59,8 +60,8 @@ export function RecoveryPanel() {
       </div></section>
 
     <section className="panel"><div className="panel-heading"><div><span className="eyebrow">CONTROLLED LOCAL INCIDENT · DEMO ONLY</span><h2>Inject, contain, recover</h2></div><span className="small-muted">{data.controls_enabled ? 'Allow-listed jobs · loopback API only' : 'Controls disabled'}</span></div>
-      <div className="action-grid">{ACTIONS.map(a => <div key={a.kind} className="action"><button className={a.kind === 'reset' ? 'button-secondary' : 'button-primary'} disabled={!!active || busy || !workerReady || !data.controls_enabled} onClick={() => run(a.kind)}>{a.label}</button><p>{a.help}</p></div>)}</div>
-      {!workerReady ? <p className="panel-footnote">The worker is not running, so controls are disabled.</p> : null}
+      <div className="action-grid">{ACTIONS.map(a => <div key={a.kind} className="action"><button className={a.kind === 'reset' ? 'button-secondary' : 'button-primary'} disabled={!!active || busy || !workerReady || !data.controls_enabled || (SHOWCASE && !showcaseAllows(a.kind))} onClick={() => run(a.kind)}>{a.label}</button><p>{a.help}</p></div>)}</div>
+      {SHOWCASE ? <p className="panel-footnote">Showcase: these buttons replay the recorded responses of a real incident and repair run on the local stack. Interrupt a publish is available only locally.</p> : !workerReady ? <p className="panel-footnote">The worker is not running, so controls are disabled.</p> : null}
       {latestJob ? <JobProgress job={latestJob} /> : null}</section>
 
     {status ? <div className="two-column compare-cards">

@@ -51,3 +51,7 @@
 @media(max-width:1200px){.action-grid{grid-template-columns:repeat(2,1fr)}.replay-status{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.action-grid,.replay-status{grid-template-columns:1fr;padding-left:16px;padding-right:16px}.job-progress,.timeline{margin-left:16px;margin-right:16px}.big-number{font-size:24px;padding-left:16px}.inner-tables{padding:0 16px 14px}.segmented button{padding:7px 8px;font-size:9px}}
 .section-title{margin:34px 0 16px;font-size:22px}
+/* Public read-only showcase build */
+.filter-fields{display:contents;border:0;margin:0;padding:0}.filter-fields:disabled button,.filter-fields:disabled select,.filter-fields:disabled input{cursor:not-allowed}
+.showcase-banner{display:flex;align-items:baseline;gap:12px;background:#e4edf5;border:1px solid #cfdeeb;border-radius:4px;padding:12px 15px;margin:0 0 22px;font-size:10px;color:#385e7e;line-height:1.7}.showcase-banner strong{font-weight:600;white-space:nowrap}.showcase-banner a{font-weight:600}
+@media(max-width:950px){.showcase-banner{flex-direction:column;gap:3px}}
